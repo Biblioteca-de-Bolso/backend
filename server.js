@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
-const sequelize = require("./src/services/sequelize");
+const sequelize = require("./src/modules/sequelize");
 
 // Configuração das Variáveis de Ambiente
 dotenv.config({ path: ".env" });
