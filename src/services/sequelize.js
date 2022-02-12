@@ -18,7 +18,7 @@ const dbConfig = {
 };
 
 // Cria Instância de Conexão com o Banco de Dados
-const sequelize = new Sequelize(process.env.DB_DATABASE_URI, dbConfig);
+const sequelize = new Sequelize(process.env.DATABASE_URL, dbConfig);
 
 // Exporta uma instância do sequelize que servirá de interface para as conexões
 module.exports = sequelize;
