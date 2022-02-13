@@ -14,44 +14,35 @@ module.exports = {
       if (!token) {
         console.log(filename, "Nenhum token de autenticação informado");
 
-        return http.badRequest(
-          {
-            message: "Nenhum token de autenticação informado",
-          },
-          res
-        );
+        return http.badRequest(res, {
+          message: "Nenhum token de autenticação informado",
+        });
       }
 
       // Verificar validade do token informado
       const decoded = auth.verifyToken(token);
 
-      if (decoded) {
-        // Ĩnformações decodificadas
+      if (!decoded["error"]) {
+        // Informações decodificadas
         console.log(decoded);
 
         // Token validado, prosseguir com a requisição
         const response = await BookBusiness.list();
 
         // Retornar com resultado da operação
-        return http.ok(response.body, res);
+        return http.ok(res, response.body);
       } else {
         // Não foi possível validar o token
-        return http.unauthorized(
-          {
-            message: "É necessário estar autenticado para acessar essa informação",
-          },
-          res
-        );
+        return http.unauthorized(res, {
+          message: decoded["error"],
+        });
       }
     } catch (error) {
       console.log(filename, `Erro durante a listagem de livros: ${error.message}`);
 
-      return http.failure(
-        {
-          message: `Erro durante a listagem de livros: ${error.message}`,
-        },
-        res
-      );
+      return http.failure(res, {
+        message: `Erro durante a listagem de livros: ${error.message}`,
+      });
     }
   },
 };

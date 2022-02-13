@@ -18,28 +18,22 @@ module.exports = {
           "Para realizar login, é necessário informar um usuário e uma senha"
         );
 
-        return http.badRequest(
-          {
-            message: "Para realizar login, é necessário informar um usuário e uma senha",
-          },
-          res
-        );
+        return http.badRequest(res, {
+          message: "Para realizar login, é necessário informar um usuário e uma senha",
+        });
       }
 
       // Realiza procedimento de login
       const response = await UserBusiness.login(user, password);
 
       // Retorna resultado da operação
-      return http.ok(response.body, res);
+      return http.ok(res, response.body);
     } catch (error) {
       console.log(filename, `Erro durante o login: ${error.message}`);
 
-      return http.failure(
-        {
-          message: `Erro durante o login: ${error.message}`,
-        },
-        res
-      );
+      return http.failure(res, {
+        message: `Erro durante o login: ${error.message}`,
+      });
     }
   },
 };

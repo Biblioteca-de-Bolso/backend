@@ -1,5 +1,5 @@
 module.exports = {
-  ok(body, res = null) {
+  ok(res, body) {
     if (res) {
       return res.status(200).json(body);
     } else {
@@ -10,7 +10,7 @@ module.exports = {
     }
   },
 
-  created(body, res = null) {
+  created(res, body) {
     if (res) {
       return res.status(201).json(body);
     } else {
@@ -21,7 +21,7 @@ module.exports = {
     }
   },
 
-  badRequest(body, res = null) {
+  badRequest(res, body) {
     if (res) {
       return res.status(400).json(body);
     } else {
@@ -32,7 +32,7 @@ module.exports = {
     }
   },
 
-  failure(body, res = null) {
+  failure(res, body) {
     if (res) {
       return res.status(500).json(body);
     } else {
@@ -43,7 +43,7 @@ module.exports = {
     }
   },
 
-  unauthorized(body, res = null) {
+  unauthorized(res, body) {
     if (res) {
       return res.status(401).json(body);
     } else {

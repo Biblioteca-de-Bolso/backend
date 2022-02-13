@@ -5,8 +5,8 @@ const filename = __filename.slice(__dirname.length + 1) + " -";
 
 module.exports = {
   async list() {
-    return http.ok({
-      message: "ok"
+    return http.ok(null, {
+      message: "ok",
     });
   },
 };

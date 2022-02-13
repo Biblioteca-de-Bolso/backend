@@ -16,25 +16,22 @@ module.exports = {
         const token = auth.signToken(userId);
 
         // Retorar o token assinado
-        return http.ok({
+        return http.ok(null, {
           auth: true,
           token: token,
         });
-
       } else {
         console.log(filename, "Usuário ou senha incorretos");
-        
-        return http.unauthorized({
+
+        return http.unauthorized(null, {
           message: "Usuário ou senha incorretos",
         });
       }
     } catch (error) {
       console.log(filename, `Erro durante o login: ${error.message}`);
-      return http.failure({
+      return http.failure(null, {
         message: `Erro durante o login: ${error.message}`,
       });
     }
   },
-
-
 };
