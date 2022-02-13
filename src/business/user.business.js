@@ -10,16 +10,15 @@ module.exports = {
     try {
       if (user === "rhenan" && password === "123") {
         // Adquirir o ID do usuário do banco de dados
-        const userId = 123456789;
+        const payload = {
+          userId: 123456789,
+        };
 
-        // Assinar token de acesso
-        const token = auth.signToken(userId);
+        // Criar o token relacionado a esta operação de login
+        const token = auth.signToken(payload);
 
         // Retorar o token assinado
-        return http.ok(null, {
-          auth: true,
-          token: token,
-        });
+        return http.ok(null, token);
       } else {
         console.log(filename, "Usuário ou senha incorretos");
 

@@ -1,22 +1,28 @@
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const filename = __filename.slice(__dirname.length + 1) + " -";
 
 module.exports = {
-  signToken(userId) {
-    // Payload que será assinado no JWT
-    const payload = {
-      userId,
-    };
-
+  // Realiza assinatura de um token
+  signToken(payload) {
     // Realiza assinatura do token com base no payload e no token secret da aplicação
-    const token = jwt.sign(payload, process.env.TOKEN_SECRET, {
-      expiresIn: 300,
+    const accesToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
+      expiresIn: 60 * 5,
     });
 
-    return token;
+    // Criação de um novo refresh token
+    const refreshToken = crypto.randomBytes(64).toString("hex");
+
+    // Salvar o refrehs token no banco de dados
+    
+    return {
+      accesToken,
+      refreshToken,
+    };
   },
 
+  // Verifica validade de um token
   verifyToken(token) {
     try {
       return jwt.verify(token, process.env.TOKEN_SECRET);

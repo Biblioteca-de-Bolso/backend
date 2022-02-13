@@ -1,4 +1,8 @@
 module.exports = {
+  generic(res, payload) {
+    return res.status(payload.statusCode).json(payload.body);
+  },
+
   ok(res, body) {
     if (res) {
       return res.status(200).json(body);

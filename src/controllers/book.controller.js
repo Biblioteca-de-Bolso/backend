@@ -19,24 +19,21 @@ module.exports = {
         });
       }
 
-      // Verificar validade do token informado
+      // Validação do token informado
       const decoded = auth.verifyToken(token);
 
-      if (!decoded["error"]) {
-        // Informações decodificadas
-        console.log(decoded);
-
-        // Token validado, prosseguir com a requisição
-        const response = await BookBusiness.list();
-
-        // Retornar com resultado da operação
-        return http.ok(res, response.body);
-      } else {
+      if (decoded["error"]) {
         // Não foi possível validar o token
         return http.unauthorized(res, {
           message: decoded["error"],
         });
       }
+
+      // Token validado, prosseguir com a requisição
+      const response = await BookBusiness.list();
+
+      // Retornar com resultado da operação
+      return http.ok(res, response.body);
     } catch (error) {
       console.log(filename, `Erro durante a listagem de livros: ${error.message}`);
 

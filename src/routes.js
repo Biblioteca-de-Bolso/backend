@@ -4,6 +4,11 @@ const routes = express.Router();
 // Importação dos Controllers
 const UserController = require("./controllers/user.controller");
 const BookController = require("./controllers/book.controller");
+const AuthController = require("./controllers/auth.controller");
+
+// Rotdas de Autenticação
+routes.post("/auth/refresh", AuthController.refreshToken);
+routes.post("/auth/create", AuthController.createToken);
 
 // Rotas de Usuário
 routes.get("/user/login", UserController.login);
