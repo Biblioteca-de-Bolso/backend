@@ -18,11 +18,11 @@ const RefreshToken = sequelize.define(
       allowNull: false,
     },
     iat: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(10),
       allowNull: false,
     },
     exp: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(10),
       allowNull: false,
     },
   },

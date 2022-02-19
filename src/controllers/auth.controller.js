@@ -31,6 +31,7 @@ module.exports = {
 
       // Retorna resultado da operação
       return http.generic(res, response);
+      
     } catch (error) {
       return http.failure(res, {
         message: `Erro Inesperado: ${error.message}`,
