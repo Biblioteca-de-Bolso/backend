@@ -9,6 +9,14 @@ const RefreshToken = sequelize.define(
       primaryKey: true,
       allowNull: false,
     },
+    email: {
+      type: DataTypes.STRING(64),
+      allowNull: false,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     iat: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -17,19 +25,11 @@ const RefreshToken = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    user: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    user_id: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
   },
   {
     schema: "bibliotecadebolso",
-    tableName: "refresh_token",
-    timestamps: false,
+    tableName: "refreshtoken",
+    timestamps: true,
   }
 );
 

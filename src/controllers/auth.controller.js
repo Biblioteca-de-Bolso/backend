@@ -1,5 +1,8 @@
 const AuthBusiness = require("../business/auth.business");
 
+const PasswordValidator = require("../validators/password.validator");
+const EmailValidator = require("../validators/email.validator");
+
 const http = require("../modules/http");
 
 const filename = __filename.slice(__dirname.length + 1) + " -";
@@ -7,27 +10,27 @@ const filename = __filename.slice(__dirname.length + 1) + " -";
 module.exports = {
   async login(req, res) {
     try {
-      // Realiza parse dos parâmetros
-      const user = req.body.user;
-      const password = req.body.password;
+      // Aquisição dos parâmetros
+      const email = req.body["email"];
+      const password = req.body["password"];
 
-      if (!user || !password) {
-        console.log(
-          filename,
-          "Para realizar login, é necessário informar um usuário e uma senha"
-        );
+      // Validação dos parâmetros
+      const validateEmail = EmailValidator.validate(email);
+      const validatePassword = PasswordValidator.validate(password);
 
-        return http.badRequest(res, {
-          message: "Para realizar login, é necessário informar um usuário e uma senha",
-        });
+      if (validatePassword.error) {
+        return http.badRequest(res, validatePassword);
       }
 
-      // Realiza procedimento de login
-      const response = await AuthBusiness.login(user, password);
+      if (validateEmail.error) {
+        return http.badRequest(res, validateEmail);
+      }
+
+      // Validação dos parâmetros finalizada, realiza procedimento de login
+      const response = await AuthBusiness.login(email, password);
 
       // Retorna resultado da operação
       return http.generic(res, response);
-
     } catch (error) {
       return http.failure(res, {
         message: `Erro Inesperado: ${error.message}`,

@@ -2,7 +2,6 @@ const crypto = require("crypto");
 
 const User = require("../models/user.model");
 
-const auth = require("../modules/auth");
 const http = require("../modules/http");
 
 const filename = __filename.slice(__dirname.length + 1) + " -";
@@ -41,21 +40,20 @@ module.exports = {
         });
 
         if (user) {
-          // Usuário registrado com sucesso, prosseguir com o email de validação
+          // Usuário registrado com sucesso
+
+          // TODO: enviar email de validação
+
           return http.created(null, {
             message: "O usuário foi registrado com sucesso",
           });
         } else {
           // Falha na criação de novo usário
           return http.failure(null, {
-            message: "Não foi possível criar o usuário",
+            message: "Falha durante a criação do usuário",
           });
         }
       }
-
-      return http.ok(null, {
-        message: "ok",
-      });
     } catch (error) {
       console.log(filename, `Erro durante a criação de novo usuário: ${error.message}`);
       return http.failure(null, {

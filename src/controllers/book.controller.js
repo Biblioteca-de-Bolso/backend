@@ -1,6 +1,6 @@
 const BookBusiness = require("../business/book.business");
+const AuthBusiness = require("../business/auth.business");
 
-const auth = require("../modules/auth");
 const http = require("../modules/http");
 
 const filename = __filename.slice(__dirname.length + 1) + " -";
@@ -20,7 +20,7 @@ module.exports = {
       }
 
       // Validação do token informado
-      const decoded = auth.verifyToken(token);
+      const decoded = AuthBusiness.verifyToken(token);
 
       if (decoded["error"]) {
         // Não foi possível validar o token
