@@ -10,6 +10,7 @@ dotenv.config({ path: ".env" });
 // Configuração do Express
 const app = express();
 
+// Middlewares e configurações
 app.use(cors());
 app.use(express.json({ limit: "1gb" }));
 app.use(

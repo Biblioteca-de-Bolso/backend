@@ -1,35 +1,65 @@
+const crypto = require("crypto");
+
+const User = require("../models/user.model");
+
 const auth = require("../modules/auth");
 const http = require("../modules/http");
 
 const filename = __filename.slice(__dirname.length + 1) + " -";
 
 module.exports = {
-  async create() {},
-
-  async login(user, password) {
+  async create(email, name, password) {
     try {
-      if (user === "rhenan" && password === "123") {
-        // Adquirir o ID do usuário do banco de dados
-        const payload = {
-          userId: 123456789,
-        };
+      // Verificação de duplicidade
+      const user = await User.findOne({
+        where: {
+          email: email,
+        },
+        raw: true,
+      });
 
-        // Criar o token relacionado a esta operação de login
-        const token = auth.signToken(payload);
-
-        // Retorar o token assinado
-        return http.ok(null, token);
-      } else {
-        console.log(filename, "Usuário ou senha incorretos");
-
-        return http.unauthorized(null, {
-          message: "Usuário ou senha incorretos",
+      if (user) {
+        // Email já existe na base de dados
+        return http.ok(null, {
+          message: "Este endereço de email já foi cadastrado por outro usuário",
         });
+      } else {
+        // Email não existe na base de dados, podemos cadastrar este usuário
+
+        // Aplicar hash MD5 na senha
+        password = crypto.createHash("md5").update(password).digest("hex");
+
+        // Criar um código de ativação para este usuário
+        const activationCode = crypto.randomBytes(8).toString("hex");
+
+        // Registra o usuário na base de dados
+        const user = await User.create({
+          email,
+          name,
+          password,
+          activationCode,
+        });
+
+        if (user) {
+          // Usuário registrado com sucesso, prosseguir com o email de validação
+          return http.created(null, {
+            message: "O usuário foi registrado com sucesso",
+          });
+        } else {
+          // Falha na criação de novo usário
+          return http.failure(null, {
+            message: "Não foi possível criar o usuário",
+          });
+        }
       }
+
+      return http.ok(null, {
+        message: "ok",
+      });
     } catch (error) {
-      console.log(filename, `Erro durante o login: ${error.message}`);
+      console.log(filename, `Erro durante a criação de novo usuário: ${error.message}`);
       return http.failure(null, {
-        message: `Erro durante o login: ${error.message}`,
+        message: `Erro durante a criação de novo usuário: ${error.message}`,
       });
     }
   },
