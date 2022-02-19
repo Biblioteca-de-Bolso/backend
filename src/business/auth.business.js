@@ -82,26 +82,21 @@ module.exports = {
       // Criação de um novo refresh token
       const randomToken = crypto.randomBytes(64).toString("hex");
 
-      const iat = dayjs().unix();
-      // console.log(dayjs(iat, "X").format("DD/MM/YYYY HH:mm:ss"));
+      // Criação das datas "issued at" e "expiration" em formato unix ms
+      const iat = dayjs().valueOf();
+      const exp = dayjs(iat).add(10, "minute").valueOf();
 
-
-      // const exp = dayjs().unix(iat).add(10, "minute").unix();
-
-      // console.log("IAT:", iat);
-      // console.log("EXP:", exp);
-      
-      // console.log(dayjs(iat, "X").format("DD/MM/YYYY HH:mm:ss"));
-      // console.log(dayjs(exp, "X").format("DD/MM/YYYY HH:mm:ss"));
-
+      // Converte o formato das datas em segundos (desconsiderar últimos três caracteres)
+      const iatString = iat.toString().slice(0, 10);
+      const expString = exp.toString().slice(0, 10);
 
       // Salvar o refresh token no banco de dados
       const refresh = await RefreshToken.create({
         id: randomToken,
         email: payload["email"],
         userId: payload["userId"],
-        iat,
-        exp,
+        iat: iatString,
+        exp: expString
       });
 
       if (refresh) {

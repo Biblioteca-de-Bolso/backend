@@ -19,6 +19,7 @@ app.use(
     limit: "1gb",
   })
 );
+app.use(express.static("./public"));
 
 app.use("/api", require("./src/routes"));
 
@@ -50,6 +51,6 @@ app.get("/api", (req, res) => {
 // Iniciando Servidor
 let port = process.env.PORT;
 if (port == "" || port == null) {
-  port = 4005;
+  port = process.env.LOCAL_PORT;
 }
 app.listen(port);

@@ -34,7 +34,7 @@ const User = sequelize.define(
   },
   {
     schema: "bibliotecadebolso",
-    tableName: "usuario",
+    tableName: "user",
     timestamps: true,
   }
 );
