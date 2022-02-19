@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const User = require("../models/user.model");
 
 const http = require("../modules/http");
+const mail = require("../modules/mail");
 
 const filename = __filename.slice(__dirname.length + 1) + " -";
 
@@ -42,8 +43,20 @@ module.exports = {
         if (user) {
           // Usuário registrado com sucesso
 
-          // TODO: enviar email de validação
+          try {
+            // Enviar email de criação de cadastro
+            const { emailHtml, emailText } = await mail.composeEmail(
+              user["name"],
+              user["email"],
+              user["activationCode"]
+            );
 
+            await mail.sendEmail(user["email"], emailText, emailHtml);
+          } catch (error) {
+            console.log(filename, `Erro durante envio de email: ${error.message}`);
+          }
+
+          // Retornar resposta
           return http.created(null, {
             message: "O usuário foi registrado com sucesso",
           });
