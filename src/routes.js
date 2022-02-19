@@ -9,6 +9,10 @@ const UserController = require("./controllers/user.controller");
 const BookController = require("./controllers/book.controller");
 const AuthController = require("./controllers/auth.controller");
 
+// Playground - Rotas de Debug e testes
+const PlaygroundController = require("./controllers/playground.controller");
+routes.get("/play/date", PlaygroundController.date);
+
 // Rotdas de Autenticação
 routes.get("/auth/login", AuthController.login);
 routes.post("/auth/refresh", AuthController.refreshToken);
