@@ -3,9 +3,10 @@ const validator = require("validator");
 const PasswordValidator = require("../validators/password.validator");
 const EmailValidator = require("../validators/email.validator");
 const NameValidator = require("../validators/name.validator");
-const userBusiness = require("../business/user.business");
+const UserIdValidator = require("../validators/userid.validator");
 
 const UserBusiness = require("../business/user.business");
+const AuthBusiness = require("../business/auth.business");
 
 const http = require("../modules/http");
 const filename = __filename.slice(__dirname.length + 1) + " -";
@@ -19,9 +20,9 @@ module.exports = {
       const password = req.body["password"];
 
       // Validação dos parâmetros
+      const validateName = NameValidator.validate(name);
       const validateEmail = EmailValidator.validate(email);
       const validatePassword = PasswordValidator.validate(password);
-      const validateName = NameValidator.validate(name);
 
       if (validatePassword.error) {
         return http.badRequest(res, validatePassword);
@@ -39,6 +40,54 @@ module.exports = {
       const response = await UserBusiness.create(email, name, password);
 
       // Retorna o resultado da operação
+      return http.generic(res, response);
+    } catch (error) {
+      return http.failure(res, {
+        message: `Erro inesperado: ${error.message}`,
+      });
+    }
+  },
+
+  async delete(req, res) {
+    try {
+
+      // Aquisição do token de autenticação
+      const token = req.headers["x-access-token"];
+
+      // Validação do token informado
+      const decoded = AuthBusiness.verifyToken(token);
+
+      if (decoded["error"]) {
+        // Não foi possível validar o token
+        return http.unauthorized(res, {
+          message: decoded["error"],
+        });
+      }
+
+      // Aquisição dos parâmetros
+      const userId = req.body["id"];
+      const email = req.body["email"];
+      const password = req.body["password"];
+
+      // Validação dos parâmetros
+      const validateUserId = UserIdValidator.validate(userId);
+      const validateEmail = EmailValidator.validate(email);
+      const validatePassword = PasswordValidator.validate(password);
+
+      if (validateUserId.error) {
+        return http.badRequest(res, validateUserId);
+      }
+
+      if (validateEmail.error) {
+        return http.badRequest(res, validavalidateEmailteEmail);
+      }
+
+      if (validatePassword.error) {
+        return http.badRequest(res, validatePassword);
+      }
+
+      const response = await UserBusiness.delete(decoded, userId, email, password);
+
       return http.generic(res, response);
     } catch (error) {
       return http.failure(res, {
