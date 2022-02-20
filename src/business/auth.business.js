@@ -10,6 +10,7 @@ const User = require("../models/user.model");
 
 // Módulos Locais
 const http = require("../modules/http");
+const { decode } = require("punycode");
 
 const filename = __filename.slice(__dirname.length + 1) + " -";
 
@@ -182,9 +183,29 @@ module.exports = {
   },
 
   // Verifica validade de um token
-  verifyToken(token) {
+  async verifyToken(token) {
     try {
-      return jwt.verify(token, process.env.TOKEN_SECRET);
+      // Decodificar o token informado
+      const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+
+      // O token não expirou e foi decodificado com sucesso, verificar a existência da conta
+      const user = await User.findOne({
+        where: {
+          id: decoded["userId"],
+          email: decoded["email"],
+        },
+        raw: true,
+      });
+
+      if (user) {
+        // Usuário encontrado, dados são válidos
+        return decoded;
+      } else {
+        // O token foi validado com sucesso, mas não foi encontrado nenhum usuário na base dados
+        return {
+          error: "Dados de usuário presente no token não são válidos",
+        };
+      }
     } catch (error) {
       console.log(filename, `Não foi possível validar o token informado: ${error.message}`);
 

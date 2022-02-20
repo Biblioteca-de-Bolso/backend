@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const validator = require("validator");
 
 const User = require("../models/user.model");
 
@@ -72,6 +73,70 @@ module.exports = {
       console.log(filename, `Erro durante a criação de novo usuário: ${error.message}`);
       return http.failure(null, {
         message: `Erro durante a criação de novo usuário: ${error.message}`,
+      });
+    }
+  },
+
+  async delete(decoded, userId, email, password) {
+    try {
+      // Aplicar hash MD5 na senha, se necessário
+      if (!validator.isMD5(password)) {
+        password = crypto.createHash("md5").update(password).digest("hex");
+      }
+
+      // Adquirir dados do usuário informado do banco de dados
+      const user = await User.findOne({
+        where: {
+          id: userId,
+          email: email,
+          password: password,
+        },
+        raw: true,
+      });
+
+      if (user) {
+        // Verifica veracidade dos dados, tanto do Token quanto do Body
+        if (
+          user["id"] == decoded["userId"] &&
+          user["email"] == decoded["email"] &&
+          user["password"] == password
+        ) {
+          // Os dados informados são os mesmo que a conta que se deseja apagar
+
+          // Remover todos os dados de usuário (de todas as tabelas)
+          const deleted = await User.destroy({
+            where: {
+              id: userId,
+              email: email,
+            },
+          });
+
+          // Verifica sucesso da exclusão
+          if (deleted) {
+            return http.ok(null, {
+              message: "Conta de usuário removida com sucesso",
+            });
+          } else {
+            return http.failure({
+              message: "Não foi possível apagar a conta de usuário",
+            });
+          }
+        } else {
+          // Para essa situação acontecer, alguem precisaria conhecer o ID e email do usuário
+          // Pouco provável, mas possível de acontecer
+          return http.ok(null, {
+            message: "Esse usuário não tem permissão para remover essa conta.",
+          });
+        }
+      } else {
+        return http.ok(null, {
+          message: "Nenhum usuário encontrado para os dados fornecidos",
+        });
+      }
+    } catch (error) {
+      console.log(filename, `Erro durante rotina de apagar usuário: ${error.message}`);
+      return http.failure(null, {
+        message: `Erro durante rotina de apagar usuário: ${error.message}`,
       });
     }
   },
