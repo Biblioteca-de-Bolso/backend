@@ -97,11 +97,9 @@ module.exports = {
       if (user) {
         // Verifica veracidade dos dados, tanto do Token quanto do Body
         if (
-          decoded["userId"] == userId &&
-          decoded["email"] == email &&
-          user["email"] == email &&
-          user["password"] == password &&
-          user["id"] == userId
+          user["id"] == decoded["userId"] &&
+          user["email"] == decoded["email"] &&
+          user["password"] == password
         ) {
           // Os dados informados são os mesmo que a conta que se deseja apagar
 
