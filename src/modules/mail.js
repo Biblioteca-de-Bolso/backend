@@ -4,22 +4,22 @@ const fs = require("fs").promises;
 const filename = __filename.slice(__dirname.length + 1) + " -";
 
 module.exports = {
-  async composeEmail(name, email, activationCode) {
+  async composeEmail(userId ,name , email, activationCode) {
     try {
       // Carrega arquivo base do corpo do email de convite
-      let html = (await fs.readFile("src/email/invite.html")).toString();
+      let html = (await fs.readFile("src/html/invite.html")).toString();
 
       // Links
       let logoUrl = `${process.env.PRODUCTION_URL}/images/library_icon.png`;
       let logoGithub = `${process.env.PRODUCTION_URL}/images/github.png`;
-      let activationLink = "";
+      let activationLink = `${process.env.PRODUCTION_URL}/api/auth/verify?id=${userId}&email=${email}&code=${activationCode}`;
 
       // Realiza substituições
       html = html.replace("#LOGO_URL", logoUrl);
       html = html.replace("#GITHUB_ICON", logoGithub);
       html = html.replace("#USER_EMAIL", email);
       html = html.replace("#USER_NAME", name.split(" ")[0]);
-      html = html.replace("#ACTIVATION_LINK", activationCode);
+      html = html.replace("#ACTIVATION_LINK", activationLink);
 
       // Enviar email
       return {

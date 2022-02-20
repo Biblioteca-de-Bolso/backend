@@ -1,7 +1,11 @@
+var path = require("path");
+
 const AuthBusiness = require("../business/auth.business");
 
 const PasswordValidator = require("../validators/password.validator");
 const EmailValidator = require("../validators/email.validator");
+const ActivationValidator = require("../validators/activation.validator");
+const UserIdValidator = require("../validators/userid.validator");
 
 const http = require("../modules/http");
 
@@ -31,6 +35,35 @@ module.exports = {
 
       // Retorna resultado da operação
       return http.generic(res, response);
+    } catch (error) {
+      return http.failure(res, {
+        message: `Erro Inesperado: ${error.message}`,
+      });
+    }
+  },
+
+  async verifyAccount(req, res) {
+    try {
+      const userId = req.query["id"];
+      const email = req.query["email"];
+      const activationCode = req.query["code"];
+
+      // Validação dos parâmetros
+      const validateId = UserIdValidator.validate(userId);
+      const validateEmail = EmailValidator.validate(email);
+      const validateActivation = ActivationValidator.validate(activationCode);
+
+      if (validateId.error || validateEmail.error || validateActivation.error) {
+        return res.sendFile(path.resolve("./src/html/confirm_error.html"));
+      }
+
+      const response = await AuthBusiness.verifyAccount(userId, email, activationCode);
+
+      if (response.error) {
+        return res.sendFile(path.resolve("./src/html/confirm_error.html"));
+      } else {
+        return res.sendFile(path.resolve("./src/html/confirm_success.html"));
+      }
       
     } catch (error) {
       return http.failure(res, {

@@ -46,6 +46,7 @@ module.exports = {
           try {
             // Enviar email de criação de cadastro
             const { emailHtml, emailText } = await mail.composeEmail(
+              user["id"],
               user["name"],
               user["email"],
               user["activationCode"]
