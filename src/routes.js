@@ -15,6 +15,7 @@ routes.get("/play/date", PlaygroundController.date);
 
 // Rotdas de Autenticação
 routes.get("/auth/login", AuthController.login);
+routes.get("/auth/verify", AuthController.verifyAccount);
 routes.post("/auth/refresh", AuthController.refreshToken);
 routes.post("/auth/create", AuthController.createToken);
 

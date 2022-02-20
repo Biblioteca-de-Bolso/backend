@@ -72,6 +72,66 @@ module.exports = {
     }
   },
 
+  async verifyAccount(userId, email, activationCode) {
+    try {
+      // Buscar os dados de usuário do banco de dados
+      const user = await User.findOne({
+        where: {
+          id: userId,
+          email: email,
+          active: false,
+        },
+        raw: true,
+      });
+
+      if (user) {
+        // Usuario encontrado, realizar modificação de ativação
+        const activeUser = await User.update(
+          { active: true },
+          {
+            where: {
+              id: userId,
+              email: email,
+              activationCode: activationCode,
+            },
+          }
+        );
+
+        // TODO:
+        // Nesta etapa, estamos retornando objetos http
+        // Vamos considerar um objeto "ok", para sucesso na ativação
+        // E considerar objetos "failure" para falha na ativação
+        // Porém, semanticamente, uma falha na ativação por motivos de dados incorretos também é "ok"
+        // Failures devem ser utilizadas para falhas no sistema
+        // Implementar um sistema de retorno de objeto de "success" e "error", e não objetos http
+
+        // Os objetos a seguir são objetos simples, e não objetos http
+        if (activeUser) {
+          return {
+            message: "Conta de usuário confirmada com sucesso",
+          };
+        } else {
+          return {
+            error: "Falha na ativação de conta de usuário",
+            message: "Erro durante a confirmação de conta de usário",
+          };
+        }
+      } else {
+        return {
+          error: "Falha na ativação de conta de usuário",
+          message: "Os dados de usuários ou de confirmação não são válidos",
+        };
+      }
+    } catch (error) {
+      console.log(filename, `Erro durante a confirmação de conta de usuário: ${error.message}`);
+
+      return {
+        error: "Falha na ativação",
+        message: `Erro durante a confirmação de conta de usuário: ${error.message}`,
+      };
+    }
+  },
+
   async createToken(payload) {
     try {
       // Realiza assinatura do token com base no payload e no token secret da aplicação
@@ -96,7 +156,7 @@ module.exports = {
         email: payload["email"],
         userId: payload["userId"],
         iat: iatString,
-        exp: expString
+        exp: expString,
       });
 
       if (refresh) {
