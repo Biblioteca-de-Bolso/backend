@@ -50,12 +50,11 @@ module.exports = {
 
   async delete(req, res) {
     try {
-
       // Aquisição do token de autenticação
       const token = req.headers["x-access-token"];
 
       // Validação do token informado
-      const decoded = AuthBusiness.verifyToken(token);
+      const decoded = await AuthBusiness.verifyToken(token);
 
       if (decoded["error"]) {
         // Não foi possível validar o token

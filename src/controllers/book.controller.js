@@ -20,7 +20,7 @@ module.exports = {
       }
 
       // Validação do token informado
-      const decoded = AuthBusiness.verifyToken(token);
+      const decoded = await AuthBusiness.verifyToken(token);
 
       if (decoded["error"]) {
         // Não foi possível validar o token
