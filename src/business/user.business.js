@@ -59,9 +59,7 @@ module.exports = {
           }
 
           // Retornar resposta
-          return http.created(null, {
-            message: "O usuário foi registrado com sucesso",
-          });
+          return http.created(null, user);
         } else {
           // Falha na criação de novo usário
           return http.failure(null, {

@@ -136,7 +136,7 @@ module.exports = {
   async createToken(payload) {
     try {
       // Realiza assinatura do token com base no payload e no token secret da aplicação
-      const accesToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
+      const accessToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
         expiresIn: 60 * 60 * 24,
       });
 
@@ -145,7 +145,7 @@ module.exports = {
 
       // Criação das datas "issued at" e "expiration" em formato unix ms
       const iat = dayjs().valueOf();
-      const exp = dayjs(iat).add(10, "minute").valueOf();
+      const exp = dayjs(iat).add(7, "day").valueOf();
 
       // Converte o formato das datas em segundos (desconsiderar últimos três caracteres)
       const iatString = iat.toString().slice(0, 10);
@@ -162,7 +162,7 @@ module.exports = {
 
       if (refresh) {
         return {
-          accesToken: accesToken,
+          accessToken: accessToken,
           refreshToken: randomToken,
         };
       } else {
