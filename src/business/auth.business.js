@@ -137,7 +137,7 @@ module.exports = {
     try {
       // Realiza assinatura do token com base no payload e no token secret da aplicação
       const accesToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
-        expiresIn: 60 * 5,
+        expiresIn: 60 * 60 * 24,
       });
 
       // Criação de um novo refresh token
