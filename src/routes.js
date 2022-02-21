@@ -15,7 +15,7 @@ const PlaygroundController = require("./controllers/playground.controller");
 routes.get("/play/date", PlaygroundController.date);
 
 // Rotas de Autenticação
-routes.get("/auth/login", AuthController.login);
+routes.post("/auth/login", AuthController.login);
 routes.get("/auth/verify", AuthController.verifyAccount);
 routes.post("/auth/refresh", AuthController.refreshToken);
 routes.post("/auth/create", AuthController.createToken);
