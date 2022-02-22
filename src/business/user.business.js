@@ -93,7 +93,7 @@ module.exports = {
       });
 
       if (user) {
-        // Verifica veracidade dos dados, tanto do Token quanto do Body
+        // Verifica veracidade dos dados
         if (
           user["id"] == decoded["userId"] &&
           user["email"] == decoded["email"] &&
