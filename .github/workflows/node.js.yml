@@ -10,15 +10,23 @@ on:
   pull_request:
     branches: [ main ]
 
-
+env:
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
+  EMAIL_USER: ${{ secrets.EMAIL_USER }}
+  EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+  LOCAL_PORT: ${{ secrets.LOCAL_PORT }}
+  PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
+  
 jobs:
   build:
 
     runs-on: ubuntu-latest
+    environment: bibliotecadebolso
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
+        node-version: [14.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -28,16 +36,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - name: Create env file
-      run: |
-        touch .env
-        echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env
-        echo TOKEN_SECRET=${{ secrets.TOKEN_SECRET }} >> .env
-        echo EMAIL_USER=${{ secrets.EMAIL_USER }} >> .env
-        echo EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} >> .env
-        echo LOCAL_PORT=${{ secrets.LOCAL_PORT }} >> .env
-        echo PRODUCTION_URL=${{ secrets.PRODUCTION_URL }} >> .env
-        cat .env
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
