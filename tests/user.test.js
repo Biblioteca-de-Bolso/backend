@@ -9,6 +9,7 @@ describe("Fluxo de Usuário", () => {
     sequelize.close();
   });
 
+  // Parâmetros do fluxo
   let userId = null;
   let accessToken = null;
   let activationCode = null;
