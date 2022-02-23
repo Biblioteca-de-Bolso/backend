@@ -1,2 +1,51 @@
-# backend
-Backend do projeto Biblioteca de Bolso - API escrita em Nodejs
+# Biblioteca de Bolso
+
+<p align="center">
+    <img src="/doc/library_icon.png" height="130">
+</p>
+
+<p align="center">
+    <a href="https://github.com/Biblioteca-de-Bolso/backend/actions/workflows/node.js.yml"  target="_blank">
+      <img src="https://github.com/Biblioteca-de-Bolso/backend/actions/workflows/node.js.yml/badge.svg" />
+    </a>
+    <a href="https://www.codacy.com/gh/Biblioteca-de-Bolso/backend/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Biblioteca-de-Bolso/backend&amp;utm_campaign=Badge_Grade" target="_blank">
+      <img src="https://app.codacy.com/project/badge/Grade/dd2736e4dd7c40748fa497dd6b63ba4f"/>
+    </a>
+    <a href="https://www.codacy.com/gh/Biblioteca-de-Bolso/backend/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Biblioteca-de-Bolso/backend&amp;utm_campaign=Badge_Coverage" target="_blank">
+      <img src="https://app.codacy.com/project/badge/Coverage/dd2736e4dd7c40748fa497dd6b63ba4f"/>
+    </a>
+    <a href="https://documenter.getpostman.com/view/19545370/UVkmQGwd" target="_blank">
+      <img src="https://img.shields.io/badge/Docs-Postman-f39f37" />
+    </a>
+    <a href="https://bibliotecadebolso.herokuapp.com" target="_blank">
+      <img src="https://heroku-badge.herokuapp.com/?app=bibliotecadebolso" />
+    </a>
+</p>
+
+A Biblioteca de Bolso é um projeto de TCC do curso de Análise e Desenvolvimento de Sistemas e consiste em um aplicativo móvel para controle e gerenciamento da sua biblioteca pessoal.
+
+Recursos planejados:
+
+- Manter registro de quais livros você possui na sua biblioteca pessoal
+- Marcar quais livros você já leu
+- Criar anotações e resumos personalizados citando trecho dos seus livros favoritos
+- Controlar quais livros você empresotu e para quem
+- Criar e compartilhar cartões de visitas de leitura, com seus escritores, livros e trechos favoritos
+
+## Tecnologias
+
+- Backend: API em [Node.js](https://nodejs.org/en/) escrita com [Express](https://expressjs.com/pt-br/)
+- Banco de Dados: [PostgreSQL](https://www.postgresql.org/)
+- Interface com o banco de dados: [Sequelize](https://sequelize.org/)
+- Testes: Suíte de testes escrita com o [Jest](https://jestjs.io/pt-BR/)
+- CI/CD: Integração com deploy automático no Heroku e [Github Actions](https://github.com/Biblioteca-de-Bolso/backend/actions)
+
+## Documentação
+
+Documentação da API disponível no Postman: [API Docs](https://documenter.getpostman.com/view/19545370/UVkmQGwd)
+
+## Disponibilidade
+
+A API encontra-se disponível hospedada no Heroku através do link: [API Biblitoeca de Bolso](https://bibliotecadebolso.herokuapp.com).
+
+Hospedagens gratuitas no Heroku entram em modo de sleeping após 30 minutos sem nenhum trafégo. Esteja ciente de que a primeira requisição pode levar alguns segundos a mais. Após acordar, o servidor responde as chamadas subsequentes normalmente.
