@@ -4,7 +4,7 @@
   "description": "API de Backend do projeto Biblioteca de Bolso",
   "main": "server.js",
   "scripts": {
-    "test": "jest --silent",
+    "test": "jest",
     "server": "nodemon server.js"
   },
   "repository": {

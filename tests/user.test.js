@@ -1,8 +1,13 @@
 const request = require("supertest");
 const app = require("../app");
+const sequelize = require("../src/modules/sequelize");
 
 describe("Fluxo de Usuário", () => {
   jest.setTimeout(10000);
+
+  afterAll(() => {
+    sequelize.close();
+  });
 
   let userId = null;
   let accessToken = null;
@@ -11,7 +16,7 @@ describe("Fluxo de Usuário", () => {
   let userName = "Nome de Usuário";
   let userPassword = "123456789";
 
-  test("Deve criar um novo usuário e retornar suas informações", async () => {
+  test("Criar um novo usuário e retornar suas informações", async () => {
     const response = await request(app).post("/api/user").send({
       email: userEmail,
       name: userName,
@@ -27,7 +32,7 @@ describe("Fluxo de Usuário", () => {
     expect(response.body).toHaveProperty("activationCode");
 
     // Adquire o ID do usuário
-    if (response.body.id) userId = response.body.id;
+    if (response.body.id) userId = response.body.id.toString();
     if (response.body.activationCode) activationCode = response.body.activationCode;
   });
 
@@ -45,7 +50,7 @@ describe("Fluxo de Usuário", () => {
     expect(response.body).not.toHaveProperty("id");
   });
 
-  test("Deve ser capaz de confirmar uma conta de usuário", async () => {
+  test("Confirmar uma conta de usuário", async () => {
     const response = await request(app).get("/api/auth/verify").query({
       id: userId,
       email: userEmail,
@@ -55,7 +60,7 @@ describe("Fluxo de Usuário", () => {
     expect(response.statusCode).toBe(200);
   });
 
-  test("Deve realizar login e retornar um Access Token", async () => {
+  test("Realizar login e retornar um Access Token", async () => {
     const response = await request(app).post("/api/auth/login").send({
       email: userEmail,
       password: userPassword,
@@ -70,17 +75,16 @@ describe("Fluxo de Usuário", () => {
     if (response.body.accessToken) accessToken = response.body.accessToken;
   });
 
-  // test("Deve ser possível remover um usuário", async () => {
-  //   const response = await request(app).delete("/api/user").send({
-  //     id: userId,
-  //     email: userEmail,
-  //     password: userPassword,
-  //   });
+  test("Remover um usuário", async () => {
+    const response = await request(app)
+      .delete("/api/user")
+      .set("x-access-token", accessToken)
+      .send({
+        id: userId,
+        email: userEmail,
+        password: userPassword,
+      });
 
-  //   expect(response.statusCode).toBe(200);
-
-  //   // De mesmo modo, assumindo o fato anterior, podemos considerar a mesma lógica
-  //   // Caso os dados do usuário NÃO sejam retornados, ele NÃO foi inserido no banco de dados
-  //   expect(response.body).not.toHaveProperty("id");
-  // });
+    expect(response.statusCode).toBe(200);
+  });
 });
