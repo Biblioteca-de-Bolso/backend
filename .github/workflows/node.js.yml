@@ -37,6 +37,7 @@ jobs:
         echo EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} >> .env
         echo LOCAL_PORT=${{ secrets.LOCAL_PORT }} >> .env
         echo PRODUCTION_URL=${{ secrets.PRODUCTION_URL }} >> .env
+        cat .env
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
