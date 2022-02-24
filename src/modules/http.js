@@ -36,23 +36,45 @@ module.exports = {
     }
   },
 
-  failure(res, body) {
-    if (res) {
-      return res.status(500).json(body);
-    } else {
-      return {
-        statusCode: 500,
-        body: body,
-      };
-    }
-  },
-
   unauthorized(res, body) {
     if (res) {
       return res.status(401).json(body);
     } else {
       return {
         statusCode: 401,
+        body: body,
+      };
+    }
+  },
+
+  forbidden(res, body) {
+    if (res) {
+      return res.status(403).json(body);
+    } else {
+      return {
+        statusCode: 403,
+        body: body,
+      };
+    }
+  },
+
+  notFound(res, body) {
+    if (res) {
+      return res.status(404).json(body);
+    } else {
+      return {
+        statusCode: 404,
+        body: body,
+      };
+    }
+  },
+
+  failure(res, body) {
+    if (res) {
+      return res.status(500).json(body);
+    } else {
+      return {
+        statusCode: 500,
         body: body,
       };
     }
