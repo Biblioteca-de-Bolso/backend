@@ -17,9 +17,6 @@
     <a href="https://documenter.getpostman.com/view/19545370/UVkmQGwd" target="_blank">
       <img src="https://img.shields.io/badge/Docs-Postman-f39f37" />
     </a>
-    <a href="https://bibliotecadebolso.herokuapp.com" target="_blank">
-      <img src="https://heroku-badge.herokuapp.com/?app=bibliotecadebolso" />
-    </a>
 </p>
 
 A Biblioteca de Bolso é um projeto de TCC do curso de Análise e Desenvolvimento de Sistemas e consiste em um aplicativo móvel para controle e gerenciamento da sua biblioteca pessoal.
