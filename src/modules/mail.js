@@ -7,7 +7,7 @@ module.exports = {
   async composeEmail(userId, name, email, activationCode) {
     try {
       // Carrega arquivo base do corpo do email de convite
-      let html = (await fs.readFile("src/html/invite.txt")).toString();
+      let html = (await fs.readFile("src/html/invite.html")).toString();
 
       // Links
       let logoUrl = `${process.env.PRODUCTION_URL}/images/library_icon.png`;
