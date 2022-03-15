@@ -54,17 +54,16 @@ module.exports = {
       const validateActivation = ActivationValidator.validate(activationCode);
 
       if (validateId.error || validateEmail.error || validateActivation.error) {
-        return res.sendFile(path.resolve("./src/html/confirm_error.html"));
+        return res.sendFile(path.resolve("./src/html/confirm_error.txt"));
       }
 
       const response = await AuthBusiness.verifyAccount(userId, email, activationCode);
 
       if (response.error) {
-        return res.sendFile(path.resolve("./src/html/confirm_error.html"));
+        return res.sendFile(path.resolve("./src/html/confirm_error.txt"));
       } else {
-        return res.sendFile(path.resolve("./src/html/confirm_success.html"));
+        return res.sendFile(path.resolve("./src/html/confirm_success.txt"));
       }
-      
     } catch (error) {
       return http.failure(res, {
         message: `Erro Inesperado: ${error.message}`,
