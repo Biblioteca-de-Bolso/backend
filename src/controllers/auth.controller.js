@@ -54,15 +54,18 @@ module.exports = {
       const validateActivation = ActivationValidator.validate(activationCode);
 
       if (validateId.error || validateEmail.error || validateActivation.error) {
-        return res.sendFile(path.resolve("./src/html/confirm_error.txt"));
+        res.status(400);
+        return res.sendFile(path.resolve("./src/html/confirm_error.html"));
       }
 
       const response = await AuthBusiness.verifyAccount(userId, email, activationCode);
 
       if (response.error) {
-        return res.sendFile(path.resolve("./src/html/confirm_error.txt"));
+        res.status(400);
+        return res.sendFile(path.resolve("./src/html/confirm_error.html"));
       } else {
-        return res.sendFile(path.resolve("./src/html/confirm_success.txt"));
+        res.status(200);
+        return res.sendFile(path.resolve("./src/html/confirm_success.html"));
       }
     } catch (error) {
       return http.failure(res, {
