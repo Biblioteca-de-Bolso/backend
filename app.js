@@ -1,11 +1,9 @@
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv");
-
+const dotenv = require("dotenv").config({ path: ".env" });
+const helmet = require("helmet");
+const customErrorHandler = require("./src/modules/error");
 const sequelize = require("./src/modules/sequelize");
-
-// Configuração das Variáveis de Ambiente
-dotenv.config({ path: ".env" });
 
 // Configuração do Express
 const app = express();
@@ -19,11 +17,11 @@ app.use(
     limit: "1gb",
   })
 );
+app.use(helmet());
 app.use(express.static("./public"));
-
 app.use("/api", require("./src/routes"));
 
-app.get("/connection", async (req, res) => {
+app.get("/api/connection", async (req, res) => {
   try {
     await sequelize.authenticate();
     console.log("Connection has been established successfully.");
@@ -32,19 +30,27 @@ app.get("/connection", async (req, res) => {
   }
 
   res.status(200).send({
-    message: "Biblioteca de Bolso - API",
+    message: "Teste de conexão com o banco de dados realizado com sucesso",
   });
 });
 
-app.get("/", async (req, res) => {
+app.get(["/", "/api"], async (req, res) => {
   res.status(200).send({
     message: "Biblioteca de Bolso - API",
   });
 });
 
-app.get("/api", (req, res) => {
-  res.status(200).send({
-    message: "Biblioteca de Bolso - API",
+// app.use(customErrorHandler);
+
+app.use((err, req, res, next) => {
+  const file = err.stack.split("\n")[1].split("\\").pop().replace(")", "");
+
+  console.log(file, "-", err.name, "-", err.message);
+
+  return res.status(500).json({
+    error: err.name,
+    message: err.message,
+    file: file,
   });
 });
 
