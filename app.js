@@ -43,7 +43,15 @@ app.get(["/", "/api"], async (req, res) => {
 // app.use(customErrorHandler);
 
 app.use((err, req, res, next) => {
-  const file = err.stack.split("\n")[1].split("\\").pop().replace(")", "");
+  let file = "";
+
+  if (err.stack.includes("/")) {
+    // Unix Based Systemas
+    file = err.stack.split("\n")[1].split("/").pop().replace(")", "");
+  } else {
+    // Windows Based Systems
+    file = err.stack.split("\n")[1].split("\\").pop().replace(")", "");
+  }
 
   console.log(file, "-", err.name, "-", err.message);
 
