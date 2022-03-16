@@ -6,7 +6,7 @@ const http = require("../modules/http");
 const filename = __filename.slice(__dirname.length + 1) + " -";
 
 module.exports = {
-  async list(req, res) {
+  async list(req, res, next) {
     try {
       // Parse de parâmetros e Token
       const token = req.headers["x-access-token"];
@@ -35,11 +35,7 @@ module.exports = {
       // Retornar com resultado da operação
       return http.ok(res, response.body);
     } catch (error) {
-      console.log(filename, `Erro durante a listagem de livros: ${error.message}`);
-
-      return http.failure(res, {
-        message: `Erro durante a listagem de livros: ${error.message}`,
-      });
+      next(error);
     }
   },
 };

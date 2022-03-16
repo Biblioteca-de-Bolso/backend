@@ -1,26 +1,20 @@
 // Express.js Custom Error Handler
 module.exports = (err, req, res, next) => {
-  const regEx = new RegExp(
-    `${process.cwd()}\\/(?!node_modules\\/)([\\/\\w-_\\.]+\\.js):(\\d*):(\\d*)`
-  );
+  let file = "";
 
-  const [, file, line, column] = err.stack.match(regEx);
-
-  let filename = "";
-
-  if (file.includes("/")) {
-    // Unix Based
-    filename = `${file.split("/").pop()}:${line}:${column}`;
+  if (err.stack.includes("/")) {
+    // Unix Based Systemas
+    file = err.stack.split("\n")[1].split("/").pop().replace(")", "");
   } else {
-    // Windows ?
-    filename = `${file.split("\\").pop()}:${line}:${column}`;
+    // Windows Based Systems
+    file = err.stack.split("\n")[1].split("\\").pop().replace(")", "");
   }
 
-  console.log(filename, "-", err.name, "-", err.message);
+  console.log(file, "-", err.name, "-", err.message);
 
   return res.status(500).json({
-    error: err.name,
-    message: err.message,
-    file: filename,
+    code: "InternalServerError",
+    message: `${err.name}: ${err.message}`,
+    file: file,
   });
 };

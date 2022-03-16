@@ -3,8 +3,6 @@ const dayjs = require("dayjs");
 module.exports = {
   async date(req, res, next) {
     try {
-      a++;
-
       const iat = dayjs().valueOf();
       const exp = dayjs(iat).add(10, "minute").valueOf();
 

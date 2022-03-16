@@ -20,6 +20,7 @@ app.use(
 app.use(helmet());
 app.use(express.static("./public"));
 app.use("/api", require("./src/routes"));
+app.use(customErrorHandler);
 
 app.get("/api/connection", async (req, res) => {
   try {
@@ -37,28 +38,6 @@ app.get("/api/connection", async (req, res) => {
 app.get(["/", "/api"], async (req, res) => {
   res.status(200).send({
     message: "Biblioteca de Bolso - API",
-  });
-});
-
-// app.use(customErrorHandler);
-
-app.use((err, req, res, next) => {
-  let file = "";
-
-  if (err.stack.includes("/")) {
-    // Unix Based Systemas
-    file = err.stack.split("\n")[1].split("/").pop().replace(")", "");
-  } else {
-    // Windows Based Systems
-    file = err.stack.split("\n")[1].split("\\").pop().replace(")", "");
-  }
-
-  console.log(file, "-", err.name, "-", err.message);
-
-  return res.status(500).json({
-    error: err.name,
-    message: err.message,
-    file: file,
   });
 });
 

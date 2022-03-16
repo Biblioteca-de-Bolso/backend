@@ -9,10 +9,9 @@ const UserBusiness = require("../business/user.business");
 const AuthBusiness = require("../business/auth.business");
 
 const http = require("../modules/http");
-const filename = __filename.slice(__dirname.length + 1) + " -";
 
 module.exports = {
-  async create(req, res) {
+  async create(req, res, next) {
     try {
       // Aquisição dos parâmetros
       const name = req.body["name"];
@@ -42,13 +41,11 @@ module.exports = {
       // Retorna o resultado da operação
       return http.generic(res, response);
     } catch (error) {
-      return http.failure(res, {
-        message: `Erro inesperado: ${error.message}`,
-      });
+      next(error);
     }
   },
 
-  async delete(req, res) {
+  async delete(req, res, next) {
     try {
       // Aquisição do token de autenticação
       const token = req.headers["x-access-token"];
@@ -89,9 +86,7 @@ module.exports = {
 
       return http.generic(res, response);
     } catch (error) {
-      return http.failure(res, {
-        message: `Erro inesperado: ${error.message}`,
-      });
+      next(error);
     }
   },
 };
