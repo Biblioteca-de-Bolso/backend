@@ -9,10 +9,8 @@ const UserIdValidator = require("../validators/userid.validator");
 
 const http = require("../modules/http");
 
-const filename = __filename.slice(__dirname.length + 1) + " -";
-
 module.exports = {
-  async login(req, res) {
+  async login(req, res, next) {
     try {
       // Aquisição dos parâmetros
       const email = req.body["email"];
@@ -36,13 +34,11 @@ module.exports = {
       // Retorna resultado da operação
       return http.generic(res, response);
     } catch (error) {
-      return http.failure(res, {
-        message: `Erro Inesperado: ${error.message}`,
-      });
+      next(error);
     }
   },
 
-  async verifyAccount(req, res) {
+  async verifyAccount(req, res, next) {
     try {
       const userId = req.query["id"];
       const email = req.query["email"];
@@ -68,24 +64,17 @@ module.exports = {
         return res.sendFile(path.resolve("./src/html/confirm_success.html"));
       }
     } catch (error) {
-      return http.failure(res, {
-        message: `Erro Inesperado: ${error.message}`,
-      });
+      next(error);
     }
   },
 
-  async refreshToken(req, res) {
-    return http.ok(res, {
-      message: "ok",
-    });
-  },
-
-  async createToken(req, res) {
-    const response = await AuthBusiness.createToken({
-      userId: "123",
-      user: "rhenan",
-    });
-
-    return http.generic(res, response);
+  async refreshToken(req, res, next) {
+    try {
+      return http.ok(res, {
+        message: "ok",
+      });
+    } catch (error) {
+      next(error);
+    }
   },
 };

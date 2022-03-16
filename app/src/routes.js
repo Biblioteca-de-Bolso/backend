@@ -11,7 +11,6 @@ routes.get("/play/date", PlaygroundController.date);
 routes.post("/auth/login", AuthController.login);
 routes.get("/auth/verify", AuthController.verifyAccount);
 routes.post("/auth/refresh", AuthController.refreshToken);
-routes.post("/auth/create", AuthController.createToken);
 
 routes.post("/user", UserController.create);
 routes.delete("/user", UserController.delete);
