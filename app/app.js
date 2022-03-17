@@ -1,9 +1,9 @@
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv").config({ path: ".env" });
+const dotenv = require("dotenv").config({ path: "../.env" });
 const helmet = require("helmet");
 const customErrorHandler = require("./src/modules/error");
-const sequelize = require("./src/modules/sequelize");
+const sequelize = require("./src/sequelize");
 
 // Configuração do Express
 const app = express();
@@ -40,5 +40,18 @@ app.get(["/", "/api"], async (req, res) => {
     message: "Biblioteca de Bolso - API",
   });
 });
+
+if (process.env.NODE_ENV !== "test") {
+  (async () => {
+    try {
+      await sequelize.sync({ force: false });
+      console.log("Sincronização do banco de dados realizada com sucesso");
+    } catch (error) {
+      console.log(
+        `Não foi possível sincronizar o Sequelize com o banco de dados: ${error.message}`
+      );
+    }
+  })();
+}
 
 module.exports = app;
