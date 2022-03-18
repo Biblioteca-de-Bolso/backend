@@ -3,7 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv").config({ path: "../.env" });
 const helmet = require("helmet");
 const customErrorHandler = require("./src/modules/error");
-const sequelize = require("./src/sequelize");
+const { sequelize, sequelizeSync } = require("./src/sequelize");
 
 // Configuração do Express
 const app = express();
@@ -25,14 +25,16 @@ app.use(customErrorHandler);
 app.get("/api/connection", async (req, res) => {
   try {
     await sequelize.authenticate();
-    console.log("Connection has been established successfully.");
+    console.log("Conexão com o banco de dados realizada com sucesso.");
+    res.status(200).send({
+      message: "Conexão com o banco de dados realizada com sucesso.",
+    });
   } catch (error) {
-    console.error("Unable to connect to the database:", error.message);
+    console.log(`Não foi possível realizar a conexão com o banco de dados: ${error.message}`);
+    res.status(500).json({
+      message: `Não foi possível realizar a conexão com o banco de dados: ${error.message}`,
+    });
   }
-
-  res.status(200).send({
-    message: "Teste de conexão com o banco de dados realizado com sucesso",
-  });
 });
 
 app.get(["/", "/api"], async (req, res) => {
@@ -43,14 +45,7 @@ app.get(["/", "/api"], async (req, res) => {
 
 if (process.env.NODE_ENV !== "test") {
   (async () => {
-    try {
-      await sequelize.sync({ force: false });
-      console.log("Sincronização do banco de dados realizada com sucesso");
-    } catch (error) {
-      console.log(
-        `Não foi possível sincronizar o Sequelize com o banco de dados: ${error.message}`
-      );
-    }
+    await sequelizeSync();
   })();
 }
 

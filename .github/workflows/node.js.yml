@@ -1,48 +1,49 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
-name: Node.js CI
+name: Docker Image CI
 
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
-env:
-  DATABASE_URL: ${{ secrets.DATABASE_URL }}
-  TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
-  EMAIL_USER: ${{ secrets.EMAIL_USER }}
-  EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-  LOCAL_PORT: ${{ secrets.LOCAL_PORT }}
-  PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
-  CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
-  
+# env:
+#   API_LOCAL_PORT: ${{ secrets.API_LOCAL_PORT }}
+#   JWT_TOKEN_SECRET: ${{ secrets.JWT_TOKEN_SECRET }}
+#   EMAIL_USER: ${{ secrets.EMAIL_USER }}
+#   EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+#   PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
+
+#   DATABASE_URL: ${{ secrets.DATABASE_URL }}
+#   LOCAL_PORT: ${{ secrets.LOCAL_PORT }}
+#   CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
     environment: bibliotecadebolso
 
     strategy:
       matrix:
-        node-version: [14.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [16.x]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm run test-coverage
-    
-    - name: Run codacy-coverage-reporter
-      uses: codacy/codacy-coverage-reporter-action@v1
-      with:
-        project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-        coverage-reports: ./coverage/clover.xml
+      - uses: actions/checkout@v2
+
+      - name: Create env file
+        run: |
+          touch .env
+          echo API_LOCAL_PORT=${{ secrets.API_LOCAL_PORT }} >> .env
+          echo JWT_TOKEN_SECRET=${{ secrets.secrets.JWT_TOKEN_SECRET }} >> .env
+          echo EMAIL_USER=${{ secrets.secrets.EMAIL_USER }} >> .env
+          echo EMAIL_PASSWORD=${{ secrets.secrets.EMAIL_PASSWORD }} >> .env
+          echo PRODUCTION_URL=${{ secrets.secrets.PRODUCTION_URL }} >> .env
+
+      - name: Build the Docker test image
+        run: docker-compose -f docker-compose.test.yml up --exit-code-from backend --build
+
+      - name: Run codacy-coverage-reporter
+        uses: codacy/codacy-coverage-reporter-action@v1
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: ./app/coverage/clover.xml

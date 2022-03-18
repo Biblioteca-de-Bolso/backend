@@ -12,4 +12,18 @@ dbConfig["logging"] = false;
 
 const sequelize = new Sequelize(URI, dbConfig);
 
-module.exports = sequelize;
+const sequelizeSync = async () => {
+  try {
+    try {
+      await sequelize.createSchema("bibliotecadebolso");
+    } catch (error) {
+      console.log("O Schema especificado já existe neste banco de dados");
+    }
+    await sequelize.sync({ force: false });
+    console.log("Sincronização do banco de dados realizada com sucesso");
+  } catch (error) {
+    console.log(`Não foi possível sincronizar o Sequelize com o banco de dados: ${error.message}`);
+  }
+};
+
+module.exports = { sequelize, sequelizeSync };
