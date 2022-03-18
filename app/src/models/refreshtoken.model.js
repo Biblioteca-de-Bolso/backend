@@ -1,5 +1,5 @@
 const DataTypes = require("sequelize");
-const sequelize = require("../modules/sequelize");
+const { sequelize } = require("../sequelize");
 
 const RefreshToken = sequelize.define(
   "RefreshToken",

@@ -136,7 +136,7 @@ module.exports = {
   async createToken(payload) {
     try {
       // Realiza assinatura do token com base no payload e no token secret da aplicação
-      const accessToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
+      const accessToken = jwt.sign(payload, process.env.JWT_TOKEN_SECRET, {
         expiresIn: 60 * 60 * 24,
       });
 
@@ -186,7 +186,7 @@ module.exports = {
   async verifyToken(token) {
     try {
       // Decodificar o token informado
-      const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
 
       // O token não expirou e foi decodificado com sucesso, verificar a existência da conta
       const user = await User.findOne({

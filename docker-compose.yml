@@ -1,0 +1,36 @@
+services:
+  backend:
+    container_name: bibliotecadebolso_backend
+    restart: always
+    env_file: .env
+    build: ./app
+    ports:
+      - ${API_LOCAL_PORT}:${API_LOCAL_PORT}
+    environment:
+      DB_HOST_DEV: database
+      DB_NAME_DEV: bibliotecadebolso
+      DB_USER_DEV: bibliotecadebolso
+      DB_PORT_DEV: 5432
+      DB_PASS_DEV: 123456789
+      WAIT_HOSTS: database:5432
+      WAIT_TIMEOUT: 600
+      WAIT_SLEEP_INTERVAL: 10
+    depends_on:
+      - database
+    command: sh -c "/wait && npm run server"
+    volumes:
+      - ./app:/usr/src/app
+      - ./app/node_modules:/usr/src/app/node_modules
+  database:
+    container_name: bibliotecadebolso_database
+    image: postgres
+    restart: always
+    env_file: .env
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: 123456789
+      POSTGRES_USER: bibliotecadebolso
+      POSTGRES_DATABASE: bibliotecadebolso
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data

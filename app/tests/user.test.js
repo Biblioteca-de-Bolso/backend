@@ -1,14 +1,17 @@
 const request = require("supertest");
 const app = require("../app");
-const sequelize = require("../src/modules/sequelize");
+const { sequelize, sequelizeSync } = require("../src/sequelize");
 
 describe("Fluxo de Usuário", () => {
   jest.setTimeout(10000);
 
-  afterAll(() => {
-    sequelize.close();
+  beforeAll(async () => {
+    await sequelizeSync();
   });
 
+  afterAll(async () => {
+    await sequelize.close();
+  });
 
   // Parâmetros do fluxo
   let userId = null;

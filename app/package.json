@@ -3,10 +3,20 @@
   "version": "1.0.0",
   "description": "API de Backend do projeto Biblioteca de Bolso",
   "main": "server.js",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "scripts": {
     "test": "jest",
-    "test-coverage": "jest --coverage",
+    "test-coverage": "jest --coverage --colors",
     "server": "nodemon server.js"
+  },
+  "jest": {
+    "coverageReporters": [
+      "clover",
+      "json",
+      "lcov"
+    ]
   },
   "repository": {
     "type": "git",
