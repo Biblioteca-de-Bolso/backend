@@ -1,9 +1,3 @@
-DB_USER = process.env.DB_USER_PROD;
-DB_PASS = process.env.DB_PASS_PROD;
-DB_HOST = process.env.DB_HOST_PROD;
-DB_PORT = process.env.DB_PORT_PROD;
-DB_NAME = process.env.DB_NAME_PROD;
-
 const dbConfig = {
   dialect: "postgres",
   protocol: "postgres",
@@ -16,6 +10,7 @@ const dbConfig = {
   },
 };
 
-const URI = `postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
+// A variável de ambiente DATABASE_URL é provisionada pelo Heroku
+const URI = process.env.DATABASE_URL;
 
 module.exports = { dbConfig, URI };
