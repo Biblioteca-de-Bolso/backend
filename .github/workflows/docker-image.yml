@@ -7,16 +7,13 @@ on:
   pull_request:
     branches: [main]
 
-# env:
-#   API_LOCAL_PORT: ${{ secrets.API_LOCAL_PORT }}
-#   JWT_TOKEN_SECRET: ${{ secrets.JWT_TOKEN_SECRET }}
-#   EMAIL_USER: ${{ secrets.EMAIL_USER }}
-#   EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-#   PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
-
-#   DATABASE_URL: ${{ secrets.DATABASE_URL }}
-#   LOCAL_PORT: ${{ secrets.LOCAL_PORT }}
-#   CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+env:
+  API_LOCAL_PORT: ${{ secrets.API_LOCAL_PORT }}
+  JWT_TOKEN_SECRET: ${{ secrets.JWT_TOKEN_SECRET }}
+  EMAIL_USER: ${{ secrets.EMAIL_USER }}
+  EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+  PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
+  CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
 jobs:
   build:
