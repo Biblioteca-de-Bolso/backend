@@ -5,8 +5,8 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/Biblioteca-de-Bolso/backend/actions/workflows/node.js.yml"  target="_blank">
-      <img src="https://github.com/Biblioteca-de-Bolso/backend/actions/workflows/node.js.yml/badge.svg" />
+    <a href="https://github.com/Biblioteca-de-Bolso/backend/actions/workflows/docker-image.yml"  target="_blank">
+      <img src="https://github.com/Biblioteca-de-Bolso/backend/actions/workflows/docker-image.yml/badge.svg" />
     </a>
     <a href="https://www.codacy.com/gh/Biblioteca-de-Bolso/backend/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Biblioteca-de-Bolso/backend&amp;utm_campaign=Badge_Grade" target="_blank">
       <img src="https://app.codacy.com/project/badge/Grade/dd2736e4dd7c40748fa497dd6b63ba4f"/>
