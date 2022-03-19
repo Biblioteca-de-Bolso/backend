@@ -1,5 +1,3 @@
-const validator = require("validator");
-
 const PasswordValidator = require("../validators/password.validator");
 const EmailValidator = require("../validators/email.validator");
 const NameValidator = require("../validators/name.validator");
@@ -9,6 +7,7 @@ const UserBusiness = require("../business/user.business");
 const AuthBusiness = require("../business/auth.business");
 
 const http = require("../modules/http");
+const { Unauthorized } = require("../modules/codes");
 
 module.exports = {
   async create(req, res, next) {
@@ -24,22 +23,21 @@ module.exports = {
       const validatePassword = PasswordValidator.validate(password);
 
       if (validatePassword.error) {
-        return http.badRequest(res, validatePassword);
+        return res.status(400).json(validatePassword);
       }
 
       if (validateEmail.error) {
-        return http.badRequest(res, validateEmail);
+        return res.status(400).json(validateEmail);
       }
 
       if (validateName.error) {
-        return http.badRequest(res, validateName);
+        return res.status(400).json(validateName);
       }
 
       // Validação dos parâmetros finalizada
       const response = await UserBusiness.create(email, name, password);
 
-      // Retorna o resultado da operação
-      return http.generic(res, response);
+      res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }
@@ -54,8 +52,8 @@ module.exports = {
       const decoded = await AuthBusiness.verifyToken(token);
 
       if (decoded["error"]) {
-        // Não foi possível validar o token
-        return http.unauthorized(res, {
+        res.status(401).json({
+          code: Unauthorized,
           message: decoded["error"],
         });
       }
@@ -71,20 +69,20 @@ module.exports = {
       const validatePassword = PasswordValidator.validate(password);
 
       if (validateUserId.error) {
-        return http.badRequest(res, validateUserId);
+        return res.status(400).json(validateUserId);
       }
 
       if (validateEmail.error) {
-        return http.badRequest(res, validavalidateEmailteEmail);
+        return res.status(400).json(validateEmail);
       }
 
       if (validatePassword.error) {
-        return http.badRequest(res, validatePassword);
+        return res.status(400).json(validatePassword);
       }
 
       const response = await UserBusiness.delete(decoded, userId, email, password);
 
-      return http.generic(res, response);
+      res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }

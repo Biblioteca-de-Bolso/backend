@@ -7,8 +7,6 @@ const EmailValidator = require("../validators/email.validator");
 const ActivationValidator = require("../validators/activation.validator");
 const UserIdValidator = require("../validators/userid.validator");
 
-const http = require("../modules/http");
-
 module.exports = {
   async login(req, res, next) {
     try {
@@ -21,18 +19,18 @@ module.exports = {
       const validatePassword = PasswordValidator.validate(password);
 
       if (validatePassword.error) {
-        return http.badRequest(res, validatePassword);
+        res.status(400).json(validatePassword);
       }
 
       if (validateEmail.error) {
-        return http.badRequest(res, validateEmail);
+        res.status(400).json(validateEmail);
       }
 
       // Validação dos parâmetros finalizada, realiza procedimento de login
       const response = await AuthBusiness.login(email, password);
 
       // Retorna resultado da operação
-      return http.generic(res, response);
+      res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }
@@ -70,7 +68,7 @@ module.exports = {
 
   async refreshToken(req, res, next) {
     try {
-      return http.ok(res, {
+      return ok({
         message: "ok",
       });
     } catch (error) {

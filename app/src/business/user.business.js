@@ -3,138 +3,124 @@ const validator = require("validator");
 
 const User = require("../models/user.model");
 
-const http = require("../modules/http");
-const mail = require("../modules/mail");
+const { conflict, created, failure, ok, forbidden } = require("../modules/http");
+const {
+  EmailAlreadyInUse,
+  DatabaseFailure,
+  UserNotFound,
+  Forbidden,
+  Success,
+} = require("../modules/codes");
 
-const filename = __filename.slice(__dirname.length + 1) + " -";
+const mail = require("../modules/mail");
+const { fileName } = require("../modules/debug");
 
 module.exports = {
   async create(email, name, password) {
-    try {
-      // Verificação de duplicidade
-      const user = await User.findOne({
-        where: {
-          email: email,
-        },
-        raw: true,
+    const user = await User.findOne({
+      where: {
+        email: email,
+      },
+      raw: true,
+    });
+
+    if (user) {
+      return conflict({
+        code: EmailAlreadyInUse,
+        message: "Este endereço de email já foi cadastrado por outro usuário.",
+      });
+    } else {
+      password = crypto.createHash("md5").update(password).digest("hex");
+
+      const activationCode = crypto.randomBytes(8).toString("hex");
+
+      const user = await User.create({
+        email,
+        name,
+        password,
+        activationCode,
       });
 
       if (user) {
-        // Email já existe na base de dados
-        return http.ok(null, {
-          message: "Este endereço de email já foi cadastrado por outro usuário",
+        try {
+          const { emailHtml, emailText } = await mail.composeEmail(
+            user["id"],
+            user["name"],
+            user["email"],
+            user["activationCode"]
+          );
+
+          await mail.sendEmail(user["email"], emailText, emailHtml);
+        } catch (error) {
+          console.log(fileName(), `Erro durante envio de email: ${error.message}`);
+        }
+
+        return created({
+          code: Success,
+          user: user,
         });
       } else {
-        // Email não existe na base de dados, podemos cadastrar este usuário
-
-        // Aplicar hash MD5 na senha
-        password = crypto.createHash("md5").update(password).digest("hex");
-
-        // Criar um código de ativação para este usuário
-        const activationCode = crypto.randomBytes(8).toString("hex");
-
-        // Registra o usuário na base de dados
-        const user = await User.create({
-          email,
-          name,
-          password,
-          activationCode,
+        return failure({
+          code: DatabaseFailure,
+          message: "Não foi possível inserir o novo usuário no banco de dados.",
         });
-
-        if (user) {
-          // Usuário registrado com sucesso
-
-          try {
-            // Enviar email de criação de cadastro
-            const { emailHtml, emailText } = await mail.composeEmail(
-              user["id"],
-              user["name"],
-              user["email"],
-              user["activationCode"]
-            );
-
-            await mail.sendEmail(user["email"], emailText, emailHtml);
-          } catch (error) {
-            console.log(filename, `Erro durante envio de email: ${error.message}`);
-          }
-
-          // Retornar resposta
-          return http.created(null, user);
-        } else {
-          // Falha na criação de novo usário
-          return http.failure(null, {
-            message: "Falha durante a criação do usuário",
-          });
-        }
       }
-    } catch (error) {
-      console.log(filename, `Erro durante a criação de novo usuário: ${error.message}`);
-      return http.failure(null, {
-        message: `Erro durante a criação de novo usuário: ${error.message}`,
-      });
     }
   },
 
   async delete(decoded, userId, email, password) {
-    try {
-      // Aplicar hash MD5 na senha, se necessário
-      if (!validator.isMD5(password)) {
-        password = crypto.createHash("md5").update(password).digest("hex");
-      }
+    // Aplicar hash MD5 na senha, se necessário
+    if (!validator.isMD5(password)) {
+      password = crypto.createHash("md5").update(password).digest("hex");
+    }
 
-      // Adquirir dados do usuário informado do banco de dados
-      const user = await User.findOne({
-        where: {
-          id: userId,
-          email: email,
-          password: password,
-        },
-        raw: true,
-      });
+    // Adquirir dados do usuário informado
+    const user = await User.findOne({
+      where: {
+        id: userId,
+        email: email,
+        password: password,
+      },
+      raw: true,
+    });
 
-      if (user) {
-        // Verifica veracidade dos dados
-        if (
-          user["id"] == decoded["userId"] &&
-          user["email"] == decoded["email"] &&
-          user["password"] == password
-        ) {
-          // Os dados informados são os mesmo que a conta que se deseja apagar
+    if (user) {
+      // Verifica veracidade dos dados
+      if (
+        user["id"] == decoded["userId"] &&
+        user["email"] == decoded["email"] &&
+        user["password"] == password
+      ) {
+        // Remover todos os dados de usuário (de todas as tabelas)
+        const deleted = await User.destroy({
+          where: {
+            id: userId,
+            email: email,
+          },
+        });
 
-          // Remover todos os dados de usuário (de todas as tabelas)
-          const deleted = await User.destroy({
-            where: {
-              id: userId,
-              email: email,
-            },
+        // Verifica sucesso da exclusão
+        if (deleted) {
+          return ok({
+            code: Success,
+            message: "Conta e dados de usuário removidos com sucesso.",
           });
-
-          // Verifica sucesso da exclusão
-          if (deleted) {
-            return http.ok(null, {
-              message: "Conta de usuário removida com sucesso",
-            });
-          } else {
-            return http.failure({
-              message: "Não foi possível apagar a conta de usuário",
-            });
-          }
         } else {
-          // Para essa situação acontecer, alguem precisaria conhecer o ID e email do usuário
-          // Pouco provável, mas possível de acontecer
-          return http.ok(null, {
-            message: "Esse usuário não tem permissão para remover essa conta.",
+          return failure({
+            code: DatabaseFailure,
+            message: "Não foi possível realizar a exclusão de um ou mais dados do banco de dados.",
           });
         }
       } else {
-        return http.ok(null, {
-          message: "Nenhum usuário encontrado para os dados fornecidos",
+        return forbidden({
+          code: Forbidden,
+          message: "O usuário informado não possui permissão para completar esta ação.",
         });
       }
-    } catch (error) {
-      console.log(filename, `Erro durante rotina de apagar usuário: ${error.message}`);
-      return http.failure(null, {
-        message: `Erro durante rotina de apagar usuário: ${error.message}`,
+    } else {
+      return ok({
+        code: UserNotFound,
+        message: "O usuário informado não foi encontrado na base de dados.",
       });
     }
   },

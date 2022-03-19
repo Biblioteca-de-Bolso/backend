@@ -1,26 +1,26 @@
 services:
-  backend:
-    container_name: bibliotecadebolso_backend
+  backend_test:
+    container_name: bibliotecadebolso_backend_test
     env_file: .env
     build: ./app
     ports:
       - ${API_LOCAL_PORT}:${API_LOCAL_PORT}
     environment:
       NODE_ENV: test
-      DB_HOST_DEV: database
+      DB_HOST_DEV: database_test
       DB_NAME_DEV: bibliotecadebolso
       DB_USER_DEV: bibliotecadebolso
       DB_PORT_DEV: 5432
       DB_PASS_DEV: 123456789
-      WAIT_HOSTS: database:5432
+      WAIT_HOSTS: database_test:5432
       WAIT_TIMEOUT: 600
       WAIT_SLEEP_INTERVAL: 10
     depends_on:
-      - database
+      - database_test
     command: sh -c "/wait && npm run test-coverage"
     volumes:
       - ./app/coverage:/usr/src/app/coverage
-  database:
+  database_test:
     container_name: bibliotecadebolso_database_test
     image: postgres
     env_file: .env

@@ -33,7 +33,6 @@
     "dayjs": "^1.11.0",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
-    "helmet": "^5.0.2",
     "jsonwebtoken": "^8.5.1",
     "nodemailer": "^6.7.2",
     "pg": "^8.7.3",

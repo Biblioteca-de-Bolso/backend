@@ -30,15 +30,11 @@ describe("Fluxo de Usuário", () => {
 
     expect(response.statusCode).toBe(201);
 
-    // A função de criação de usuário no Business da aplicação retorna os dados do usuário
-    // Esses dados são retornados APENAS se a entidade for inserida no banco de dados
-    // Portanto, recebendo os dados do cliente, podemos assumir que a inserção foi bem sucedida
-    expect(response.body).toHaveProperty("id");
-    expect(response.body).toHaveProperty("activationCode");
+    expect(response.body).toHaveProperty("user");
 
     // Adquire o ID do usuário
-    if (response.body.id) userId = response.body.id.toString();
-    if (response.body.activationCode) activationCode = response.body.activationCode;
+    if (response.body.user.id) userId = response.body.user.id.toString();
+    if (response.body.user.activationCode) activationCode = response.body.user.activationCode;
   });
 
   test("Não deve ser possível criar um usuário com email que já está cadastrado", async () => {
@@ -48,11 +44,9 @@ describe("Fluxo de Usuário", () => {
       password: userPassword,
     });
 
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(409);
 
-    // De mesmo modo, assumindo o fato anterior, podemos considerar a mesma lógica
-    // Caso os dados do usuário NÃO sejam retornados, ele NÃO foi inserido no banco de dados
-    expect(response.body).not.toHaveProperty("id");
+    expect(response.body).not.toHaveProperty("user");
   });
 
   test("Confirmar uma conta de usuário", async () => {
