@@ -1,7 +1,5 @@
 const validator = require("validator");
 
-const filename = __filename.slice(__dirname.length + 1) + " -";
-
 module.exports = {
   validate(password) {
     if (!password) {

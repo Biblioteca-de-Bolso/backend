@@ -1,6 +1,6 @@
 services:
-  backend:
-    container_name: bibliotecadebolso_backend
+  backend_test:
+    container_name: bibliotecadebolso_backend_test
     env_file: .env
     build: ./app
     ports:

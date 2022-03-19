@@ -1,12 +1,9 @@
-const jwt = require("jsonwebtoken");
-const http = require("../modules/http");
-
-const filename = __filename.slice(__dirname.length + 1) + " -";
+const { ok } = require("../modules/http");
 
 module.exports = {
   async list() {
-    return http.ok(null, {
-      message: "ok",
+    return ok({
+      message: "Ok",
     });
   },
 };

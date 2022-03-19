@@ -37,7 +37,7 @@ jobs:
           echo PRODUCTION_URL=${{ secrets.PRODUCTION_URL }} >> .env
 
       - name: Build the Docker test image
-        run: docker-compose -f docker-compose.test.yml up --exit-code-from backend --build
+        run: docker-compose -f docker-compose.test.yml up --exit-code-from backend_test --build
 
       - name: Run codacy-coverage-reporter
         uses: codacy/codacy-coverage-reporter-action@v1
