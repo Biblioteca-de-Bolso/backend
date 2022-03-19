@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv").config({ path: "../.env" });
-const helmet = require("helmet");
 const customErrorHandler = require("./src/modules/error");
 const { sequelize, sequelizeSync } = require("./src/sequelize");
 
@@ -17,7 +16,6 @@ app.use(
     limit: "1gb",
   })
 );
-app.use(helmet());
 app.use(express.static("./public"));
 app.use("/api", require("./src/routes"));
 app.use(customErrorHandler);
