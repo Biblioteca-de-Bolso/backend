@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/Biblioteca-de-Bolso/backend#readme",
   "dependencies": {
+    "axios": "^0.26.1",
     "cors": "^2.8.5",
     "dayjs": "^1.11.0",
     "dotenv": "^16.0.0",
