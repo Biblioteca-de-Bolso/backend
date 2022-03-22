@@ -20,12 +20,12 @@ module.exports = {
   // Usuário não possui permissão para realizar esta ação
   Forbidden: "Forbidden",
 
-  // Requisição executada com sucesso
-  Success: "Success",
-
   // É necessário realizar a confirmação da conta de usuário
   AccountNotVerified: "AccountNotVerified",
 
   // Falha na criação de token JWT
   JWTCreationFailure: "JWTCreationFailure",
+
+  // Requisição executada com sucesso
+  Success: "Success",
 };

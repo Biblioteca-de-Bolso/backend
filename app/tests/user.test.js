@@ -29,12 +29,14 @@ describe("Fluxo de Usuário", () => {
     });
 
     expect(response.statusCode).toBe(201);
-
-    expect(response.body).toHaveProperty("user");
+    expect(response.body).toHaveProperty("code");
+    expect(response.body).toHaveProperty("response");
+    expect(response.body.code).toBe("Success");
 
     // Adquire o ID do usuário
-    if (response.body.user.id) userId = response.body.user.id.toString();
-    if (response.body.user.activationCode) activationCode = response.body.user.activationCode;
+    if (response.body.response.user.id) userId = response.body.response.user.id.toString();
+    if (response.body.response.user.activationCode)
+      activationCode = response.body.response.user.activationCode;
   });
 
   test("Não deve ser possível criar um usuário com email que já está cadastrado", async () => {
@@ -69,9 +71,11 @@ describe("Fluxo de Usuário", () => {
 
     // De mesmo modo, assumindo o fato anterior, podemos considerar a mesma lógica
     // Caso os dados do usuário NÃO sejam retornados, ele NÃO foi inserido no banco de dados
-    expect(response.body).toHaveProperty("accessToken");
+    expect(response.body).toHaveProperty("code");
+    expect(response.body).toHaveProperty("response");
+    expect(response.body.code).toBe("Success");
 
-    if (response.body.accessToken) accessToken = response.body.accessToken;
+    if (response.body.response.accessToken) accessToken = response.body.response.accessToken;
   });
 
   test("Remover um usuário", async () => {

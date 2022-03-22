@@ -3,7 +3,7 @@ const { ok } = require("../modules/http");
 const { googleBooksAPI } = require("../modules/googlebooks");
 
 module.exports = {
-  async search(qstring) {
+  async search(qstring, lang) {
     let books = [];
 
     await googleBooksAPI
@@ -11,6 +11,7 @@ module.exports = {
         params: {
           key: process.env.GOOGLE_BOOKS_API,
           q: qstring,
+          langRestrict: lang || "pt",
         },
       })
       .then((response) => {

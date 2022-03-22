@@ -57,7 +57,9 @@ module.exports = {
 
         return created({
           code: Success,
-          user: user,
+          response: {
+            user: user,
+          },
         });
       } else {
         return failure({

@@ -8,7 +8,12 @@ const RefreshToken = require("../models/refreshtoken.model");
 const User = require("../models/user.model");
 
 const { failure, unauthorized, ok } = require("../modules/http");
-const { Unauthorized, AccountNotVerified, JWTCreationFailure } = require("../modules/codes");
+const {
+  Unauthorized,
+  AccountNotVerified,
+  JWTCreationFailure,
+  Success,
+} = require("../modules/codes");
 
 module.exports = {
   async login(email, password) {
@@ -45,12 +50,18 @@ module.exports = {
             message: "Não foi possível concluir a criação do JWT durante a autenticação.",
           });
         } else {
-          return ok({ ...token });
+          return ok({
+            code: Success,
+            response: {
+              ...token,
+            },
+          });
         }
       } else {
         return ok({
           code: AccountNotVerified,
-          message: "Para realizar o login, é necessário realizar a confirmação de conta via email.",
+          message:
+            "Para realizar o login, é necessário realizar a confirmação de cadastro via email.",
         });
       }
     } else {
