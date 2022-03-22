@@ -1,5 +1,7 @@
+const requireDir = require("require-dir");
 const { Sequelize } = require("sequelize");
 
+// Carrega arquivo de configurações conforme o ambiente configurado
 if (process.env.NODE_ENV === "production") {
   var { dbConfig, URI } = require("./config_prod");
 } else {
@@ -8,12 +10,17 @@ if (process.env.NODE_ENV === "production") {
 
 console.log(`Database URI: ${URI}`);
 
+// Configurações globais adicionais
 dbConfig["logging"] = false;
 
 const sequelize = new Sequelize(URI, dbConfig);
 
 const sequelizeSync = async () => {
   try {
+    // Inclusão dos models
+    const models = requireDir("../models");
+
+    // Sincronização do Banco de Dados
     try {
       await sequelize.createSchema("bibliotecadebolso");
     } catch (error) {
