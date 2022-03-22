@@ -1,19 +1,12 @@
 const requireDir = require("require-dir");
 const { Sequelize } = require("sequelize");
+const env = process.env.NODE_ENV || "development";
+const config = require("./config")[env];
 
-// Carrega arquivo de configurações conforme o ambiente configurado
-if (process.env.NODE_ENV === "production") {
-  var { dbConfig, URI } = require("./config_prod");
-} else {
-  var { dbConfig, URI } = require("./config_dev");
-}
-
-console.log(`Database URI: ${URI}`);
-
-// Configurações globais adicionais
-dbConfig["logging"] = false;
-
-const sequelize = new Sequelize(URI, dbConfig);
+const sequelize =
+  env === "production"
+    ? new Sequelize(process.env.DATABASE_URL, config)
+    : new Sequelize(config.database, config.username, config.password, config);
 
 const sequelizeSync = async () => {
   try {
