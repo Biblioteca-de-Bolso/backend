@@ -26,7 +26,7 @@ app.get("/api/connection", async (req, res) => {
     await sequelize.authenticate();
     console.log("Conexão com o banco de dados realizada com sucesso.");
     res.status(200).send({
-      code: Success,
+      status: "ok",
       response: {
         message: "Conexão com o banco de dados realizada com sucesso.",
       },
@@ -34,6 +34,7 @@ app.get("/api/connection", async (req, res) => {
   } catch (error) {
     console.log(`Não foi possível realizar a conexão com o banco de dados: ${error.message}`);
     res.status(500).json({
+      status: "error",
       code: InternalServerError,
       message: `Não foi possível realizar a conexão com o banco de dados: ${error.message}`,
     });
@@ -42,7 +43,10 @@ app.get("/api/connection", async (req, res) => {
 
 app.get(["/", "/api"], async (req, res) => {
   res.status(200).send({
-    message: "Biblioteca de Bolso - API",
+    status: "ok",
+    response: {
+      message: "Biblioteca de Bolso - API",
+    },
   });
 });
 
