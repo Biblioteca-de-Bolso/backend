@@ -1,4 +1,4 @@
-var path = require("path");
+const path = require("path");
 
 const AuthBusiness = require("../business/auth.business");
 
@@ -18,11 +18,11 @@ module.exports = {
       const validateEmail = EmailValidator.validate(email);
       const validatePassword = PasswordValidator.validate(password);
 
-      if (validatePassword.error) {
+      if (validatePassword.status === "error") {
         res.status(400).json(validatePassword);
       }
 
-      if (validateEmail.error) {
+      if (validateEmail.status === "error") {
         res.status(400).json(validateEmail);
       }
 
@@ -47,14 +47,18 @@ module.exports = {
       const validateEmail = EmailValidator.validate(email);
       const validateActivation = ActivationValidator.validate(activationCode);
 
-      if (validateId.error || validateEmail.error || validateActivation.error) {
+      if (
+        validateId.status === "error" ||
+        validateEmail.status === "error" ||
+        validateActivation.status === "error"
+      ) {
         res.status(400);
         return res.sendFile(path.resolve("./src/html/confirm_error.html"));
       }
 
       const response = await AuthBusiness.verifyAccount(userId, email, activationCode);
 
-      if (response.error) {
+      if (response.status === "error") {
         res.status(400);
         return res.sendFile(path.resolve("./src/html/confirm_error.html"));
       } else {

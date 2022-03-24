@@ -8,7 +8,13 @@ const RefreshToken = require("../models/refreshtoken.model");
 const User = require("../models/user.model");
 
 const { failure, unauthorized, ok } = require("../modules/http");
-const { Unauthorized, AccountNotVerified, JWTCreationFailure } = require("../modules/codes");
+const {
+  Unauthorized,
+  AccountNotVerified,
+  JWTCreationFailure,
+  IncorrectParameter,
+  DatabaseFailure,
+} = require("../modules/codes");
 
 module.exports = {
   async login(email, password) {
@@ -39,22 +45,22 @@ module.exports = {
         // Criar o token relacionado a esta operação de login
         const token = await this.createToken(payload);
 
-        if (token.error) {
-          return failure({
-            code: JWTCreationFailure,
-            message: "Não foi possível concluir a criação do JWT durante a autenticação.",
-          });
+        if (token.status === "error") {
+          return failure(token);
         } else {
-          return ok({ ...token });
+          return ok(token);
         }
       } else {
         return ok({
+          status: "error",
           code: AccountNotVerified,
-          message: "Para realizar o login, é necessário realizar a confirmação de conta via email.",
+          message:
+            "Para realizar o login, é necessário realizar a confirmação de cadastro via email.",
         });
       }
     } else {
       return unauthorized({
+        status: "error",
         code: Unauthorized,
         message: "Usuário ou senha incorretos.",
       });
@@ -62,61 +68,49 @@ module.exports = {
   },
 
   async verifyAccount(userId, email, activationCode) {
-    try {
-      // Buscar os dados de usuário do banco de dados
-      const user = await User.findOne({
-        where: {
-          id: userId,
-          email: email,
-          active: false,
-        },
-        raw: true,
-      });
+    // Buscar os dados de usuário do banco de dados
+    const user = await User.findOne({
+      where: {
+        id: userId,
+        email: email,
+        active: false,
+      },
+      raw: true,
+    });
 
-      if (user) {
-        // Usuario encontrado, realizar modificação de ativação
-        const activeUser = await User.update(
-          { active: true },
-          {
-            where: {
-              id: userId,
-              email: email,
-              activationCode: activationCode,
-            },
-          }
-        );
-
-        // TODO:
-        // Nesta etapa, estamos retornando objetos http
-        // Vamos considerar um objeto "ok", para sucesso na ativação
-        // E considerar objetos "failure" para falha na ativação
-        // Porém, semanticamente, uma falha na ativação por motivos de dados incorretos também é "ok"
-        // Failures devem ser utilizadas para falhas no sistema
-        // Implementar um sistema de retorno de objeto de "success" e "error", e não objetos http
-
-        // Os objetos a seguir são objetos simples, e não objetos http
-        if (activeUser) {
-          return {
-            message: "Conta de usuário confirmada com sucesso",
-          };
-        } else {
-          return {
-            error: "Falha na ativação de conta de usuário",
-            message: "Erro durante a confirmação de conta de usário",
-          };
+    if (user) {
+      // Usuario encontrado, realizar modificação de ativação
+      const activeUser = await User.update(
+        { active: true },
+        {
+          where: {
+            id: userId,
+            email: email,
+            activationCode: activationCode,
+          },
         }
+      );
+
+      // Os objetos a seguir são objetos simples, e não objetos http
+      if (activeUser) {
+        return {
+          status: "ok",
+          response: {
+            message: "Conta de usuário confirmada com sucesso.",
+          },
+        };
       } else {
         return {
-          error: "Falha na ativação de conta de usuário",
-          message: "Os dados de usuários ou de confirmação não são válidos",
+          status: "error",
+          error: DatabaseFailure,
+          message: "Erro durante a confirmação de conta de usário.",
         };
       }
-    } catch (error) {
-      console.log(filename, `Erro durante a confirmação de conta de usuário: ${error.message}`);
-
+    } else {
       return {
-        error: "Falha na ativação",
-        message: `Erro durante a confirmação de conta de usuário: ${error.message}`,
+        status: "error",
+        code: IncorrectParameter,
+        message: "Os dados de usuários ou de confirmação não são válidos.",
       };
     }
   },
@@ -149,41 +143,39 @@ module.exports = {
 
     if (refresh) {
       return {
-        accessToken: accessToken,
-        refreshToken: randomToken,
+        status: "ok",
+        response: {
+          accessToken: accessToken,
+          refreshToken: randomToken,
+        },
       };
     } else {
       return {
-        error: "Falha na criação do web token",
-        message: "Não foi possível concluir a criação do web token durante a autenticação.",
+        status: "error",
+        code: DatabaseFailure,
+        message: "Não foi possível realizar o registro do refresh token criado.",
       };
     }
   },
 
   async verifyToken(token) {
-    try {
-      // Tenta realizar validação do token informado
-      const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
+    // Tenta realizar validação do token informado
+    const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
 
-      // Token validado com sucesso, extrair dados de usuário
-      const user = await User.findOne({
-        where: {
-          id: decoded["userId"],
-          email: decoded["email"],
-        },
-        raw: true,
-      });
+    // Token validado com sucesso, extrair dados de usuário
+    const user = await User.findOne({
+      where: {
+        id: decoded["userId"],
+        email: decoded["email"],
+      },
+      raw: true,
+    });
 
-      if (user) {
-        return decoded;
-      } else {
-        return {
-          error: "Dados de usuário presente no token não são válidos.",
-        };
-      }
-    } catch (error) {
+    if (user) {
+      return decoded;
+    } else {
       return {
-        error: `Não foi possível validar o token informado: ${error.message}`,
+        error: "Dados de usuário presente no token não são válidos.",
       };
     }
   },

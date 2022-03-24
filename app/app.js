@@ -2,7 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv").config({ path: "../.env" });
 const customErrorHandler = require("./src/modules/error");
-const { sequelize, sequelizeSync } = require("./src/sequelize");
+const { sequelize, sequelizeSync } = require("./src/sequelize/");
+const { Success, InternalServerError } = require("./src/modules/codes");
 
 // Configuração do Express
 const app = express();
@@ -25,11 +26,15 @@ app.get("/api/connection", async (req, res) => {
     await sequelize.authenticate();
     console.log("Conexão com o banco de dados realizada com sucesso.");
     res.status(200).send({
-      message: "Conexão com o banco de dados realizada com sucesso.",
+      code: Success,
+      response: {
+        message: "Conexão com o banco de dados realizada com sucesso.",
+      },
     });
   } catch (error) {
     console.log(`Não foi possível realizar a conexão com o banco de dados: ${error.message}`);
     res.status(500).json({
+      code: InternalServerError,
       message: `Não foi possível realizar a conexão com o banco de dados: ${error.message}`,
     });
   }

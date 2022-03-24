@@ -1,11 +1,13 @@
 const validator = require("validator");
+const { IncorrectParameter } = require("../modules/codes");
 
 module.exports = {
   validate(name) {
     if (!name) {
       return {
-        error: "Parâmetro incorreto",
-        message: "É necesário inserir um nome válido",
+        status: "error",
+        code: IncorrectParameter,
+        message: "É necesário inserir um nome válido.",
       };
     }
 
@@ -15,8 +17,9 @@ module.exports = {
       })
     ) {
       return {
-        error: "Parâmetro incorreto",
-        message: "O nome informado não deve possuir caracteres especiais",
+        status: "error",
+        code: IncorrectParameter,
+        message: "O nome informado não deve possuir caracteres especiais.",
       };
     }
 
@@ -27,8 +30,9 @@ module.exports = {
       })
     ) {
       return {
-        error: "Parâmetro incorreto",
-        message: "O nome informado precisa ter entre 3 e 64 caracteres",
+        status: "error",
+        error: IncorrectParameter,
+        message: "O nome informado precisa ter entre 3 e 64 caracteres.",
       };
     }
 

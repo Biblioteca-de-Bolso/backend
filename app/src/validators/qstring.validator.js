@@ -4,9 +4,9 @@ module.exports = {
   validate(qstring) {
     if (!qstring) {
       return {
+        status: "error",
         code: IncorrectParameter,
-        error: "Parâmetro incorreto ou mal formatado",
-        message: "É necesário inserir uma parâmetro de busca",
+        message: "É necesário inserir um parâmetro de busca.",
       };
     }
     return {};

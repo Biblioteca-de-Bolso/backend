@@ -1,25 +1,29 @@
 const validator = require("validator");
+const { IncorrectParameter } = require("../modules/codes");
 
 module.exports = {
   validate(password) {
     if (!password) {
       return {
-        error: "Parâmetro incorreto",
-        message: "É necesário inserir uma senha válida",
+        status: "error",
+        code: IncorrectParameter,
+        message: "É necesário inserir uma senha válida.",
       };
     }
 
     if (!validator.isLength(password, { min: 8, max: 32 })) {
       return {
-        error: "Parâmetro incorreto",
-        message: "A senha precisa ter entre 8 e 32 caracteres",
+        status: "error",
+        code: IncorrectParameter,
+        message: "A senha precisa ter entre 8 e 32 caracteres.",
       };
     }
 
     if (validator.contains(password, " ")) {
       return {
-        error: "Parâmetro incorreto",
-        message: "A senha informada não deve possuir espaços",
+        status: "error",
+        code: IncorrectParameter,
+        message: "A senha informada não deve possuir espaços.",
       };
     }
 
@@ -29,7 +33,8 @@ module.exports = {
       })
     ) {
       return {
-        error: "Parâmetro incorreto",
+        status: "error",
+        code: IncorrectParameter,
         message: `Apenas os seguintes caracteres especiais são permitidos: ~\`!@#$%^&*()_-+={[}]|:;\"'<,>.?/`,
       };
     }

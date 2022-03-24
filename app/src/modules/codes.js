@@ -20,9 +20,6 @@ module.exports = {
   // Usuário não possui permissão para realizar esta ação
   Forbidden: "Forbidden",
 
-  // Requisição executada com sucesso
-  Success: "Success",
-
   // É necessário realizar a confirmação da conta de usuário
   AccountNotVerified: "AccountNotVerified",
 
