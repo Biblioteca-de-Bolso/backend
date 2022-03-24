@@ -5,11 +5,11 @@ module.exports = {
   // Parâmetro inexistente ou mal formatado
   IncorrectParameter: "IncorrectParameter",
 
-  // Email já foi cadastrado por outro usuário
-  EmailAlreadyInUse: "EmailAlreadyInUse",
-
   // Falha de operação no banco de dados
   DatabaseFailure: "DatabaseFailure",
+
+  // Email já foi cadastrado por outro usuário
+  EmailAlreadyInUse: "EmailAlreadyInUse",
 
   // Dados de usuário não foram encontrados na base de dados
   UserNotFound: "UserNotFound",
