@@ -20,7 +20,6 @@ services:
     command: sh -c "/wait && npm run server"
     volumes:
       - ./app:/usr/src/app
-      # - ./app/node_modules:/usr/src/app/node_modules
       - /usr/src/app/node_modules
   database:
     container_name: bibliotecadebolso_database

@@ -25,7 +25,4 @@ module.exports = {
 
   // Falha na criação de token JWT
   JWTCreationFailure: "JWTCreationFailure",
-
-  // Requisição executada com sucesso
-  Success: "Success",
 };

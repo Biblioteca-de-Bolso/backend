@@ -20,7 +20,7 @@ routes.post("/user", UserController.create);
 routes.delete("/user", UserController.delete);
 
 // Rotas de Livros
-routes.get("/book/list", BookController.list);
+routes.get("/book", BookController.list);
 
 // Rotas do Google Books
 routes.get("/googlebooks/", GoogleBooksController.search);

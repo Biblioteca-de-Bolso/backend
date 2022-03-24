@@ -22,15 +22,15 @@ module.exports = {
       const validateEmail = EmailValidator.validate(email);
       const validatePassword = PasswordValidator.validate(password);
 
-      if (validatePassword.error) {
+      if (validatePassword.status === "error") {
         return res.status(400).json(validatePassword);
       }
 
-      if (validateEmail.error) {
+      if (validateEmail.status === "error") {
         return res.status(400).json(validateEmail);
       }
 
-      if (validateName.error) {
+      if (validateName.status === "error") {
         return res.status(400).json(validateName);
       }
 
@@ -53,6 +53,7 @@ module.exports = {
 
       if (decoded["error"]) {
         res.status(401).json({
+          status: "error",
           code: Unauthorized,
           message: decoded["error"],
         });
@@ -68,15 +69,15 @@ module.exports = {
       const validateEmail = EmailValidator.validate(email);
       const validatePassword = PasswordValidator.validate(password);
 
-      if (validateUserId.error) {
+      if (validateUserId.status === "error") {
         return res.status(400).json(validateUserId);
       }
 
-      if (validateEmail.error) {
+      if (validateEmail.status === "error") {
         return res.status(400).json(validateEmail);
       }
 
-      if (validatePassword.error) {
+      if (validatePassword.status === "error") {
         return res.status(400).json(validatePassword);
       }
 

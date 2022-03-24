@@ -12,6 +12,7 @@ module.exports = {
 
       if (!token) {
         res.status(400).json({
+          status: "error",
           code: IncorrectParameter,
           message: "Nenhum token de autenticação informado.",
         });
@@ -22,6 +23,7 @@ module.exports = {
 
       if (decoded["error"]) {
         res.status(401).json({
+          status: "error",
           code: Unauthorized,
           message: decoded["error"],
         });
@@ -33,7 +35,7 @@ module.exports = {
 
       const validateQstring = QstringValidator.validate(qstring);
 
-      if (validateQstring.error) {
+      if (validateQstring.status === "error") {
         res.status(400).json(validateQstring);
       }
 

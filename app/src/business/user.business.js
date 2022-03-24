@@ -26,6 +26,7 @@ module.exports = {
 
     if (user) {
       return conflict({
+        status: "error",
         code: EmailAlreadyInUse,
         message: "Este endereço de email já foi cadastrado por outro usuário.",
       });
@@ -56,13 +57,14 @@ module.exports = {
         }
 
         return created({
-          code: Success,
+          status: "ok",
           response: {
             user: user,
           },
         });
       } else {
         return failure({
+          status: "error",
           code: DatabaseFailure,
           message: "Não foi possível inserir o novo usuário no banco de dados.",
         });
@@ -104,23 +106,28 @@ module.exports = {
         // Verifica sucesso da exclusão
         if (deleted) {
           return ok({
-            code: Success,
-            message: "Conta e dados de usuário removidos com sucesso.",
+            status: "ok",
+            response: {
+              message: "Conta e dados de usuário removidos com sucesso.",
+            },
           });
         } else {
           return failure({
+            status: "error",
             code: DatabaseFailure,
             message: "Não foi possível realizar a exclusão de um ou mais dados do banco de dados.",
           });
         }
       } else {
         return forbidden({
+          status: "error",
           code: Forbidden,
           message: "O usuário informado não possui permissão para completar esta ação.",
         });
       }
     } else {
       return ok({
+        status: "error",
         code: UserNotFound,
         message: "O usuário informado não foi encontrado na base de dados.",
       });

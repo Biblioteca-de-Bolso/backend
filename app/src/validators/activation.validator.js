@@ -1,24 +1,29 @@
 const validator = require("validator");
-
-const filename = __filename.slice(__dirname.length + 1) + " -";
+const { IncorrectParameter } = require("../modules/codes");
 
 module.exports = {
   validate(code) {
     if (!code) {
       return {
-        error: "Parâmetro incorreto",
+        status: "error",
+        code: IncorrectParameter,
+        message: "É necessário informar um código de ativação.",
       };
     }
 
     if (!validator.isAlphanumeric(code)) {
       return {
-        error: "Parâmetro incorreto",
+        status: "error",
+        code: IncorrectParameter,
+        message: "O código de ativação informado não é válido.",
       };
     }
 
     if (!validator.isLength(code, { min: 16, max: 16 })) {
       return {
-        error: "Parâmetro incorreto",
+        status: "error",
+        code: IncorrectParameter,
+        message: "O código de ativação informado não é válido.",
       };
     }
 

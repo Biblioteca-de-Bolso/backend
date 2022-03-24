@@ -13,6 +13,7 @@ module.exports = {
     database: "bibliotecadebolso",
     host: "database_test",
     dialect: "postgres",
+    logging: false,
   },
   production: {
     dialect: "postgres",

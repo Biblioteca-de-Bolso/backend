@@ -1,9 +1,8 @@
 const BookBusiness = require("../business/book.business");
 const AuthBusiness = require("../business/auth.business");
 
-const { fileName } = require("../modules/debug");
 const { badRequest, unauthorized } = require("../modules/http");
-const { Unauthorized } = require("../modules/codes");
+const { Unauthorized, IncorrectParameter } = require("../modules/codes");
 
 module.exports = {
   async list(req, res, next) {
@@ -12,9 +11,9 @@ module.exports = {
       const token = req.headers["x-access-token"];
 
       if (!token) {
-        console.log(fileName(), "Nenhum token de autenticação informado");
-
-        return badRequest({
+        res.status(400).json({
+          status: "error",
+          code: IncorrectParameter,
           message: "Nenhum token de autenticação informado.",
         });
       }
@@ -23,7 +22,8 @@ module.exports = {
       const decoded = await AuthBusiness.verifyToken(token);
 
       if (decoded["error"]) {
-        return unauthorized({
+        res.status(400).json({
+          status: "error",
           code: Unauthorized,
           message: decoded["error"],
         });
@@ -33,7 +33,7 @@ module.exports = {
       const response = await BookBusiness.list();
 
       // Retornar com resultado da operação
-      return ok(response.body);
+      res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }

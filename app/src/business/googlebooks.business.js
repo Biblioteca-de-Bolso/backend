@@ -51,7 +51,7 @@ module.exports = {
       });
 
     return ok({
-      code: Success,
+      code: "ok",
       response: {
         books: books,
       },
