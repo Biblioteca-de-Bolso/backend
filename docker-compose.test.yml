@@ -21,6 +21,7 @@ services:
     command: >
       sh -c "
         /wait &&
+        npx prisma generate --schema src/prisma/schema.prisma &&
         npx prisma db push --schema src/prisma/schema.prisma  &&
         npm run test-coverage"
     volumes:
