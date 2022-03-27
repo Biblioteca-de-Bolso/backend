@@ -31,6 +31,7 @@
   "homepage": "https://github.com/Biblioteca-de-Bolso/backend#readme",
   "dependencies": {
     "@prisma/client": "^3.11.1",
+    "@sendgrid/mail": "^7.6.2",
     "axios": "^0.26.1",
     "cors": "^2.8.5",
     "dayjs": "^1.11.0",
