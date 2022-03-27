@@ -1,27 +1,20 @@
 const crypto = require("crypto");
 const validator = require("validator");
 
-const User = require("../models/user.model");
+const prisma = require("../prisma");
 
 const { conflict, created, failure, ok, forbidden } = require("../modules/http");
-const {
-  EmailAlreadyInUse,
-  DatabaseFailure,
-  UserNotFound,
-  Forbidden,
-  Success,
-} = require("../modules/codes");
+const { EmailAlreadyInUse, DatabaseFailure, UserNotFound, Forbidden } = require("../modules/codes");
 
 const mail = require("../modules/mail");
 const { fileName } = require("../modules/debug");
 
 module.exports = {
   async create(email, name, password) {
-    const user = await User.findOne({
+    const user = await prisma.user.findUnique({
       where: {
         email: email,
       },
-      raw: true,
     });
 
     if (user) {
@@ -35,11 +28,13 @@ module.exports = {
 
       const activationCode = crypto.randomBytes(8).toString("hex");
 
-      const user = await User.create({
-        email,
-        name,
-        password,
-        activationCode,
+      const user = await prisma.user.create({
+        data: {
+          email,
+          name,
+          password,
+          activationCode,
+        },
       });
 
       if (user) {
@@ -79,13 +74,12 @@ module.exports = {
     }
 
     // Adquirir dados do usuário informado
-    const user = await User.findOne({
+    const user = await prisma.user.findFirst({
       where: {
-        id: userId,
+        id: parseInt(userId),
         email: email,
         password: password,
       },
-      raw: true,
     });
 
     if (user) {
@@ -96,12 +90,24 @@ module.exports = {
         user["password"] == password
       ) {
         // Remover todos os dados de usuário (de todas as tabelas)
-        const deleted = await User.destroy({
-          where: {
-            id: userId,
-            email: email,
-          },
-        });
+        // const deleted = await prisma.user.delete({
+        //   where: {
+        //     id: parseInt(userId),
+        //   },
+        // });
+
+        const deleted = await prisma.$transaction([
+          prisma.refreshToken.deleteMany({
+            where: {
+              userId: parseInt(userId),
+            },
+          }),
+          prisma.user.delete({
+            where: {
+              id: parseInt(userId),
+            },
+          }),
+        ]);
 
         // Verifica sucesso da exclusão
         if (deleted) {

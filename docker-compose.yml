@@ -12,6 +12,7 @@ services:
       DB_USER_DEV: bibliotecadebolso
       DB_PORT_DEV: 5432
       DB_PASS_DEV: 123456789
+
       WAIT_HOSTS: database:5432
       WAIT_TIMEOUT: 600
       WAIT_SLEEP_INTERVAL: 10
@@ -20,7 +21,7 @@ services:
     command: sh -c "/wait && npm run server"
     volumes:
       - ./app:/usr/src/app
-      - /usr/src/app/node_modules
+      - ./app/node_modules:/usr/src/app/node_modules
   database:
     container_name: bibliotecadebolso_database
     image: postgres
