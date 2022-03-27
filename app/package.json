@@ -7,6 +7,7 @@
     "node": ">=16.0.0"
   },
   "scripts": {
+    "build": "prisma generate",
     "test": "jest",
     "test-coverage": "jest --coverage --colors",
     "server": "nodemon -e js,mjs,json,prisma server.js"
