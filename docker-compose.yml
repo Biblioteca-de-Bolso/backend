@@ -18,7 +18,11 @@ services:
       WAIT_SLEEP_INTERVAL: 10
     depends_on:
       - database
-    command: sh -c "/wait && npm run server"
+    command: >
+      sh -c "
+      /wait && 
+      npx prisma migrate deploy --schema src/prisma/schema.prisma &&
+      npm run server"
     volumes:
       - ./app:/usr/src/app
       - ./app/node_modules:/usr/src/app/node_modules
