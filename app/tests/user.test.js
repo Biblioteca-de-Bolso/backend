@@ -7,7 +7,9 @@ describe("Fluxo de Usuário", () => {
 
   beforeAll(async () => {});
 
-  afterAll(async () => {});
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
 
   // Parâmetros do fluxo
   let userId = null;
