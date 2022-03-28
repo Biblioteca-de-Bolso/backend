@@ -5,7 +5,9 @@ const prisma = require("../src/prisma");
 describe("Fluxo de Usuário", () => {
   jest.setTimeout(10000);
 
-  beforeAll(async () => {});
+  beforeAll(async () => {
+    await prisma.$connect();
+  });
 
   afterAll(async () => {
     await prisma.$disconnect();
