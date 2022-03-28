@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id              Int       @id @unique @default(autoincrement())
+  name            String    @db.VarChar(64)
+  email           String    @unique @db.VarChar(64) 
+  password        String    @db.VarChar(32) 
+  active          Boolean?  @db.Boolean @default(false)
+  activationCode  String?   @db.VarChar(16)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  refreshTokens  refreshToken[]
+}
+
+model refreshToken {
+  id              String    @id @unique @db.VarChar(128)
+  email           String    @db.VarChar(64)
+  userId          Int          
+  iat             String    @db.VarChar(10)
+  exp             String    @db.VarChar(10)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user            user      @relation(fields: [userId], references: [id]) 
+}
+
+model book {
+  bookId          Int       @id @unique @default(autoincrement())
+  userId          Int
+  title           String    @db.VarChar(128)
+  author          String?   @db.VarChar(128)
+  isbn_10         String?   @db.VarChar(10)
+  isbn_13         String?   @db.VarChar(13)
+  publisher       String?   @db.VarChar(128)
+  description     String?   @db.Text
+  thumbnail       String?   @db.VarChar(255)
+  readStatus      Int?
+  borrowStatus    Int?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}

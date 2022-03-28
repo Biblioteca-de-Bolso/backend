@@ -6,6 +6,7 @@ services:
     ports:
       - ${API_LOCAL_PORT}:${API_LOCAL_PORT}
     environment:
+      DATABASE_URL: "postgres://bibliotecadebolso_test:123456789@database_test:5432/bibliotecadebolso_test?schema=bibliotecadebolso"
       NODE_ENV: test
       DB_HOST_DEV: database_test
       DB_NAME_DEV: bibliotecadebolso
@@ -17,7 +18,12 @@ services:
       WAIT_SLEEP_INTERVAL: 10
     depends_on:
       - database_test
-    command: sh -c "/wait && npm run test-coverage"
+    command: >
+      sh -c "
+        /wait &&
+        npx prisma generate --schema src/prisma/schema.prisma &&
+        npx prisma db push --schema src/prisma/schema.prisma  &&
+        npm run test-coverage"
     volumes:
       - ./app/coverage:/usr/src/app/coverage
   database_test:
@@ -28,5 +34,5 @@ services:
       - 5432:5432
     environment:
       POSTGRES_PASSWORD: 123456789
-      POSTGRES_USER: bibliotecadebolso
-      POSTGRES_DATABASE: bibliotecadebolso
+      POSTGRES_USER: bibliotecadebolso_test
+      POSTGRES_DATABASE: bibliotecadebolso_test

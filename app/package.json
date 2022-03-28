@@ -7,10 +7,10 @@
     "node": ">=16.0.0"
   },
   "scripts": {
+    "build": "npx prisma generate --schema src/prisma/schema.prisma",
     "test": "jest",
     "test-coverage": "jest --coverage --colors",
-    "server": "nodemon server.js",
-    "db:makemigrations": "./node_modules/sequelize-lazy-migrations/bin/makemigration.js"
+    "server": "nodemon -e js,mjs,json,prisma server.js"
   },
   "jest": {
     "coverageReporters": [
@@ -30,6 +30,8 @@
   },
   "homepage": "https://github.com/Biblioteca-de-Bolso/backend#readme",
   "dependencies": {
+    "@prisma/client": "^3.11.1",
+    "@sendgrid/mail": "^7.6.2",
     "axios": "^0.26.1",
     "cors": "^2.8.5",
     "dayjs": "^1.11.0",
@@ -46,6 +48,7 @@
   "devDependencies": {
     "jest": "^27.5.1",
     "nodemon": "^2.0.15",
+    "prisma": "^3.11.1",
     "supertest": "^6.2.2"
   }
 }
