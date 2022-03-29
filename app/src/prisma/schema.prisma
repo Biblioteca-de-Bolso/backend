@@ -8,20 +8,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model user {
-  id              Int       @id @unique @default(autoincrement())
-  name            String    @db.VarChar(64)
-  email           String    @unique @db.VarChar(64) 
-  password        String    @db.VarChar(32) 
-  active          Boolean?  @db.Boolean @default(false)
-  activationCode  String?   @db.VarChar(16)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+model User {
+  id              Int           @id @unique @default(autoincrement())
+  name            String        @db.VarChar(64)
+  email           String        @unique @db.VarChar(64) 
+  password        String        @db.VarChar(32) 
+  active          Boolean?      @db.Boolean @default(false)
+  activationCode  String?       @db.VarChar(16)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
-  refreshTokens  refreshToken[]
+  refreshTokens   RefreshToken[]
+
+  @@map("user")
 }
 
-model refreshToken {
+model RefreshToken {
   id              String    @id @unique @db.VarChar(128)
   email           String    @db.VarChar(64)
   userId          Int          
@@ -30,10 +32,12 @@ model refreshToken {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  user            user      @relation(fields: [userId], references: [id]) 
+  user            User      @relation(fields: [userId], references: [id]) 
+
+  @@map("refreshToken")
 }
 
-model book {
+model Book {
   bookId          Int       @id @unique @default(autoincrement())
   userId          Int
   title           String    @db.VarChar(128)
@@ -47,4 +51,6 @@ model book {
   borrowStatus    Int?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+
+  @@map("book")
 }
