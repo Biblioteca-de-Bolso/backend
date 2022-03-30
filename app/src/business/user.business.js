@@ -38,17 +38,20 @@ module.exports = {
       });
 
       if (user) {
-        try {
-          const { emailHtml, emailText } = await mail.composeEmail(
-            user["id"],
-            user["name"],
-            user["email"],
-            user["activationCode"]
-          );
+        // Não enviar email de cadastro em ambiente de teste
+        if (process.env.NODE_ENV !== "test") {
+          try {
+            const { emailHtml, emailText } = await mail.composeEmail(
+              user["id"],
+              user["name"],
+              user["email"],
+              user["activationCode"]
+            );
 
-          await mail.sendEmail(user["email"], emailText, emailHtml);
-        } catch (error) {
-          console.log(fileName(), `Erro durante envio de email: ${error.message}`);
+            await mail.sendEmail(user["email"], emailText, emailHtml);
+          } catch (error) {
+            console.log(fileName(), `Erro durante envio de email: ${error.message}`);
+          }
         }
 
         return created({

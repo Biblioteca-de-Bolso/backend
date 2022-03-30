@@ -6,6 +6,7 @@ services:
     ports:
       - ${API_LOCAL_PORT}:${API_LOCAL_PORT}
     environment:
+      NODE_ENV: test
       DATABASE_URL: "postgres://bibliotecadebolso_test:123456789@database_test:5432/bibliotecadebolso_test"
       WAIT_HOSTS: database_test:5432
       WAIT_TIMEOUT: 600
