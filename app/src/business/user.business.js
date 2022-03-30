@@ -3,7 +3,7 @@ const validator = require("validator");
 
 const prisma = require("../prisma");
 
-const { conflict, created, failure, ok, forbidden } = require("../modules/http");
+const { conflict, created, failure, ok, forbidden, notFound } = require("../modules/http");
 const { EmailAlreadyInUse, DatabaseFailure, UserNotFound, Forbidden } = require("../modules/codes");
 
 const mail = require("../modules/mail");
@@ -133,6 +133,38 @@ module.exports = {
         status: "error",
         code: UserNotFound,
         message: "O usuário informado não foi encontrado na base de dados.",
+      });
+    }
+  },
+
+  async read(decoded, userId) {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: parseInt(userId),
+      },
+    });
+
+    if (user) {
+      // Verificar permissão de acesso aos dados desse usuário
+      if (user["id"] == decoded["userId"] && user["email"] === decoded["email"]) {
+        return ok({
+          status: "ok",
+          response: {
+            user: user,
+          },
+        });
+      } else {
+        return forbidden({
+          status: "error",
+          code: Forbidden,
+          message: "Este usuário não possui permissão para acessar a informação solicitada.",
+        });
+      }
+    } else {
+      return notFound({
+        status: "error",
+        code: UserNotFound,
+        message: "Este usuário não foi encontrado.",
       });
     }
   },

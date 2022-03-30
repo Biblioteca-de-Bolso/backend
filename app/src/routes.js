@@ -18,6 +18,7 @@ routes.post("/auth/refresh", AuthController.refreshToken);
 // Rotas de Usuário
 routes.post("/user", UserController.create);
 routes.delete("/user", UserController.delete);
+routes.get("/user/:id", UserController.read);
 
 // Rotas de Livros
 routes.get("/book", BookController.list);
