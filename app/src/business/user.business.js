@@ -90,12 +90,6 @@ module.exports = {
         user["password"] == password
       ) {
         // Remover todos os dados de usuário (de todas as tabelas)
-        // const deleted = await prisma.user.delete({
-        //   where: {
-        //     id: parseInt(userId),
-        //   },
-        // });
-
         const deleted = await prisma.$transaction([
           prisma.refreshToken.deleteMany({
             where: {

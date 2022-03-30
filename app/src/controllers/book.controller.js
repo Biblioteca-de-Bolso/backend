@@ -11,7 +11,7 @@ module.exports = {
       const token = req.headers["x-access-token"];
 
       if (!token) {
-        res.status(400).json({
+        return res.status(400).json({
           status: "error",
           code: IncorrectParameter,
           message: "Nenhum token de autenticação informado.",
@@ -22,7 +22,7 @@ module.exports = {
       const decoded = await AuthBusiness.verifyToken(token);
 
       if (decoded["error"]) {
-        res.status(400).json({
+        return res.status(400).json({
           status: "error",
           code: Unauthorized,
           message: decoded["error"],
@@ -33,7 +33,7 @@ module.exports = {
       const response = await BookBusiness.list();
 
       // Retornar com resultado da operação
-      res.status(response.statusCode).json(response.body);
+      return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }

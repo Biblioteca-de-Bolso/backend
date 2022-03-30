@@ -37,7 +37,7 @@ module.exports = {
       // Validação dos parâmetros finalizada
       const response = await UserBusiness.create(email, name, password);
 
-      res.status(response.statusCode).json(response.body);
+      return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }
@@ -52,7 +52,7 @@ module.exports = {
       const decoded = await AuthBusiness.verifyToken(token);
 
       if (decoded["error"]) {
-        res.status(401).json({
+        return res.status(401).json({
           status: "error",
           code: Unauthorized,
           message: decoded["error"],
@@ -83,7 +83,7 @@ module.exports = {
 
       const response = await UserBusiness.delete(decoded, userId, email, password);
 
-      res.status(response.statusCode).json(response.body);
+      return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }

@@ -42,7 +42,7 @@ module.exports = {
   },
 
   async sendEmail(recipient, text, html) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const msg = {
         to: recipient,
         from: "debolsobiblioteca@gmail.com",
@@ -51,14 +51,14 @@ module.exports = {
         html: html,
       };
 
-      sendGrid
+      await sendGrid
         .send(msg)
         .then(() => {
           console.log(fileName(), "Email enviado com sucesso.");
           resolve();
         })
         .catch((error) => {
-          console.error(error);
+          console.log(error);
           reject();
         });
     });
