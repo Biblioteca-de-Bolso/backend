@@ -48,7 +48,7 @@ describe("Testes para leitura de dados de um usuário", () => {
     await prisma.$disconnect();
   });
 
-  test("Deve retornar os dados do usuário", async () => {
+  test.skip("Deve retornar os dados do usuário", async () => {
     const response = await request(app).get(`/user/${user["id"]}`).set({
       "x-access-token": accessToken,
     });
