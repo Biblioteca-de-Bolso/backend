@@ -7,7 +7,7 @@
     "node": ">=16.0.0"
   },
   "scripts": {
-    "build": "npx prisma generate --schema src/prisma/schema.prisma",
+    "build": "npx prisma generate",
     "test": "jest",
     "test-coverage": "jest --coverage --colors",
     "server": "nodemon -e js,mjs,json,prisma server.js"
@@ -38,11 +38,7 @@
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
-    "nodemailer": "^6.7.2",
-    "pg": "^8.7.3",
-    "pg-hstore": "^2.3.4",
     "require-dir": "^1.2.0",
-    "sequelize": "^6.17.0",
     "validator": "^13.7.0"
   },
   "devDependencies": {

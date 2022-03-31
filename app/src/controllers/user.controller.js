@@ -6,7 +6,6 @@ const UserIdValidator = require("../validators/userid.validator");
 const UserBusiness = require("../business/user.business");
 const AuthBusiness = require("../business/auth.business");
 
-const http = require("../modules/http");
 const { Unauthorized } = require("../modules/codes");
 
 module.exports = {
@@ -37,7 +36,7 @@ module.exports = {
       // Validação dos parâmetros finalizada
       const response = await UserBusiness.create(email, name, password);
 
-      res.status(response.statusCode).json(response.body);
+      return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }
@@ -52,7 +51,7 @@ module.exports = {
       const decoded = await AuthBusiness.verifyToken(token);
 
       if (decoded["error"]) {
-        res.status(401).json({
+        return res.status(401).json({
           status: "error",
           code: Unauthorized,
           message: decoded["error"],
@@ -83,7 +82,41 @@ module.exports = {
 
       const response = await UserBusiness.delete(decoded, userId, email, password);
 
-      res.status(response.statusCode).json(response.body);
+      return res.status(response.statusCode).json(response.body);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async read(req, res, next) {
+    try {
+      // Aquisição do token de autenticação
+      const token = req.headers["x-access-token"];
+
+      // Validação do token informado
+      const decoded = await AuthBusiness.verifyToken(token);
+
+      if (decoded["error"]) {
+        return res.status(401).json({
+          status: "error",
+          code: Unauthorized,
+          message: decoded["error"],
+        });
+      }
+
+      // Aquisição dos parâmetros
+      const userId = req.params["id"];
+
+      // Validação dos parâmetros
+      const validateUserId = UserIdValidator.validate(userId);
+
+      if (validateUserId.status === "error") {
+        return res.status(400).json(validateUserId);
+      }
+
+      const response = await UserBusiness.read(decoded, userId);
+
+      return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }

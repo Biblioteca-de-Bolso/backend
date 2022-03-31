@@ -70,15 +70,17 @@ module.exports = {
       where: {
         id: parseInt(userId),
         email: email,
+        activationCode: activationCode,
         active: false,
       },
     });
 
     if (user) {
       // Usuario encontrado, realizar modificação de ativação
-      const activeUser = await prisma.user.update({
+      const activeUser = await prisma.user.updateMany({
         where: {
           id: parseInt(userId),
+          activationCode: activationCode,
         },
         data: { active: true },
       });
@@ -105,6 +107,10 @@ module.exports = {
         message: "Os dados de usuários ou de confirmação não são válidos.",
       };
     }
+  },
+
+  async refreshToken() {
+    // ...
   },
 
   async createToken(payload) {

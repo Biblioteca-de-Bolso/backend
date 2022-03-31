@@ -1,3 +1,3 @@
 #! /bin/bash
 cd ../app
-dotenv -e ../.env -- npx prisma db pull --schema src/prisma/schema.prisma
+sudo docker exec -it bibliotecadebolso_backend npx prisma db pull

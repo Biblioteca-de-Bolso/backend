@@ -14,23 +14,23 @@ module.exports = {
       const email = req.body["email"];
       const password = req.body["password"];
 
-      // Validação dos parâmetros
+      // Validação dos parâmetrosc
       const validateEmail = EmailValidator.validate(email);
       const validatePassword = PasswordValidator.validate(password);
 
       if (validatePassword.status === "error") {
-        res.status(400).json(validatePassword);
+        return res.status(400).json(validatePassword);
       }
 
       if (validateEmail.status === "error") {
-        res.status(400).json(validateEmail);
+        return res.status(400).json(validateEmail);
       }
 
       // Validação dos parâmetros finalizada, realiza procedimento de login
       const response = await AuthBusiness.login(email, password);
 
       // Retorna resultado da operação
-      res.status(response.statusCode).json(response.body);
+      return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }

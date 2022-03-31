@@ -3,7 +3,7 @@ const validator = require("validator");
 
 const prisma = require("../prisma");
 
-const { conflict, created, failure, ok, forbidden } = require("../modules/http");
+const { conflict, created, failure, ok, forbidden, notFound } = require("../modules/http");
 const { EmailAlreadyInUse, DatabaseFailure, UserNotFound, Forbidden } = require("../modules/codes");
 
 const mail = require("../modules/mail");
@@ -38,17 +38,20 @@ module.exports = {
       });
 
       if (user) {
-        try {
-          const { emailHtml, emailText } = await mail.composeEmail(
-            user["id"],
-            user["name"],
-            user["email"],
-            user["activationCode"]
-          );
+        // Não enviar email de cadastro em ambiente de teste
+        if (process.env.NODE_ENV !== "test") {
+          try {
+            const { emailHtml, emailText } = await mail.composeEmail(
+              user["id"],
+              user["name"],
+              user["email"],
+              user["activationCode"]
+            );
 
-          await mail.sendEmail(user["email"], emailText, emailHtml);
-        } catch (error) {
-          console.log(fileName(), `Erro durante envio de email: ${error.message}`);
+            await mail.sendEmail(user["email"], emailText, emailHtml);
+          } catch (error) {
+            console.log(fileName(), `Erro durante envio de email: ${error.message}`);
+          }
         }
 
         return created({
@@ -90,12 +93,6 @@ module.exports = {
         user["password"] == password
       ) {
         // Remover todos os dados de usuário (de todas as tabelas)
-        // const deleted = await prisma.user.delete({
-        //   where: {
-        //     id: parseInt(userId),
-        //   },
-        // });
-
         const deleted = await prisma.$transaction([
           prisma.refreshToken.deleteMany({
             where: {
@@ -136,6 +133,38 @@ module.exports = {
         status: "error",
         code: UserNotFound,
         message: "O usuário informado não foi encontrado na base de dados.",
+      });
+    }
+  },
+
+  async read(decoded, userId) {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: parseInt(userId),
+      },
+    });
+
+    if (user) {
+      // Verificar permissão de acesso aos dados desse usuário
+      if (user["id"] == decoded["userId"] && user["email"] === decoded["email"]) {
+        return ok({
+          status: "ok",
+          response: {
+            user: user,
+          },
+        });
+      } else {
+        return forbidden({
+          status: "error",
+          code: Forbidden,
+          message: "Este usuário não possui permissão para acessar a informação solicitada.",
+        });
+      }
+    } else {
+      return notFound({
+        status: "error",
+        code: UserNotFound,
+        message: "Este usuário não foi encontrado.",
       });
     }
   },

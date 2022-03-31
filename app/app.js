@@ -2,8 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv").config({ path: "../.env" });
 const customErrorHandler = require("./src/modules/error");
-const { InternalServerError } = require("./src/modules/codes");
-const prisma = require("./src/prisma");
 
 // Configuração do Express
 const app = express();
@@ -26,6 +24,8 @@ app.get(["/", "/api"], async (req, res) => {
     status: "ok",
     response: {
       message: "Biblioteca de Bolso - API",
+      homepage: "https://github.com/Biblioteca-de-Bolso/backend",
+      documentation: "https://documenter.getpostman.com/view/19545370/UVkmQGwd",
     },
   });
 });
