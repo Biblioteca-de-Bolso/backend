@@ -1,7 +1,8 @@
-const nodemailer = require("nodemailer");
 const fs = require("fs").promises;
+const { fileName } = require("./debug");
+const sendGrid = require("@sendgrid/mail");
 
-const filename = __filename.slice(__dirname.length + 1) + " -";
+sendGrid.setApiKey(process.env.SEND_GRID_API);
 
 module.exports = {
   async composeEmail(userId, name, email, activationCode) {
@@ -33,7 +34,7 @@ module.exports = {
         emailHtml: html,
       };
     } catch (error) {
-      console.log(filename, `Erro durante construção do email: ${error.message}`);
+      console.log(fileName(), `Erro durante construção do email: ${error.message}`);
       return {
         error: `Erro durante construção do email: ${error.message}`,
       };
@@ -41,32 +42,25 @@ module.exports = {
   },
 
   async sendEmail(recipient, text, html) {
-    return new Promise((resolve, reject) => {
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASSWORD,
-        },
-      });
-
-      const mailOptions = {
-        from: "debolsobiblioteca@gmail.com",
+    return new Promise(async (resolve, reject) => {
+      const msg = {
         to: recipient,
+        from: "debolsobiblioteca@gmail.com",
         subject: "Bem vindo(a) à Biblioteca de Bolso!",
         text: text,
         html: html,
       };
 
-      transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          console.log(filename, `Erro durante o envio de email: ${error.message}`);
-          reject();
-        } else {
-          console.log(filename, `Email enviado com sucesso: ${info.response}`);
+      await sendGrid
+        .send(msg)
+        .then(() => {
+          console.log(fileName(), "Email enviado com sucesso.");
           resolve();
-        }
-      });
+        })
+        .catch((error) => {
+          console.log(error);
+          reject();
+        });
     });
   },
 };

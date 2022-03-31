@@ -1,27 +1,20 @@
 const crypto = require("crypto");
 const validator = require("validator");
 
-const User = require("../models/user.model");
+const prisma = require("../prisma");
 
-const { conflict, created, failure, ok, forbidden } = require("../modules/http");
-const {
-  EmailAlreadyInUse,
-  DatabaseFailure,
-  UserNotFound,
-  Forbidden,
-  Success,
-} = require("../modules/codes");
+const { conflict, created, failure, ok, forbidden, notFound } = require("../modules/http");
+const { EmailAlreadyInUse, DatabaseFailure, UserNotFound, Forbidden } = require("../modules/codes");
 
 const mail = require("../modules/mail");
 const { fileName } = require("../modules/debug");
 
 module.exports = {
   async create(email, name, password) {
-    const user = await User.findOne({
+    const user = await prisma.user.findUnique({
       where: {
         email: email,
       },
-      raw: true,
     });
 
     if (user) {
@@ -35,25 +28,30 @@ module.exports = {
 
       const activationCode = crypto.randomBytes(8).toString("hex");
 
-      const user = await User.create({
-        email,
-        name,
-        password,
-        activationCode,
+      const user = await prisma.user.create({
+        data: {
+          email,
+          name,
+          password,
+          activationCode,
+        },
       });
 
       if (user) {
-        try {
-          const { emailHtml, emailText } = await mail.composeEmail(
-            user["id"],
-            user["name"],
-            user["email"],
-            user["activationCode"]
-          );
+        // Não enviar email de cadastro em ambiente de teste
+        if (process.env.NODE_ENV !== "test") {
+          try {
+            const { emailHtml, emailText } = await mail.composeEmail(
+              user["id"],
+              user["name"],
+              user["email"],
+              user["activationCode"]
+            );
 
-          await mail.sendEmail(user["email"], emailText, emailHtml);
-        } catch (error) {
-          console.log(fileName(), `Erro durante envio de email: ${error.message}`);
+            await mail.sendEmail(user["email"], emailText, emailHtml);
+          } catch (error) {
+            console.log(fileName(), `Erro durante envio de email: ${error.message}`);
+          }
         }
 
         return created({
@@ -79,13 +77,12 @@ module.exports = {
     }
 
     // Adquirir dados do usuário informado
-    const user = await User.findOne({
+    const user = await prisma.user.findFirst({
       where: {
-        id: userId,
+        id: parseInt(userId),
         email: email,
         password: password,
       },
-      raw: true,
     });
 
     if (user) {
@@ -96,12 +93,18 @@ module.exports = {
         user["password"] == password
       ) {
         // Remover todos os dados de usuário (de todas as tabelas)
-        const deleted = await User.destroy({
-          where: {
-            id: userId,
-            email: email,
-          },
-        });
+        const deleted = await prisma.$transaction([
+          prisma.refreshToken.deleteMany({
+            where: {
+              userId: parseInt(userId),
+            },
+          }),
+          prisma.user.delete({
+            where: {
+              id: parseInt(userId),
+            },
+          }),
+        ]);
 
         // Verifica sucesso da exclusão
         if (deleted) {
@@ -130,6 +133,38 @@ module.exports = {
         status: "error",
         code: UserNotFound,
         message: "O usuário informado não foi encontrado na base de dados.",
+      });
+    }
+  },
+
+  async read(decoded, userId) {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: parseInt(userId),
+      },
+    });
+
+    if (user) {
+      // Verificar permissão de acesso aos dados desse usuário
+      if (user["id"] == decoded["userId"] && user["email"] === decoded["email"]) {
+        return ok({
+          status: "ok",
+          response: {
+            user: user,
+          },
+        });
+      } else {
+        return forbidden({
+          status: "error",
+          code: Forbidden,
+          message: "Este usuário não possui permissão para acessar a informação solicitada.",
+        });
+      }
+    } else {
+      return notFound({
+        status: "error",
+        code: UserNotFound,
+        message: "Este usuário não foi encontrado.",
       });
     }
   },

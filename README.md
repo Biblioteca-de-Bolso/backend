@@ -1,7 +1,7 @@
 # Biblioteca de Bolso
 
 <p align="center">
-    <img src="/doc/library_icon.png" height="130">
+    <img src="/docs/library_icon.png" height="130">
 </p>
 
 <p align="center">
@@ -33,9 +33,10 @@ Recursos planejados:
 
 - Backend: API em [Node.js](https://nodejs.org/en/) escrita com [Express](https://expressjs.com/pt-br/)
 - Banco de Dados: [PostgreSQL](https://www.postgresql.org/)
-- Interface com o banco de dados: [Sequelize](https://sequelize.org/)
+- Interface com o banco de dados: [Prisma](https://www.prisma.io/)
 - Testes: Suíte de testes escrita com o [Jest](https://jestjs.io/pt-BR/)
 - CI/CD: Integração com deploy automático no Heroku e [Github Actions](https://github.com/Biblioteca-de-Bolso/backend/actions)
+- Ambiente de desenvolvimento: [Docker](https://www.docker.com/)
 
 ## Documentação
 

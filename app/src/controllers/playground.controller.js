@@ -16,7 +16,7 @@ module.exports = {
         "EXP Format": expString,
       };
 
-      res.status(200).json(response);
+      return res.status(200).json(response);
     } catch (error) {
       next(error);
     }

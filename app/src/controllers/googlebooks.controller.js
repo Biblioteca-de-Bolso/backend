@@ -11,7 +11,7 @@ module.exports = {
       const token = req.headers["x-access-token"];
 
       if (!token) {
-        res.status(400).json({
+        return res.status(400).json({
           status: "error",
           code: IncorrectParameter,
           message: "Nenhum token de autenticação informado.",
@@ -22,7 +22,7 @@ module.exports = {
       const decoded = await AuthBusiness.verifyToken(token);
 
       if (decoded["error"]) {
-        res.status(401).json({
+        return res.status(401).json({
           status: "error",
           code: Unauthorized,
           message: decoded["error"],
@@ -36,14 +36,14 @@ module.exports = {
       const validateQstring = QstringValidator.validate(qstring);
 
       if (validateQstring.status === "error") {
-        res.status(400).json(validateQstring);
+        return res.status(400).json(validateQstring);
       }
 
       // Token validado, prosseguir com a requisição
       const response = await GoogleBooksBusines.search(qstring, langRestrict);
 
       // Retornar com resultado da operação
-      res.status(response.statusCode).json(response.body);
+      return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }

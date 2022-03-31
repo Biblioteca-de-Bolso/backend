@@ -4,14 +4,12 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const validator = require("validator");
 
-const RefreshToken = require("../models/refreshtoken.model");
-const User = require("../models/user.model");
+const prisma = require("../prisma");
 
 const { failure, unauthorized, ok } = require("../modules/http");
 const {
   Unauthorized,
   AccountNotVerified,
-  JWTCreationFailure,
   IncorrectParameter,
   DatabaseFailure,
 } = require("../modules/codes");
@@ -24,12 +22,11 @@ module.exports = {
     }
 
     // Verificação de usuário e senha contra o banco de dados
-    const user = await User.findOne({
+    const user = await prisma.user.findFirst({
       where: {
         email: email,
         password: password,
       },
-      raw: true,
     });
 
     if (user) {
@@ -37,7 +34,7 @@ module.exports = {
       if (user["active"]) {
         // Construir o payload do token com os dados necessários
         const payload = {
-          userId: user["id"],
+          userId: parseInt(user["id"]),
           email: user["email"],
           name: user["name"],
         };
@@ -69,27 +66,24 @@ module.exports = {
 
   async verifyAccount(userId, email, activationCode) {
     // Buscar os dados de usuário do banco de dados
-    const user = await User.findOne({
+    const user = await prisma.user.findFirst({
       where: {
-        id: userId,
+        id: parseInt(userId),
         email: email,
+        activationCode: activationCode,
         active: false,
       },
-      raw: true,
     });
 
     if (user) {
       // Usuario encontrado, realizar modificação de ativação
-      const activeUser = await User.update(
-        { active: true },
-        {
-          where: {
-            id: userId,
-            email: email,
-            activationCode: activationCode,
-          },
-        }
-      );
+      const activeUser = await prisma.user.updateMany({
+        where: {
+          id: parseInt(userId),
+          activationCode: activationCode,
+        },
+        data: { active: true },
+      });
 
       // Os objetos a seguir são objetos simples, e não objetos http
       if (activeUser) {
@@ -115,6 +109,10 @@ module.exports = {
     }
   },
 
+  async refreshToken() {
+    // ...
+  },
+
   async createToken(payload) {
     // Realiza assinatura do token com base no payload e no token secret da aplicação
     const accessToken = jwt.sign(payload, process.env.JWT_TOKEN_SECRET, {
@@ -133,12 +131,14 @@ module.exports = {
     const expString = exp.toString().slice(0, 10);
 
     // Salvar o refresh token no banco de dados
-    const refresh = await RefreshToken.create({
-      id: randomToken,
-      email: payload["email"],
-      userId: payload["userId"],
-      iat: iatString,
-      exp: expString,
+    const refresh = await prisma.refreshToken.create({
+      data: {
+        id: randomToken,
+        email: payload["email"],
+        userId: payload["userId"],
+        iat: iatString,
+        exp: expString,
+      },
     });
 
     if (refresh) {
@@ -163,12 +163,11 @@ module.exports = {
     const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
 
     // Token validado com sucesso, extrair dados de usuário
-    const user = await User.findOne({
+    const user = await prisma.user.findFirst({
       where: {
-        id: decoded["userId"],
+        id: parseInt(decoded["userId"]),
         email: decoded["email"],
       },
-      raw: true,
     });
 
     if (user) {

@@ -72,7 +72,6 @@ module.exports = {
             subtite: book.volumeInfo["subtitle"] || "",
             author: author || "",
             publisher: book.volumeInfo["publisher"] || "",
-            publishedDate: book.volumeInfo["publishedDate"] || "",
             description: book.volumeInfo["description"] || "",
             thumbnail: thumbnail || "",
           });

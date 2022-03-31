@@ -1,6 +1,3 @@
-const request = require("supertest");
-const app = require("../app");
-
 const http = require("../src/modules/http");
 
 describe("Objetos de retorno HTTP", () => {
