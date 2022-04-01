@@ -59,7 +59,7 @@ module.exports = {
       }
 
       // Aquisição dos parâmetros
-      const userId = req.body["id"];
+      const userId = parseInt(req.body["id"]);
       const email = req.body["email"];
       const password = req.body["password"];
 
@@ -105,7 +105,7 @@ module.exports = {
       }
 
       // Aquisição dos parâmetros
-      const userId = req.params["id"];
+      const userId = parseInt(req.params["id"]);
 
       // Validação dos parâmetros
       const validateUserId = UserIdValidator.validate(userId);

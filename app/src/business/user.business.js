@@ -2,12 +2,11 @@ const crypto = require("crypto");
 const validator = require("validator");
 
 const prisma = require("../prisma");
+const mail = require("../services/mail");
+const { fileName } = require("../modules/debug");
 
 const { conflict, created, failure, ok, forbidden, notFound } = require("../modules/http");
 const { EmailAlreadyInUse, DatabaseFailure, UserNotFound, Forbidden } = require("../modules/codes");
-
-const mail = require("../modules/mail");
-const { fileName } = require("../modules/debug");
 
 module.exports = {
   async create(email, name, password) {
@@ -140,7 +139,7 @@ module.exports = {
   async read(decoded, userId) {
     const user = await prisma.user.findUnique({
       where: {
-        id: parseInt(userId),
+        id: userId,
       },
     });
 

@@ -11,7 +11,7 @@ module.exports = {
       };
     }
 
-    if (!validator.isDecimal(userId)) {
+    if (!validator.isDecimal(userId.toString())) {
       return {
         status: "error",
         code: IncorrectParameter,

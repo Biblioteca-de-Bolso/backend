@@ -1,5 +1,5 @@
 const fs = require("fs").promises;
-const { fileName } = require("./debug");
+const { fileName } = require("../modules/debug");
 const sendGrid = require("@sendgrid/mail");
 
 sendGrid.setApiKey(process.env.SEND_GRID_API);

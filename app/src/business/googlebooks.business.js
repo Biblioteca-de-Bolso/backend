@@ -1,6 +1,6 @@
 const { ok } = require("../modules/http");
-const { googleBooksAPI } = require("../modules/googlebooks");
 const { fileName } = require("../modules/debug");
+const { googleBooksAPI } = require("../services/googlebooks");
 
 module.exports = {
   async search(qstring, lang) {

@@ -20,6 +20,9 @@ module.exports = {
   // Usuário não possui permissão para realizar esta ação
   Forbidden: "Forbidden",
 
+  // A rota solicitada não foi encontrada ou implementada
+  NotFound: "NotFound",
+
   // É necessário realizar a confirmação da conta de usuário
   AccountNotVerified: "AccountNotVerified",
 

@@ -1,4 +1,3 @@
-// Módulos necessário
 const dayjs = require("dayjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -68,7 +67,7 @@ module.exports = {
     // Buscar os dados de usuário do banco de dados
     const user = await prisma.user.findFirst({
       where: {
-        id: parseInt(userId),
+        id: userId,
         email: email,
         activationCode: activationCode,
         active: false,
@@ -79,7 +78,7 @@ module.exports = {
       // Usuario encontrado, realizar modificação de ativação
       const activeUser = await prisma.user.updateMany({
         where: {
-          id: parseInt(userId),
+          id: userId,
           activationCode: activationCode,
         },
         data: { active: true },
