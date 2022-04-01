@@ -1,32 +1,37 @@
 const BookBusiness = require("../business/book.business");
 const AuthBusiness = require("../business/auth.business");
 
-const { badRequest, unauthorized } = require("../modules/http");
 const { Unauthorized, IncorrectParameter } = require("../modules/codes");
 
 module.exports = {
+  async create(req, res, next) {
+    try {
+      // Parse de parâmetros e Token
+      const token = req.headers["x-access-token"];
+
+      // Validação do token informado
+      const decoded = await AuthBusiness.verifyToken(token);
+
+      if (decoded["status"] === "error") {
+        return res.status(400).json(decoded);
+      }
+
+      // Extração dos parâmetros
+    } catch (error) {
+      return next(error);
+    }
+  },
+
   async list(req, res, next) {
     try {
       // Parse de parâmetros e Token
       const token = req.headers["x-access-token"];
 
-      if (!token) {
-        return res.status(400).json({
-          status: "error",
-          code: IncorrectParameter,
-          message: "Nenhum token de autenticação informado.",
-        });
-      }
-
       // Validação do token informado
       const decoded = await AuthBusiness.verifyToken(token);
 
-      if (decoded["error"]) {
-        return res.status(400).json({
-          status: "error",
-          code: Unauthorized,
-          message: decoded["error"],
-        });
+      if (decoded["status"] === "error") {
+        return res.status(400).json(decoded);
       }
 
       // Token validado, prosseguir com a requisição

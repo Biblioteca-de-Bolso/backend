@@ -7,26 +7,14 @@ const QstringValidator = require("../validators/qstring.validator");
 module.exports = {
   async search(req, res, next) {
     try {
-      // Parse do Token
+      // Parse de parâmetros e Token
       const token = req.headers["x-access-token"];
-
-      if (!token) {
-        return res.status(400).json({
-          status: "error",
-          code: IncorrectParameter,
-          message: "Nenhum token de autenticação informado.",
-        });
-      }
 
       // Validação do token informado
       const decoded = await AuthBusiness.verifyToken(token);
 
-      if (decoded["error"]) {
-        return res.status(401).json({
-          status: "error",
-          code: Unauthorized,
-          message: decoded["error"],
-        });
+      if (decoded["status"] === "error") {
+        return res.status(400).json(decoded);
       }
 
       // Parse dos parâmetros

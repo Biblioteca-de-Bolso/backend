@@ -28,4 +28,7 @@ module.exports = {
 
   // Falha na criação de token JWT
   JWTCreationFailure: "JWTCreationFailure",
+
+  // Falha na verificação de token JWT
+  JWTVerifyError: "JWTVerifyError",
 };

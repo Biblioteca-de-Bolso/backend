@@ -5,13 +5,18 @@ const validator = require("validator");
 
 const prisma = require("../prisma");
 
-const { failure, unauthorized, ok } = require("../modules/http");
+const { failure, unauthorized, ok, badRequest } = require("../modules/http");
 const {
   Unauthorized,
   AccountNotVerified,
   IncorrectParameter,
   DatabaseFailure,
+  JWTVerifyError,
 } = require("../modules/codes");
+
+const emailValidator = require("../validators/email.validator");
+const nameValidator = require("../validators/name.validator");
+const useridValidator = require("../validators/userid.validator");
 
 module.exports = {
   async login(email, password) {
@@ -158,22 +163,60 @@ module.exports = {
   },
 
   async verifyToken(token) {
-    // Tenta realizar validação do token informado
-    const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
+    if (token) {
+      try {
+        // Tenta realizar validação do token informado
+        const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
 
-    // Token validado com sucesso, extrair dados de usuário
-    const user = await prisma.user.findFirst({
-      where: {
-        id: parseInt(decoded["userId"]),
-        email: decoded["email"],
-      },
-    });
+        // Valores a serem validados, contra suas respectivas funções de validação
+        const validators = [
+          [decoded["userId"], useridValidator],
+          [decoded["email"], emailValidator],
+          [decoded["name"], nameValidator],
+        ];
 
-    if (user) {
-      return decoded;
+        // Aplica o valor a ser validado, na função de validação
+        for (const pair of validators) {
+          const result = pair[1].validate(pair[0]);
+
+          if (result.status === "error") {
+            return {
+              status: "error",
+              code: JWTVerifyError,
+              message: "As informações presentes no token JWT estão incorretas.",
+            };
+          }
+        }
+
+        // Token validado com sucesso, extrair dados de usuário
+        const user = await prisma.user.findFirst({
+          where: {
+            id: parseInt(decoded["userId"]),
+            email: decoded["email"],
+          },
+        });
+
+        if (user) {
+          return decoded;
+        } else {
+          return {
+            status: "error",
+            code: JWTVerifyError,
+            message: "Dados de usuário presente no token não são válidos.",
+          };
+        }
+      } catch (error) {
+        return {
+          status: "error",
+          code: JWTVerifyError,
+          message: `Erro ao validar token JWT: ${error.message}`,
+        };
+      }
     } else {
       return {
-        error: "Dados de usuário presente no token não são válidos.",
+        status: "error",
+        code: IncorrectParameter,
+        message: "Nenhum token de autenticação informado.",
       };
     }
   },

@@ -44,18 +44,14 @@ module.exports = {
 
   async delete(req, res, next) {
     try {
-      // Aquisição do token de autenticação
+      // Parse de parâmetros e Token
       const token = req.headers["x-access-token"];
 
       // Validação do token informado
       const decoded = await AuthBusiness.verifyToken(token);
 
-      if (decoded["error"]) {
-        return res.status(401).json({
-          status: "error",
-          code: Unauthorized,
-          message: decoded["error"],
-        });
+      if (decoded["status"] === "error") {
+        return res.status(400).json(decoded);
       }
 
       // Aquisição dos parâmetros
@@ -90,18 +86,14 @@ module.exports = {
 
   async read(req, res, next) {
     try {
-      // Aquisição do token de autenticação
+      // Parse de parâmetros e Token
       const token = req.headers["x-access-token"];
 
       // Validação do token informado
       const decoded = await AuthBusiness.verifyToken(token);
 
-      if (decoded["error"]) {
-        return res.status(401).json({
-          status: "error",
-          code: Unauthorized,
-          message: decoded["error"],
-        });
+      if (decoded["status"] === "error") {
+        return res.status(400).json(decoded);
       }
 
       // Aquisição dos parâmetros
