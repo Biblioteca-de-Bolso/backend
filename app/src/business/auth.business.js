@@ -168,26 +168,6 @@ module.exports = {
         // Tenta realizar validação do token informado
         const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
 
-        // Valores a serem validados, contra suas respectivas funções de validação
-        const validators = [
-          [decoded["userId"], useridValidator],
-          [decoded["email"], emailValidator],
-          [decoded["name"], nameValidator],
-        ];
-
-        // Aplica o valor a ser validado, na função de validação
-        for (const pair of validators) {
-          const result = pair[1].validate(pair[0]);
-
-          if (result.status === "error") {
-            return {
-              status: "error",
-              code: JWTVerifyError,
-              message: "As informações presentes no token JWT estão incorretas.",
-            };
-          }
-        }
-
         // Token validado com sucesso, extrair dados de usuário
         const user = await prisma.user.findFirst({
           where: {
