@@ -1,7 +1,7 @@
-const PasswordValidator = require("../validators/password.rules");
-const EmailValidator = require("../validators/email.rules");
-const NameValidator = require("../validators/name.rules");
-const UserIdValidator = require("../validators/userid.rules");
+const PasswordValidator = require("../validators/user/password.rules");
+const EmailValidator = require("../validators/user/email.rules");
+const NameValidator = require("../validators/user/name.rules");
+const UserIdValidator = require("../validators/user/id.rules");
 
 const UserBusiness = require("../business/user.business");
 const AuthBusiness = require("../business/auth.business");

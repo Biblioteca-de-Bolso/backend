@@ -2,10 +2,10 @@ const path = require("path");
 
 const AuthBusiness = require("../business/auth.business");
 
-const PasswordValidator = require("../validators/password.rules");
-const EmailValidator = require("../validators/email.rules");
-const ActivationValidator = require("../validators/activation.rules");
-const UserIdValidator = require("../validators/userid.rules");
+const PasswordValidator = require("../validators/user/password.rules");
+const EmailValidator = require("../validators/user/email.rules");
+const ActivationValidator = require("../validators/user/activation.rules");
+const UserIdValidator = require("../validators/user/id.rules");
 
 const validation = require("../modules/validation");
 

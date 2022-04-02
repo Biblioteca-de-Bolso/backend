@@ -4,17 +4,19 @@ const AuthBusiness = require("../business/auth.business");
 module.exports = {
   async create(req, res, next) {
     try {
-      // Parse de parâmetros e Token
+      // Validação do token
       const token = req.headers["x-access-token"];
 
-      // Validação do token informado
       const decoded = await AuthBusiness.verifyToken(token);
 
       if (decoded["status"] === "error") {
         return res.status(400).json(decoded);
       }
 
-      // Extração dos parâmetros
+      // Validação dos parâmetros
+      const { title, author, isbn, publisher, description, thumbnail } = req.body;
+
+      const rules = [];
     } catch (error) {
       return next(error);
     }

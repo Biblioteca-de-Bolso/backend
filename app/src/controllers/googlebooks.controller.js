@@ -1,8 +1,8 @@
 const GoogleBooksBusines = require("../business/googlebooks.business");
 const AuthBusiness = require("../business/auth.business");
 
-const QstringValidator = require("../validators/qstring.rules");
-const LangValidator = require("../validators/lang.rules");
+const QstringValidator = require("../validators/googlebooks/qstring.rules");
+const LangValidator = require("../validators/googlebooks/lang.rules");
 
 const validation = require("../modules/validation");
 

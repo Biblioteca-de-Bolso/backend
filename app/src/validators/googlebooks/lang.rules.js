@@ -1,6 +1,6 @@
 // https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 
-const { validationError } = require("../modules/validation");
+const { validationError } = require("../../modules/validation");
 
 const ISO6391 = new Set([
   "aa",

@@ -1,4 +1,4 @@
-const { validationError } = require("../modules/validation");
+const { validationError } = require("../../modules/validation");
 
 module.exports = {
   validate(input, required) {
