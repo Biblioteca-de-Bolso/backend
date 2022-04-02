@@ -2,28 +2,28 @@ const path = require("path");
 
 const AuthBusiness = require("../business/auth.business");
 
-const PasswordValidator = require("../validators/password.validator");
-const EmailValidator = require("../validators/email.validator");
-const ActivationValidator = require("../validators/activation.validator");
-const UserIdValidator = require("../validators/userid.validator");
+const PasswordValidator = require("../validators/password.rules");
+const EmailValidator = require("../validators/email.rules");
+const ActivationValidator = require("../validators/activation.rules");
+const UserIdValidator = require("../validators/userid.rules");
+
+const validation = require("../modules/validation");
 
 module.exports = {
   async login(req, res, next) {
     try {
-      // Aquisição dos parâmetros
-      const email = req.body["email"];
-      const password = req.body["password"];
+      // Aquisição e validação dos parâmetros
+      const { email, password } = req.body;
 
-      // Validação dos parâmetrosc
-      const validateEmail = EmailValidator.validate(email);
-      const validatePassword = PasswordValidator.validate(password);
+      const rules = [
+        [email, EmailValidator],
+        [password, PasswordValidator],
+      ];
 
-      if (validatePassword.status === "error") {
-        return res.status(400).json(validatePassword);
-      }
+      const validationResult = validation.run(rules);
 
-      if (validateEmail.status === "error") {
-        return res.status(400).json(validateEmail);
+      if (validationResult["status"] === "error") {
+        res.status(400).json(validationResult);
       }
 
       // Validação dos parâmetros finalizada, realiza procedimento de login
@@ -38,24 +38,25 @@ module.exports = {
 
   async verifyAccount(req, res, next) {
     try {
+      // Aquisição e validação dos parâmetros
       const userId = parseInt(req.query["id"]);
       const email = req.query["email"];
       const activationCode = req.query["code"];
 
-      // Validação dos parâmetros
-      const validateId = UserIdValidator.validate(userId);
-      const validateEmail = EmailValidator.validate(email);
-      const validateActivation = ActivationValidator.validate(activationCode);
+      const rules = [
+        [userId, UserIdValidator],
+        [email, EmailValidator],
+        [activationCode, ActivationValidator],
+      ];
 
-      if (
-        validateId.status === "error" ||
-        validateEmail.status === "error" ||
-        validateActivation.status === "error"
-      ) {
+      const validationResult = validation.run(rules);
+
+      if (validationResult["status"] === "error") {
         res.status(400);
         return res.sendFile(path.resolve("./src/html/confirm_error.html"));
       }
 
+      // Validação dos parâmetros finalizada
       const response = await AuthBusiness.verifyAccount(userId, email, activationCode);
 
       if (response.status === "error") {
