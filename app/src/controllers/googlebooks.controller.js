@@ -1,36 +1,39 @@
 const GoogleBooksBusines = require("../business/googlebooks.business");
 const AuthBusiness = require("../business/auth.business");
-const { IncorrectParameter, Unauthorized } = require("../modules/codes");
 
-const QstringValidator = require("../validators/qstring.validator");
+const QstringValidator = require("../validators/qstring.rules");
+const LangValidator = require("../validators/lang.rules");
+
+const validation = require("../modules/validation");
 
 module.exports = {
   async search(req, res, next) {
     try {
-      // Parse de parâmetros e Token
+      // Validação do token
       const token = req.headers["x-access-token"];
 
-      // Validação do token informado
       const decoded = await AuthBusiness.verifyToken(token);
 
       if (decoded["status"] === "error") {
         return res.status(400).json(decoded);
       }
 
-      // Parse dos parâmetros
-      const qstring = req.query["qstring"];
-      const langRestrict = req.query["lang"];
+      // Aquisição e validação dos parâmetros
+      const { qstring, lang } = req.query;
 
-      const validateQstring = QstringValidator.validate(qstring);
+      const rules = [
+        [qstring, QstringValidator],
+        [lang, LangValidator, { required: false }],
+      ];
 
-      if (validateQstring.status === "error") {
-        return res.status(400).json(validateQstring);
+      const validationResult = validation.run(rules);
+
+      if (validationResult.status === "error") {
+        return res.status(400).json(validationResult);
       }
 
-      // Token validado, prosseguir com a requisição
-      const response = await GoogleBooksBusines.search(qstring, langRestrict);
+      const response = await GoogleBooksBusines.search(qstring, lang);
 
-      // Retornar com resultado da operação
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);

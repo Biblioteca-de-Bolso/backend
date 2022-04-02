@@ -38,7 +38,7 @@ module.exports = {
 
       if (user) {
         // Não enviar email de cadastro em ambiente de teste
-        if (process.env.NODE_ENV !== "test") {
+        if (process.env.NODE_ENV !== "test" && false) {
           try {
             const { emailHtml, emailText } = await mail.composeEmail(
               user["id"],
