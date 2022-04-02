@@ -7,7 +7,7 @@ module.exports = {
       return {
         status: "error",
         code: IncorrectParameter,
-        message: "É necesário inserir um email válido.",
+        message: "O formato do email inserido não é válido.",
       };
     }
 
@@ -15,7 +15,7 @@ module.exports = {
       return {
         status: "error",
         code: IncorrectParameter,
-        message: "É necesário inserir um email válido.",
+        message: "O formato do email inserido não é válido.",
       };
     }
 

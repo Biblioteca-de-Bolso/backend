@@ -5,7 +5,7 @@ const validator = require("validator");
 
 const prisma = require("../prisma");
 
-const { failure, unauthorized, ok, badRequest } = require("../modules/http");
+const { failure, unauthorized, ok } = require("../modules/http");
 const {
   Unauthorized,
   AccountNotVerified,
@@ -13,10 +13,6 @@ const {
   DatabaseFailure,
   JWTVerifyError,
 } = require("../modules/codes");
-
-const emailValidator = require("../validators/email.validator");
-const nameValidator = require("../validators/name.validator");
-const useridValidator = require("../validators/userid.validator");
 
 module.exports = {
   async login(email, password) {
