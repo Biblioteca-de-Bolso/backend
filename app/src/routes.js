@@ -7,6 +7,8 @@ const AuthController = require("./controllers/auth.controller");
 const PlaygroundController = require("./controllers/playground.controller");
 const GoogleBooksController = require("./controllers/googlebooks.controller");
 
+const protectedRoute = require("./middlewares/auth");
+
 // Rotas de Playground
 routes.get("/play/date", PlaygroundController.date);
 
@@ -17,13 +19,13 @@ routes.post("/auth/refresh", AuthController.refreshToken);
 
 // Rotas de Usuário
 routes.post("/user", UserController.create);
-routes.delete("/user", UserController.delete);
-routes.get("/user/:id", UserController.read);
+routes.delete("/user", protectedRoute, UserController.delete);
+routes.get("/user/:id", protectedRoute, UserController.read);
 
 // Rotas de Livros
-routes.get("/book", BookController.list);
+routes.get("/book", protectedRoute, BookController.list);
 
 // Rotas do Google Books
-routes.get("/googlebooks/", GoogleBooksController.search);
+routes.get("/googlebooks/", protectedRoute, GoogleBooksController.search);
 
 module.exports = routes;

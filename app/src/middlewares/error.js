@@ -1,4 +1,5 @@
-// Express.js Custom Error Handler
+// Middleware de custom error handler
+
 module.exports = (err, req, res, next) => {
   let file = "";
 

@@ -1,5 +1,4 @@
 const GoogleBooksBusines = require("../business/googlebooks.business");
-const AuthBusiness = require("../business/auth.business");
 
 const QstringValidator = require("../validators/googlebooks/qstring.rules");
 const LangValidator = require("../validators/googlebooks/lang.rules");
@@ -9,15 +8,6 @@ const validation = require("../modules/validation");
 module.exports = {
   async search(req, res, next) {
     try {
-      // Validação do token
-      const token = req.headers["x-access-token"];
-
-      const decoded = await AuthBusiness.verifyToken(token);
-
-      if (decoded["status"] === "error") {
-        return res.status(400).json(decoded);
-      }
-
       // Aquisição e validação dos parâmetros
       const { qstring, lang } = req.query;
 

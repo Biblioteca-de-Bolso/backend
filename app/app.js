@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv").config({ path: "../.env" });
-const customErrorHandler = require("./src/modules/error");
+const customErrorHandler = require("./src/middlewares/error");
 const { NotFound } = require("./src/modules/codes");
 
 const app = express();

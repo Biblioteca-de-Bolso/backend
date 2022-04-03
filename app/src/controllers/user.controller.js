@@ -4,7 +4,6 @@ const NameValidator = require("../validators/user/name.rules");
 const UserIdValidator = require("../validators/user/id.rules");
 
 const UserBusiness = require("../business/user.business");
-const AuthBusiness = require("../business/auth.business");
 
 const validation = require("../modules/validation");
 
@@ -39,14 +38,8 @@ module.exports = {
 
   async delete(req, res, next) {
     try {
-      // Validaçao do token JWT
-      const token = req.headers["x-access-token"];
-
-      const decoded = await AuthBusiness.verifyToken(token);
-
-      if (decoded["status"] === "error") {
-        return res.status(400).json(decoded);
-      }
+      // Aquisição do token
+      const { decoded } = req;
 
       // Aquisição e validação de parâmetros
       const userId = parseInt(req.body["id"]);
@@ -75,14 +68,8 @@ module.exports = {
 
   async read(req, res, next) {
     try {
-      // Validaçao do token
-      const token = req.headers["x-access-token"];
-
-      const decoded = await AuthBusiness.verifyToken(token);
-
-      if (decoded["status"] === "error") {
-        return res.status(400).json(decoded);
-      }
+      // Aquisição do token
+      const { decoded } = req;
 
       // Aquisição e validação de parâmetros
       const userId = parseInt(req.params["id"]);

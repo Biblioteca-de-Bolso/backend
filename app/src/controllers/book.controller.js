@@ -1,17 +1,10 @@
 const BookBusiness = require("../business/book.business");
-const AuthBusiness = require("../business/auth.business");
 
 module.exports = {
   async create(req, res, next) {
     try {
-      // Validação do token
-      const token = req.headers["x-access-token"];
-
-      const decoded = await AuthBusiness.verifyToken(token);
-
-      if (decoded["status"] === "error") {
-        return res.status(400).json(decoded);
-      }
+      // Aquisição do token
+      const { decoded } = req;
 
       // Validação dos parâmetros
       const { title, author, isbn, publisher, description, thumbnail } = req.body;
@@ -24,15 +17,8 @@ module.exports = {
 
   async list(req, res, next) {
     try {
-      // Parse de parâmetros e Token
-      const token = req.headers["x-access-token"];
-
-      // Validação do token informado
-      const decoded = await AuthBusiness.verifyToken(token);
-
-      if (decoded["status"] === "error") {
-        return res.status(400).json(decoded);
-      }
+      // Aquisição do token
+      const { decoded } = req;
 
       // Token validado, prosseguir com a requisição
       const response = await BookBusiness.list();
