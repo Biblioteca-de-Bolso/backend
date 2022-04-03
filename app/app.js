@@ -29,7 +29,7 @@ app.get(["/", "/api"], async (req, res) => {
   });
 });
 
-app.get("/*", async (req, res) => {
+app.get(["/*", "/api/*"], async (req, res) => {
   return res.status(404).json({
     status: "error",
     code: NotFound,

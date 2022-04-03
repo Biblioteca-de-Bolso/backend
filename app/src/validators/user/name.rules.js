@@ -22,7 +22,7 @@ module.exports = {
           max: 64,
         })
       ) {
-        return validationError("O nome de usuário deve ter entre 3 e 64 caracteres");
+        return validationError("O nome de usuário deve ter entre 3 e 64 caracteres.");
       }
     }
 
