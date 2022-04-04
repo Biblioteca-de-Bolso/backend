@@ -11,7 +11,7 @@ module.exports = async function (req, res, next) {
     return res.status(400).json(decoded);
   }
 
-  req.decoded = decoded;
+  req.token = decoded;
 
   next();
 };

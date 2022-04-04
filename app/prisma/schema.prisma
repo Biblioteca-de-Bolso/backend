@@ -43,8 +43,8 @@ model Book {
   userId          Int
   title           String        @db.VarChar(128)
   author          String?       @db.VarChar(128)
-  isbn_10         String?       @db.VarChar(10)
-  isbn_13         String?       @db.VarChar(13)
+  isbn10          String?       @db.VarChar(10)
+  isbn13          String?       @db.VarChar(13)
   publisher       String?       @db.VarChar(128)
   description     String?       @db.Text
   thumbnail       String?       @db.VarChar(255)

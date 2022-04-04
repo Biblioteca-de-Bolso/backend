@@ -39,7 +39,7 @@ module.exports = {
   async delete(req, res, next) {
     try {
       // Aquisição do token
-      const { decoded } = req;
+      const { token } = req;
 
       // Aquisição e validação de parâmetros
       const userId = parseInt(req.body["id"]);
@@ -58,7 +58,7 @@ module.exports = {
       }
 
       // Execução da rotina
-      const response = await UserBusiness.delete(decoded, userId, email, password);
+      const response = await UserBusiness.delete(token, userId, email, password);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
@@ -69,7 +69,7 @@ module.exports = {
   async read(req, res, next) {
     try {
       // Aquisição do token
-      const { decoded } = req;
+      const { token } = req;
 
       // Aquisição e validação de parâmetros
       const userId = parseInt(req.params["id"]);
@@ -82,7 +82,7 @@ module.exports = {
         return res.status(400).json(validationResult);
       }
 
-      const response = await UserBusiness.read(decoded, userId);
+      const response = await UserBusiness.read(token, userId);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {

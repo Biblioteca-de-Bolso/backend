@@ -13,7 +13,7 @@ module.exports = {
   async create(req, res, next) {
     try {
       // Aquisição do token
-      const { decoded } = req;
+      const { token } = req;
 
       // Validação dos parâmetros
       const { title, author, isbn, publisher, description, thumbnail } = req.body;
@@ -34,7 +34,8 @@ module.exports = {
       }
 
       const response = await BookBusiness.create(
-        decoded,
+        token,
+        title,
         author,
         isbn,
         publisher,
@@ -51,7 +52,7 @@ module.exports = {
   async list(req, res, next) {
     try {
       // Aquisição do token
-      const { decoded } = req;
+      const { token } = req;
 
       // Token validado, prosseguir com a requisição
       const response = await BookBusiness.list();
