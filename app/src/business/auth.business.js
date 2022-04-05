@@ -11,7 +11,7 @@ const {
   AccountNotVerified,
   IncorrectParameter,
   DatabaseFailure,
-  JWTVerifyError,
+  JWTFailure,
 } = require("../modules/codes");
 
 module.exports = {
@@ -152,7 +152,7 @@ module.exports = {
     } else {
       return {
         status: "error",
-        code: DatabaseFailure,
+        code: JWTFailure,
         message: "Não foi possível realizar o registro do refresh token criado.",
       };
     }
@@ -177,14 +177,14 @@ module.exports = {
         } else {
           return {
             status: "error",
-            code: JWTVerifyError,
+            code: JWTFailure,
             message: "Dados de usuário presente no token não são válidos.",
           };
         }
       } catch (error) {
         return {
           status: "error",
-          code: JWTVerifyError,
+          code: JWTFailure,
           message: `Erro ao validar token JWT: ${error.message}`,
         };
       }

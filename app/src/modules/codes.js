@@ -26,9 +26,6 @@ module.exports = {
   // É necessário realizar a confirmação da conta de usuário
   AccountNotVerified: "AccountNotVerified",
 
-  // Falha na criação de token JWT
-  JWTCreationFailure: "JWTCreationFailure",
-
-  // Falha na verificação de token JWT
-  JWTVerifyError: "JWTVerifyError",
+  // Falhas com a manipulação e criação de token JWT
+  JWTFailure: "JWTFailure",
 };
