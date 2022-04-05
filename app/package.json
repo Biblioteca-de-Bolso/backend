@@ -19,6 +19,9 @@
       "lcov"
     ]
   },
+  "prisma": {
+    "seed": "node prisma/seeds/db.seed.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Biblioteca-de-Bolso/backend.git"

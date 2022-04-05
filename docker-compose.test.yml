@@ -18,6 +18,7 @@ services:
         /wait &&
         npx prisma generate &&
         npx prisma db push  &&
+        node prisma/seeds/db.seed.js &&
         npm run test-coverage"
     volumes:
       - ./app/coverage:/usr/src/app/coverage

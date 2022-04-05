@@ -8,39 +8,16 @@ describe("Testes para leitura de dados de um usuário", () => {
   jest.setTimeout(10000);
 
   let accessToken = "";
-  let user = {};
 
   beforeAll(async () => {
-    await prisma.$connect();
+    // Usuário: Allan Turing (verificar arquivo de seed)
 
-    // Criar um usuário fictício
-    const hash = crypto.randomBytes(16).toString("hex");
-
-    user = {
-      name: hash,
-      email: hash + "@email.com",
-      password: hash,
-      active: true,
-    };
-
-    // Inserir usuário fictício no banco de dados
-    const created = await prisma.user.create({
-      data: {
-        ...user,
-      },
-    });
-
-    // Adquire o ID do usuário criado
-    user["id"] = created["id"];
-
-    // Criar token de autenticação para este usuário
     const token = await createToken({
-      userId: user["id"],
-      email: user["email"],
-      password: user["password"],
+      userId: 1,
+      email: "allanturing@email.com",
+      password: "allanturing",
     });
 
-    // Extrai o access token do token criado
     accessToken = token["response"]["accessToken"];
   });
 
@@ -48,13 +25,26 @@ describe("Testes para leitura de dados de um usuário", () => {
     await prisma.$disconnect();
   });
 
-  test.skip("Deve retornar os dados do usuário", async () => {
-    const response = await request(app).get(`/user/${user["id"]}`).set({
+  test("Não deve retornar os dados de outro usuário", async () => {
+    const response = await request(app).get(`/api/user/1`).set({
+      "x-access-token": accessToken,
+    });
+
+    expect(response.statusCode).toBe(403);
+    expect(response.body).toHaveProperty("status");
+    expect(response.body.status).toBe("error");
+    expect(response.body).toHaveProperty("code");
+    expect(response.body).toHaveProperty("message");
+  });
+
+  test("Deve retornar os dados do usuário", async () => {
+    const response = await request(app).get(`/api/user/0`).set({
       "x-access-token": accessToken,
     });
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("status");
     expect(response.body.status).toBe("ok");
+    expect(response.body).toHaveProperty("response");
   });
 });
