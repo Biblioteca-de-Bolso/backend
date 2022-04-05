@@ -1,33 +1,58 @@
 const BookBusiness = require("../business/book.business");
-const AuthBusiness = require("../business/auth.business");
 
-const { badRequest, unauthorized } = require("../modules/http");
-const { Unauthorized, IncorrectParameter } = require("../modules/codes");
+const TitleValidator = require("../validators/book/title.rules");
+const AuthorValidator = require("../validators/book/author.rules");
+const ISBNValidator = require("../validators/book/isbn.rules");
+const PublisherValidator = require("../validators/book/publisher.rules");
+const DescriptionValidator = require("../validators/book/description.rules");
+const ThumbnailValidator = require("../validators/book/thumbnail.rules");
+
+const validation = require("../modules/validation");
 
 module.exports = {
+  async create(req, res, next) {
+    try {
+      // Aquisição do token
+      const { token } = req;
+
+      // Validação dos parâmetros
+      const { title, author, isbn, publisher, description, thumbnail } = req.body;
+
+      const rules = [
+        [title, TitleValidator, { required: true }],
+        [author, AuthorValidator, { required: false }],
+        [isbn, ISBNValidator, { required: false }],
+        [publisher, PublisherValidator, { required: false }],
+        [description, DescriptionValidator, { required: false }],
+        [thumbnail, ThumbnailValidator, { required: false }],
+      ];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult.status === "error") {
+        return res.status(400).json(validationResult);
+      }
+
+      const response = await BookBusiness.create(
+        token,
+        title,
+        author,
+        isbn,
+        publisher,
+        description,
+        thumbnail
+      );
+
+      res.status(response.statusCode).json(response.body);
+    } catch (error) {
+      return next(error);
+    }
+  },
+
   async list(req, res, next) {
     try {
-      // Parse de parâmetros e Token
-      const token = req.headers["x-access-token"];
-
-      if (!token) {
-        return res.status(400).json({
-          status: "error",
-          code: IncorrectParameter,
-          message: "Nenhum token de autenticação informado.",
-        });
-      }
-
-      // Validação do token informado
-      const decoded = await AuthBusiness.verifyToken(token);
-
-      if (decoded["error"]) {
-        return res.status(400).json({
-          status: "error",
-          code: Unauthorized,
-          message: decoded["error"],
-        });
-      }
+      // Aquisição do token
+      const { token } = req;
 
       // Token validado, prosseguir com a requisição
       const response = await BookBusiness.list();

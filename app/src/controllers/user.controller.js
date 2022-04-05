@@ -1,36 +1,30 @@
-const PasswordValidator = require("../validators/password.validator");
-const EmailValidator = require("../validators/email.validator");
-const NameValidator = require("../validators/name.validator");
-const UserIdValidator = require("../validators/userid.validator");
+const PasswordValidator = require("../validators/user/password.rules");
+const EmailValidator = require("../validators/user/email.rules");
+const NameValidator = require("../validators/user/name.rules");
+const UserIdValidator = require("../validators/user/id.rules");
 
 const UserBusiness = require("../business/user.business");
-const AuthBusiness = require("../business/auth.business");
 
-const { Unauthorized } = require("../modules/codes");
+const validation = require("../modules/validation");
 
 module.exports = {
   async create(req, res, next) {
     try {
       // Aquisição dos parâmetros
-      const name = req.body["name"];
-      const email = req.body["email"];
-      const password = req.body["password"];
+      const { name, email, password } = req.body;
+
+      // Construir regras de validação
+      const rules = [
+        [name, NameValidator],
+        [email, EmailValidator],
+        [password, PasswordValidator],
+      ];
 
       // Validação dos parâmetros
-      const validateName = NameValidator.validate(name);
-      const validateEmail = EmailValidator.validate(email);
-      const validatePassword = PasswordValidator.validate(password);
+      const validationResult = validation.run(rules);
 
-      if (validatePassword.status === "error") {
-        return res.status(400).json(validatePassword);
-      }
-
-      if (validateEmail.status === "error") {
-        return res.status(400).json(validateEmail);
-      }
-
-      if (validateName.status === "error") {
-        return res.status(400).json(validateName);
+      if (validationResult["status"] === "error") {
+        return res.status(400).json(validationResult);
       }
 
       // Validação dos parâmetros finalizada
@@ -44,43 +38,27 @@ module.exports = {
 
   async delete(req, res, next) {
     try {
-      // Aquisição do token de autenticação
-      const token = req.headers["x-access-token"];
+      // Aquisição do token
+      const { token } = req;
 
-      // Validação do token informado
-      const decoded = await AuthBusiness.verifyToken(token);
+      // Aquisição e validação de parâmetros
+      const userId = parseInt(req.body["id"]);
+      const { email, password } = req.body;
 
-      if (decoded["error"]) {
-        return res.status(401).json({
-          status: "error",
-          code: Unauthorized,
-          message: decoded["error"],
-        });
+      const rules = [
+        [userId, UserIdValidator],
+        [email, EmailValidator],
+        [password, PasswordValidator],
+      ];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult["status"] === "error") {
+        return res.status(400).json(validationResult);
       }
 
-      // Aquisição dos parâmetros
-      const userId = req.body["id"];
-      const email = req.body["email"];
-      const password = req.body["password"];
-
-      // Validação dos parâmetros
-      const validateUserId = UserIdValidator.validate(userId);
-      const validateEmail = EmailValidator.validate(email);
-      const validatePassword = PasswordValidator.validate(password);
-
-      if (validateUserId.status === "error") {
-        return res.status(400).json(validateUserId);
-      }
-
-      if (validateEmail.status === "error") {
-        return res.status(400).json(validateEmail);
-      }
-
-      if (validatePassword.status === "error") {
-        return res.status(400).json(validatePassword);
-      }
-
-      const response = await UserBusiness.delete(decoded, userId, email, password);
+      // Execução da rotina
+      const response = await UserBusiness.delete(token, userId, email, password);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
@@ -90,31 +68,21 @@ module.exports = {
 
   async read(req, res, next) {
     try {
-      // Aquisição do token de autenticação
-      const token = req.headers["x-access-token"];
+      // Aquisição do token
+      const { token } = req;
 
-      // Validação do token informado
-      const decoded = await AuthBusiness.verifyToken(token);
+      // Aquisição e validação de parâmetros
+      const userId = parseInt(req.params["id"]);
 
-      if (decoded["error"]) {
-        return res.status(401).json({
-          status: "error",
-          code: Unauthorized,
-          message: decoded["error"],
-        });
+      const rules = [[userId, UserIdValidator]];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult["status"] === "error") {
+        return res.status(400).json(validationResult);
       }
 
-      // Aquisição dos parâmetros
-      const userId = req.params["id"];
-
-      // Validação dos parâmetros
-      const validateUserId = UserIdValidator.validate(userId);
-
-      if (validateUserId.status === "error") {
-        return res.status(400).json(validateUserId);
-      }
-
-      const response = await UserBusiness.read(decoded, userId);
+      const response = await UserBusiness.read(token, userId);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {

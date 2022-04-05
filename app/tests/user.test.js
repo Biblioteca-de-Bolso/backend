@@ -227,9 +227,7 @@ describe("Fluxo de Usuário", () => {
         password: userPassword,
       });
 
-    // Deve retornar 401 pois a conta que já foi removida não existe mais
-    // Portanto, uma requisição com esses dados deve retornar "unauthorized"
-    expect(response.statusCode).toBe(401);
+    expect(response.statusCode).toBe(400);
     expect(response.body).toHaveProperty("status");
     expect(response.body.status).toBe("error");
   });

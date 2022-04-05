@@ -1,6 +1,7 @@
-const { ok } = require("../modules/http");
-const { googleBooksAPI } = require("../modules/googlebooks");
+const { ok, failure } = require("../modules/http");
 const { fileName } = require("../modules/debug");
+const { googleBooksAPI } = require("../services/googlebooks");
+const { InternalServerError } = require("../modules/codes");
 
 module.exports = {
   async search(qstring, lang) {
@@ -78,12 +79,15 @@ module.exports = {
         }
       })
       .catch((error) => {
-        console.log(error);
-        console.log("Erro:", error.name, error.message);
+        return failure({
+          status: "error",
+          code: InternalServerError,
+          message: error.message,
+        });
       });
 
     return ok({
-      code: "ok",
+      status: "ok",
       response: {
         books: books,
       },

@@ -1,4 +1,3 @@
-// Módulos necessário
 const dayjs = require("dayjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -12,6 +11,7 @@ const {
   AccountNotVerified,
   IncorrectParameter,
   DatabaseFailure,
+  JWTFailure,
 } = require("../modules/codes");
 
 module.exports = {
@@ -68,7 +68,7 @@ module.exports = {
     // Buscar os dados de usuário do banco de dados
     const user = await prisma.user.findFirst({
       where: {
-        id: parseInt(userId),
+        id: userId,
         email: email,
         activationCode: activationCode,
         active: false,
@@ -79,7 +79,7 @@ module.exports = {
       // Usuario encontrado, realizar modificação de ativação
       const activeUser = await prisma.user.updateMany({
         where: {
-          id: parseInt(userId),
+          id: userId,
           activationCode: activationCode,
         },
         data: { active: true },
@@ -152,29 +152,47 @@ module.exports = {
     } else {
       return {
         status: "error",
-        code: DatabaseFailure,
+        code: JWTFailure,
         message: "Não foi possível realizar o registro do refresh token criado.",
       };
     }
   },
 
   async verifyToken(token) {
-    // Tenta realizar validação do token informado
-    const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
+    if (token) {
+      try {
+        // Tenta realizar validação do token informado
+        const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
 
-    // Token validado com sucesso, extrair dados de usuário
-    const user = await prisma.user.findFirst({
-      where: {
-        id: parseInt(decoded["userId"]),
-        email: decoded["email"],
-      },
-    });
+        // Token validado com sucesso, extrair dados de usuário
+        const user = await prisma.user.findFirst({
+          where: {
+            id: parseInt(decoded["userId"]),
+            email: decoded["email"],
+          },
+        });
 
-    if (user) {
-      return decoded;
+        if (user) {
+          return decoded;
+        } else {
+          return {
+            status: "error",
+            code: JWTFailure,
+            message: "Dados de usuário presente no token não são válidos.",
+          };
+        }
+      } catch (error) {
+        return {
+          status: "error",
+          code: JWTFailure,
+          message: `Erro ao validar token JWT: ${error.message}`,
+        };
+      }
     } else {
       return {
-        error: "Dados de usuário presente no token não são válidos.",
+        status: "error",
+        code: IncorrectParameter,
+        message: "Nenhum token de autenticação informado.",
       };
     }
   },

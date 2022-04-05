@@ -19,6 +19,7 @@ model User {
   updatedAt       DateTime      @updatedAt
 
   refreshTokens   RefreshToken[]
+  books           Book[]
 
   @@map("user")
 }
@@ -38,19 +39,34 @@ model RefreshToken {
 }
 
 model Book {
-  bookId          Int       @id @unique @default(autoincrement())
+  bookId          Int           @id @unique @default(autoincrement())
   userId          Int
-  title           String    @db.VarChar(128)
-  author          String?   @db.VarChar(128)
-  isbn_10         String?   @db.VarChar(10)
-  isbn_13         String?   @db.VarChar(13)
-  publisher       String?   @db.VarChar(128)
-  description     String?   @db.Text
-  thumbnail       String?   @db.VarChar(255)
-  readStatus      Int?
-  borrowStatus    Int?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  title           String        @db.VarChar(128)
+  author          String?       @db.VarChar(128)
+  isbn10          String?       @db.VarChar(10)
+  isbn13          String?       @db.VarChar(13)
+  publisher       String?       @db.VarChar(128)
+  description     String?       @db.Text
+  thumbnail       String?       @db.VarChar(255)
+  readStatus      ReadStatus?   @default(NO_STATUS)
+  borrowStatus    BorrowStatus? @default(RETURNED)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user            User          @relation(fields: [userId], references: [id])
 
   @@map("book")
+}
+
+enum BorrowStatus {
+  PENDING
+  RETURNED
+}
+
+enum ReadStatus {
+  PLANNING
+  READING
+  CONCLUDED
+  DROPPED
+  NO_STATUS
 }

@@ -2,12 +2,11 @@ const crypto = require("crypto");
 const validator = require("validator");
 
 const prisma = require("../prisma");
+const mail = require("../services/mail");
+const { fileName } = require("../modules/debug");
 
 const { conflict, created, failure, ok, forbidden, notFound } = require("../modules/http");
 const { EmailAlreadyInUse, DatabaseFailure, UserNotFound, Forbidden } = require("../modules/codes");
-
-const mail = require("../modules/mail");
-const { fileName } = require("../modules/debug");
 
 module.exports = {
   async create(email, name, password) {
@@ -39,7 +38,7 @@ module.exports = {
 
       if (user) {
         // Não enviar email de cadastro em ambiente de teste
-        if (process.env.NODE_ENV !== "test") {
+        if (process.env.NODE_ENV !== "test" && true) {
           try {
             const { emailHtml, emailText } = await mail.composeEmail(
               user["id"],
@@ -70,7 +69,7 @@ module.exports = {
     }
   },
 
-  async delete(decoded, userId, email, password) {
+  async delete(token, userId, email, password) {
     // Aplicar hash MD5 na senha, se necessário
     if (!validator.isMD5(password)) {
       password = crypto.createHash("md5").update(password).digest("hex");
@@ -88,8 +87,8 @@ module.exports = {
     if (user) {
       // Verifica veracidade dos dados
       if (
-        user["id"] == decoded["userId"] &&
-        user["email"] == decoded["email"] &&
+        user["id"] == token["userId"] &&
+        user["email"] == token["email"] &&
         user["password"] == password
       ) {
         // Remover todos os dados de usuário (de todas as tabelas)
@@ -137,16 +136,19 @@ module.exports = {
     }
   },
 
-  async read(decoded, userId) {
+  async read(token, userId) {
     const user = await prisma.user.findUnique({
       where: {
-        id: parseInt(userId),
+        id: userId,
       },
     });
 
     if (user) {
+      // Remover o campo de senha do retorno
+      delete user["password"];
+
       // Verificar permissão de acesso aos dados desse usuário
-      if (user["id"] == decoded["userId"] && user["email"] === decoded["email"]) {
+      if (user["id"] == token["userId"] && user["email"] === token["email"]) {
         return ok({
           status: "ok",
           response: {
