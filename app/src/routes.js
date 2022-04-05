@@ -6,6 +6,7 @@ const BookController = require("./controllers/book.controller");
 const AuthController = require("./controllers/auth.controller");
 const PlaygroundController = require("./controllers/playground.controller");
 const GoogleBooksController = require("./controllers/googlebooks.controller");
+const AnnotationController = require("./controllers/annotation.controller");
 
 const protectedRoute = require("./middlewares/auth");
 
@@ -26,6 +27,9 @@ routes.get("/user/:id", protectedRoute, UserController.read);
 routes.get("/book", protectedRoute, BookController.list);
 routes.get("/book/:id", protectedRoute, BookController.read);
 routes.post("/book", protectedRoute, BookController.create);
+
+// Rotas de Anotações
+routes.post("/annotation", protectedRoute, AnnotationController.create);
 
 // Rotas do Google Books
 routes.get("/googlebooks/", protectedRoute, GoogleBooksController.search);
