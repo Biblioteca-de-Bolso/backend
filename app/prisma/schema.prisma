@@ -20,6 +20,7 @@ model User {
 
   refreshTokens   RefreshToken[]
   books           Book[]
+  annotations     Annotation[]
 
   @@map("user")
 }
@@ -39,7 +40,7 @@ model RefreshToken {
 }
 
 model Book {
-  bookId          Int           @id @unique @default(autoincrement())
+  id              Int           @id @unique @default(autoincrement())
   userId          Int
   title           String        @db.VarChar(128)
   author          String?       @db.VarChar(128)
@@ -55,6 +56,8 @@ model Book {
 
   user            User          @relation(fields: [userId], references: [id])
 
+  annotations     Annotation[]
+
   @@map("book")
 }
 
@@ -69,4 +72,20 @@ enum ReadStatus {
   CONCLUDED
   DROPPED
   NO_STATUS
+}
+
+model Annotation {
+  id        Int       @id @unique @default(autoincrement())
+  userId    Int
+  bookId    Int     
+  title     String    @db.VarChar(128)
+  text      String    @db.Text
+  page      Int?       
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id])
+  book      Book      @relation(fields: [bookId], references: [id])
+
+  @@map("annotation")
 }
