@@ -1,6 +1,6 @@
-const { ok, failure } = require("../modules/http");
+const { ok, failure, notFound, forbidden } = require("../modules/http");
 const { isbn10to13, isbn13to10 } = require("../modules/isbn");
-const { DatabaseFailure } = require("../modules/codes");
+const { DatabaseFailure, NotFound, Forbidden } = require("../modules/codes");
 const prisma = require("../prisma");
 
 module.exports = {
@@ -46,7 +46,42 @@ module.exports = {
     }
   },
 
-  async list() {
+  async read(token, id) {
+    const userId = parseInt(token["userId"]);
+
+    const book = await prisma.book.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (book) {
+      const bookOwner = book["userId"];
+
+      if (bookOwner !== userId) {
+        return forbidden({
+          status: "error",
+          code: Forbidden,
+          message: "Este usuário não tem permissão para acessar o conteúdos solicitado.",
+        });
+      } else {
+        return ok({
+          status: "ok",
+          response: {
+            book: book,
+          },
+        });
+      }
+    } else {
+      return notFound({
+        status: "error",
+        code: NotFound,
+        message: "O livro informado não foi encontrado.",
+      });
+    }
+  },
+
+  async list(token) {
     return ok({
       status: "ok",
       response: {

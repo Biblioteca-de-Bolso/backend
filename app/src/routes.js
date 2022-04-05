@@ -24,6 +24,7 @@ routes.get("/user/:id", protectedRoute, UserController.read);
 
 // Rotas de Livros
 routes.get("/book", protectedRoute, BookController.list);
+routes.get("/book/:id", protectedRoute, BookController.read);
 routes.post("/book", protectedRoute, BookController.create);
 
 // Rotas do Google Books
