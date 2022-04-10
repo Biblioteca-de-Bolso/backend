@@ -17,4 +17,12 @@ describe("Testes da estrutura de resposta da API", () => {
     expect(response.body).toHaveProperty("status");
     expect(response.body.status).toBe("ok");
   });
+
+  test("Uma rota inexistente deve retornar error 404 Not Found", async () => {
+    const response = await request(app).get("/inexistente");
+
+    expect(response.statusCode).toBe(404);
+    expect(response.body).toHaveProperty("status");
+    expect(response.body.status).toBe("error");
+  });
 });

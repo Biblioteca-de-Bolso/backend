@@ -137,9 +137,6 @@ module.exports = {
   },
 
   async read(token, userId) {
-    console.log(token);
-    console.log(userId);
-
     const user = await prisma.user.findUnique({
       where: {
         id: userId,

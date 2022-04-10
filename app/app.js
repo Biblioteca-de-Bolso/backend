@@ -27,31 +27,13 @@ app.get(["/", "/api"], async (req, res) => {
   });
 });
 
-const errorResponse = {
-  status: "error",
-  code: NotFound,
-  message: "A rota solicitada não foi encontrada ou implementada.",
-  documentation: "https://documenter.getpostman.com/view/19545370/UVkmQGwd",
-};
-
-app.get("/*", async (req, res) => {
-  return res.status(404).json(errorResponse);
-});
-
-app.post("/*", async (req, res) => {
-  return res.status(404).json(errorResponse);
-});
-
-app.put("/*", async (req, res) => {
-  return res.status(404).json(errorResponse);
-});
-
-app.patch("/*", async (req, res) => {
-  return res.status(404).json(errorResponse);
-});
-
-app.delete("/*", async (req, res) => {
-  return res.status(404).json(errorResponse);
+app.all("/*", async (req, res) => {
+  return res.status(404).json({
+    status: "error",
+    code: NotFound,
+    message: "A rota solicitada não foi encontrada ou implementada.",
+    documentation: "https://documenter.getpostman.com/view/19545370/UVkmQGwd",
+  });
 });
 
 app.use(customErrorHandler);

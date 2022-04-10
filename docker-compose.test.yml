@@ -5,6 +5,8 @@ services:
     build: ./app
     ports:
       - ${API_LOCAL_PORT}:${API_LOCAL_PORT}
+    networks:
+    - bibliotecadebolso-network
     environment:
       NODE_ENV: test
       DATABASE_URL: "postgres://bibliotecadebolso_test:123456789@database_test:5432/bibliotecadebolso_test"
@@ -18,7 +20,6 @@ services:
         /wait &&
         npx prisma generate &&
         npx prisma db push  &&
-        node prisma/seeds/db.seed.js &&
         npm run test-coverage"
     volumes:
       - ./app/coverage:/usr/src/app/coverage
@@ -28,7 +29,12 @@ services:
     env_file: .env
     ports:
       - 5432:5432
+    networks:
+    - bibliotecadebolso-network
     environment:
       POSTGRES_PASSWORD: 123456789
       POSTGRES_USER: bibliotecadebolso_test
       POSTGRES_DATABASE: bibliotecadebolso_test
+networks: 
+  bibliotecadebolso-network:
+    driver: bridge
