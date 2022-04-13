@@ -93,6 +93,59 @@ module.exports = async () => {
         },
       },
     },
+    {
+      name: "Dennis Ritchie",
+      email: "dennisritchie@email.com",
+      password: crypto.createHash("md5").update("dennisritchie").digest("hex"),
+      active: true,
+      activationCode: "123456789",
+      books: {
+        createMany: {
+          data: [
+            {
+              title: "Livro de C",
+              author: "Autor do Livro de C",
+              isbn10: "8550811483",
+              isbn13: "9788550811482",
+              publisher: "Editora do Livro de C",
+              description: "Descrição do livro de C",
+              // annotations: {
+              //   createMany: {
+              //     data: [
+              //       {
+              //         userId: 4,
+              //         bookId: 7,
+              //         title: "Anotação sobre livro de C",
+              //         text: "C é muito legal",
+              //       },
+              //     ],
+              //   },
+              // },
+            },
+            {
+              title: "Livro de Compiladores",
+              author: "Autor do Livro de Compiladores",
+              isbn10: "658843121X",
+              isbn13: "9786588431214",
+              publisher: "Editora do Livro de Compiladores",
+              description: "Descrição do livro de Compiladores",
+              // annotations: {
+              //   createMany: {
+              //     data: [
+              //       {
+              //         userId: 4,
+              //         bookId: 8,
+              //         title: "Anotação sobre livro de Compiladores",
+              //         text: "Compiladores são muito legais",
+              //       },
+              //     ],
+              //   },
+              // },
+            },
+          ],
+        },
+      },
+    },
   ];
 
   try {

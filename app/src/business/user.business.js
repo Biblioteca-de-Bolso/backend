@@ -5,8 +5,22 @@ const prisma = require("../prisma");
 const mail = require("../services/mail");
 const { fileName } = require("../modules/debug");
 
-const { conflict, created, failure, ok, forbidden, notFound } = require("../modules/http");
-const { EmailAlreadyInUse, DatabaseFailure, UserNotFound, Forbidden } = require("../modules/codes");
+const {
+  conflict,
+  created,
+  failure,
+  ok,
+  forbidden,
+  notFound,
+  unauthorized,
+} = require("../modules/http");
+const {
+  EmailAlreadyInUse,
+  DatabaseFailure,
+  UserNotFound,
+  Forbidden,
+  Unauthorized,
+} = require("../modules/codes");
 
 module.exports = {
   async create(email, name, password) {
@@ -93,6 +107,16 @@ module.exports = {
       ) {
         // Remover todos os dados de usuário (de todas as tabelas)
         const deleted = await prisma.$transaction([
+          prisma.annotation.deleteMany({
+            where: {
+              userId: parseInt(userId),
+            },
+          }),
+          prisma.book.deleteMany({
+            where: {
+              userId: parseInt(userId),
+            },
+          }),
           prisma.refreshToken.deleteMany({
             where: {
               userId: parseInt(userId),
@@ -128,10 +152,10 @@ module.exports = {
         });
       }
     } else {
-      return ok({
+      return unauthorized({
         status: "error",
-        code: UserNotFound,
-        message: "O usuário informado não foi encontrado na base de dados.",
+        code: Unauthorized,
+        message: "Não foi possível completar a solicitação, verifique os parâmetros informados.",
       });
     }
   },
