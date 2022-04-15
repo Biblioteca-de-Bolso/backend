@@ -7,6 +7,7 @@ const PublisherValidator = require("../validators/book/publisher.rules");
 const DescriptionValidator = require("../validators/book/description.rules");
 const ThumbnailValidator = require("../validators/book/thumbnail.rules");
 const BookIdValidator = require("../validators/book/id.rules");
+const PageValidator = require("../validators/shared/page.rules");
 
 const validation = require("../modules/validation");
 
@@ -55,7 +56,7 @@ module.exports = {
     const { token } = req;
 
     // Aquisição e validação dos parâmetros
-    const { id } = req.params;
+    const id = parseInt(req.params["id"]);
 
     const rules = [[id, BookIdValidator]];
 
@@ -66,7 +67,7 @@ module.exports = {
     }
 
     // Token validado, prosseguir com a requisição
-    const response = await BookBusiness.read(token);
+    const response = await BookBusiness.read(token, id);
 
     // Retornar com resultado da operação
     return res.status(response.statusCode).json(response.body);
@@ -77,8 +78,19 @@ module.exports = {
       // Aquisição do token
       const { token } = req;
 
+      // Aquisição e validação dos parâmetros
+      const page = req.query["page"];
+
+      const rules = [[page, PageValidator, { required: false }]];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult.status === "error") {
+        return res.status(400).json(validationResult);
+      }
+
       // Token validado, prosseguir com a requisição
-      const response = await BookBusiness.list();
+      const response = await BookBusiness.list(token, page);
 
       // Retornar com resultado da operação
       return res.status(response.statusCode).json(response.body);

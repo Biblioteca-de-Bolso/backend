@@ -28,4 +28,7 @@ module.exports = {
 
   // Falhas com a manipulação e criação de token JWT
   JWTFailure: "JWTFailure",
+
+  // A página solicitada não retornou nenhum resultado
+  Empty: "Empty",
 };

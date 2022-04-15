@@ -4,16 +4,17 @@ const { validationError } = require("../../modules/validation");
 module.exports = {
   validate(input, required) {
     if (!input && required) {
-      return validationError("É necessário informar o ID do usuário.");
+      return validationError("É necessário informar o título da anotação.");
     }
 
     if (input) {
       if (
-        !validator.isInt(input.toString(), {
-          min: 0,
+        !validator.isLength(input, {
+          min: 1,
+          max: 128,
         })
       ) {
-        return validationError("O ID do usuário informado não é válido.");
+        return validationError("O título da anotação deve ter entre 1 e 128 caracteres.");
       }
     }
 

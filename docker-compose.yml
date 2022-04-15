@@ -6,6 +6,8 @@ services:
     build: ./app
     ports:
       - ${API_LOCAL_PORT}:${API_LOCAL_PORT}
+    networks:
+    - bibliotecadebolso-network
     environment:
       WAIT_HOSTS: database:5432
       WAIT_TIMEOUT: 600
@@ -28,6 +30,8 @@ services:
     env_file: .env
     ports:
       - 5432:5432
+    networks:
+    - bibliotecadebolso-network
     environment:
       POSTGRES_PASSWORD: 123456789
       POSTGRES_USER: bibliotecadebolso
@@ -36,3 +40,6 @@ services:
       - ./postgres-data:/var/lib/postgresql/data
 volumes:
   node_modules: {}
+networks: 
+  bibliotecadebolso-network:
+    driver: bridge

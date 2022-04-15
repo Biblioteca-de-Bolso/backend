@@ -4,7 +4,7 @@ const { validationError } = require("../../modules/validation");
 module.exports = {
   validate(input, required) {
     if (!input && required) {
-      return validationError("É necessário informar o ID do usuário.");
+      return validationError("É necessário informar um número de página.");
     }
 
     if (input) {
@@ -13,7 +13,7 @@ module.exports = {
           min: 0,
         })
       ) {
-        return validationError("O ID do usuário informado não é válido.");
+        return validationError("O número de página informado não é válido.");
       }
     }
 

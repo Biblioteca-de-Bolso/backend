@@ -8,7 +8,11 @@ module.exports = {
     }
 
     if (input) {
-      if (!validator.isDecimal(input.toString())) {
+      if (
+        !validator.isInt(input.toString(), {
+          min: 0,
+        })
+      ) {
         return validationError("O ID do livro informado não é válido.");
       }
     }
