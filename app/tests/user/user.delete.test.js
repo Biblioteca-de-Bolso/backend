@@ -27,8 +27,6 @@ describe("Remoção de Usuário", () => {
       },
     });
 
-    console.log("Usuario retornado:", user);
-
     const books = await prisma.book.findMany({
       where: {
         userId: userId,
