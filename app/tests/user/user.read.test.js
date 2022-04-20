@@ -48,7 +48,7 @@ describe("Leitura de Usuário", () => {
   test("Não deve ler os dados de um usuário inexistente", async () => {
     const response = await request(app)
       .get(`/api/user/99`)
-      .set({ "x-access-token": accessToken })
+      .set({ authorization: `Bearer ${accessToken}` })
       .send();
 
     expect(response.statusCode).toBe(404);
@@ -61,7 +61,7 @@ describe("Leitura de Usuário", () => {
   test("Nao deve ler os dados de outro usuário", async () => {
     const response = await request(app)
       .get(`/api/user/1`)
-      .set({ "x-access-token": accessToken })
+      .set({ authorization: `Bearer ${accessToken}` })
       .send();
 
     expect(response.statusCode).toBe(403);
@@ -74,7 +74,7 @@ describe("Leitura de Usuário", () => {
   test("Deve ler os dados do usuário", async () => {
     const response = await request(app)
       .get(`/api/user/${userId}`)
-      .set({ "x-access-token": accessToken })
+      .set({ authorization: `Bearer ${accessToken}` })
       .send();
 
     expect(response.statusCode).toBe(200);

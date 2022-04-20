@@ -47,7 +47,7 @@ describe("Busca de livros no Google Books", () => {
     const response = await request(app)
       .get("/api/googlebooks")
       .set({
-        "x-access-token": accessToken,
+        authorization: `Bearer ${accessToken}`,
       })
       .send();
 
@@ -61,7 +61,7 @@ describe("Busca de livros no Google Books", () => {
     const response = await request(app)
       .get("/api/googlebooks?qstring=código limpo")
       .set({
-        "x-access-token": accessToken,
+        authorization: `Bearer ${accessToken}`,
       })
       .send();
 

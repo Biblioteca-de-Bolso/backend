@@ -77,7 +77,7 @@ describe("Remoção de Usuário", () => {
   test("Não deve remover um usuário sem informar um id", async () => {
     const response = await request(app)
       .delete(`/api/user`)
-      .set({ "x-access-token": accessToken })
+      .set({ authorization: `Bearer ${accessToken}` })
       .send({
         email: userEmail,
         password: userPassword,
@@ -93,7 +93,7 @@ describe("Remoção de Usuário", () => {
   test("Não deve remover um usuário sem informar um email", async () => {
     const response = await request(app)
       .delete(`/api/user`)
-      .set({ "x-access-token": accessToken })
+      .set({ authorization: `Bearer ${accessToken}` })
       .send({
         id: userId,
         password: userPassword,
@@ -109,7 +109,7 @@ describe("Remoção de Usuário", () => {
   test("Não deve remover um usuário sem informar uma senha", async () => {
     const response = await request(app)
       .delete(`/api/user`)
-      .set({ "x-access-token": accessToken })
+      .set({ authorization: `Bearer ${accessToken}` })
       .send({
         id: userId,
         email: userEmail,
@@ -125,7 +125,7 @@ describe("Remoção de Usuário", () => {
   test("Não deve remover os dados de usuário passando uma senha incorreta", async () => {
     const response = await request(app)
       .delete(`/api/user`)
-      .set({ "x-access-token": accessToken })
+      .set({ authorization: `Bearer ${accessToken}` })
       .send({
         id: userId,
         email: userEmail,
@@ -142,7 +142,7 @@ describe("Remoção de Usuário", () => {
   test("Não deve remover os dados de usuário passando uma senha incorreta", async () => {
     const response = await request(app)
       .delete(`/api/user`)
-      .set({ "x-access-token": accessToken })
+      .set({ authorization: `Bearer ${accessToken}` })
       .send({
         id: userId,
         email: userEmail,
@@ -159,7 +159,7 @@ describe("Remoção de Usuário", () => {
   test("Não deve remover os dados de usuário passando um id de outro usuário", async () => {
     const response = await request(app)
       .delete(`/api/user`)
-      .set({ "x-access-token": accessToken })
+      .set({ authorization: `Bearer ${accessToken}` })
       .send({
         id: 1,
         email: userEmail,
