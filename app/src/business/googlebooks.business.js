@@ -44,8 +44,6 @@ module.exports = {
 
               identifiers[type] = value;
             }
-          } else {
-            console.log(fileName(), "Este livro não possui identificadores de indústria:", book.id);
           }
 
           // Extração da capa do livro
@@ -62,8 +60,6 @@ module.exports = {
             for (const bookAuthor of book.volumeInfo["authors"]) {
               author += author.length === 0 ? bookAuthor : ", " + bookAuthor;
             }
-          } else {
-            console.log(fileName(), "Este livro não possui autores:", book.id);
           }
 
           books.push({

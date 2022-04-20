@@ -3,7 +3,9 @@
 const AuthBusiness = require("../business/auth.business");
 
 module.exports = async function (req, res, next) {
-  const token = req.headers["x-access-token"];
+  const header = req.headers["authorization"];
+
+  const token = header ? header.split(" ")[1] : "";
 
   const decoded = await AuthBusiness.verifyToken(token);
 

@@ -2,7 +2,7 @@ const request = require("supertest");
 const app = require("../../app");
 const prisma = require("../../src/prisma");
 
-describe("Leitura de Usuário", () => {
+describe("Busca de livros no Google Books", () => {
   jest.setTimeout(10000);
 
   beforeAll(async () => {
@@ -16,17 +16,15 @@ describe("Leitura de Usuário", () => {
   let accessToken = "";
 
   // Ada Lovelace
-  const userId = 2;
   const userEmail = "ada@email.com";
   const userPassword = "adalovelace";
 
-  test("Não deve ler os dados de um usuário sem informar um token", async () => {
-    const response = await request(app).get(`/api/user/${userId}`).send();
+  test("Não deve realizar a busca de um livro sem informar um token", async () => {
+    const response = await request(app).get("/api/googlebooks").send();
 
     expect(response.statusCode).toBe(400);
     expect(response.body).toHaveProperty("status");
     expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
     expect(response.body.code).toBe("IncorrectParameter");
   });
 
@@ -45,43 +43,33 @@ describe("Leitura de Usuário", () => {
     if (response.body.response.accessToken) accessToken = response.body.response.accessToken;
   });
 
-  test("Não deve ler os dados de um usuário inexistente", async () => {
+  test("Não deve realizar a busca de um livro sem informar uma strig de busca", async () => {
     const response = await request(app)
-      .get(`/api/user/99`)
-      .set({ authorization: `Bearer ${accessToken}` })
+      .get("/api/googlebooks")
+      .set({
+        authorization: `Bearer ${accessToken}`,
+      })
       .send();
 
-    expect(response.statusCode).toBe(404);
+    expect(response.statusCode).toBe(400);
     expect(response.body).toHaveProperty("status");
     expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("UserNotFound");
+    expect(response.body.code).toBe("IncorrectParameter");
   });
 
-  test("Nao deve ler os dados de outro usuário", async () => {
+  test("Deve realizar a busca de um livro", async () => {
     const response = await request(app)
-      .get(`/api/user/1`)
-      .set({ authorization: `Bearer ${accessToken}` })
-      .send();
-
-    expect(response.statusCode).toBe(403);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("Forbidden");
-  });
-
-  test("Deve ler os dados do usuário", async () => {
-    const response = await request(app)
-      .get(`/api/user/${userId}`)
-      .set({ authorization: `Bearer ${accessToken}` })
+      .get("/api/googlebooks?qstring=código limpo")
+      .set({
+        authorization: `Bearer ${accessToken}`,
+      })
       .send();
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("status");
     expect(response.body.status).toBe("ok");
     expect(response.body).toHaveProperty("response");
-    expect(response.body.response).toHaveProperty("user");
-    expect(response.body.response.user.id).toBe(userId);
+    expect(response.body.response).toHaveProperty("books");
+    expect(response.body.response.books.length).toBeGreaterThan(0);
   });
 });

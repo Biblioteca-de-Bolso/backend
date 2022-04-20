@@ -1,5 +1,5 @@
 const request = require("supertest");
-const app = require("../app");
+const app = require("../../app");
 
 describe("Testes da estrutura de resposta da API", () => {
   test("A raiz da API deve retornar um OK 200", async () => {
