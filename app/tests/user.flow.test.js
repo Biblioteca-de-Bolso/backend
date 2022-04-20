@@ -165,7 +165,7 @@ describe("Fluxo de Usuário", () => {
   test("Não deve remover um usuário sem informar um ID", async () => {
     const response = await request(app)
       .delete("/api/user")
-      .set("x-access-token", accessToken)
+      .set({ authorization: `Bearer ${accessToken}` })
       .send({
         email: userEmail,
         password: userPassword,
@@ -179,7 +179,7 @@ describe("Fluxo de Usuário", () => {
   test("Não deve remover um usuário sem informar um email", async () => {
     const response = await request(app)
       .delete("/api/user")
-      .set("x-access-token", accessToken)
+      .set({ authorization: `Bearer ${accessToken}` })
       .send({
         id: userId,
         password: userPassword,
@@ -193,7 +193,7 @@ describe("Fluxo de Usuário", () => {
   test("Não deve remover um usuário sem informar uma senha", async () => {
     const response = await request(app)
       .delete("/api/user")
-      .set("x-access-token", accessToken)
+      .set({ authorization: `Bearer ${accessToken}` })
       .send({
         id: userId,
         email: userEmail,
@@ -207,7 +207,7 @@ describe("Fluxo de Usuário", () => {
   test("Deve remover um usuário", async () => {
     const response = await request(app)
       .delete("/api/user")
-      .set("x-access-token", accessToken)
+      .set({ authorization: `Bearer ${accessToken}` })
       .send({
         id: userId,
         email: userEmail,
@@ -220,7 +220,7 @@ describe("Fluxo de Usuário", () => {
   test("Não deve remover um usuário que já foi removido", async () => {
     const response = await request(app)
       .delete("/api/user")
-      .set("x-access-token", accessToken)
+      .set({ authorization: `Bearer ${accessToken}` })
       .send({
         id: userId,
         email: userEmail,
