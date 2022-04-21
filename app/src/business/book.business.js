@@ -7,7 +7,7 @@ const prisma = require("../prisma");
 
 module.exports = {
   async create(token, title, author, isbn, publisher, description, thumbnail) {
-    const userId = parseInt(token["userId"]);
+    const userId = parseInt(token["id"]);
 
     // Executa verificação de ISBN informado
     let isbn10 = "";
@@ -49,7 +49,7 @@ module.exports = {
   },
 
   async read(token, id) {
-    const userId = parseInt(token["userId"]);
+    const userId = parseInt(token["id"]);
 
     const book = await prisma.book.findUnique({
       where: {
@@ -84,7 +84,7 @@ module.exports = {
   },
 
   async list(token, page) {
-    const userId = parseInt(token["userId"]);
+    const userId = parseInt(token["id"]);
 
     if (!page || page == 0) page = 1;
 

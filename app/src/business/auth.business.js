@@ -5,13 +5,19 @@ const validator = require("validator");
 
 const prisma = require("../prisma");
 
-const { failure, unauthorized, ok } = require("../modules/http");
+const { failure, unauthorized, ok, forbidden } = require("../modules/http");
 const {
   Unauthorized,
   AccountNotVerified,
   IncorrectParameter,
   DatabaseFailure,
   JWTFailure,
+  JWTExpired,
+  JWTNotBefore,
+  InvalidRefreshToken,
+  RefreshTokenNotBefore,
+  RefreshTokenExpired,
+  Forbidden,
 } = require("../modules/codes");
 
 module.exports = {
@@ -34,7 +40,7 @@ module.exports = {
       if (user["active"]) {
         // Construir o payload do token com os dados necessários
         const payload = {
-          userId: parseInt(user["id"]),
+          id: parseInt(user["id"]),
           email: user["email"],
           name: user["name"],
         };
@@ -109,14 +115,86 @@ module.exports = {
     }
   },
 
-  async refreshToken() {
-    // ...
+  async refreshToken(token, refreshToken) {
+    const userId = parseInt(token["id"]);
+    const userEmail = token["email"];
+    const userName = token["name"];
+
+    const refresh = await prisma.refreshToken.findUnique({
+      where: {
+        id: refreshToken,
+      },
+    });
+
+    if (refresh) {
+      // Verificação de autenticidade do refresh token informado
+      if (userId !== parseInt(refresh["userId"]) || userEmail !== refresh["email"]) {
+        return forbidden({
+          status: "error",
+          code: Forbidden,
+          message:
+            "Os dados presentes no token não são válidos com os dados presentes no refresh token.",
+        });
+      }
+
+      // Verificações de validade do refresh token informado
+      const currentTime = dayjs().valueOf().toString().slice(0, 10);
+
+      if (currentTime < parseInt(refresh["iat"])) {
+        return ok({
+          status: "error",
+          code: RefreshTokenNotBefore,
+          message:
+            "O horário de criação do refresh token informado é anterior ao horário atual, ajuste o horário do seu dispositivo.",
+        });
+      }
+
+      if (currentTime > parseInt(refresh["exp"])) {
+        return ok({
+          status: "error",
+          code: RefreshTokenExpired,
+          message: "O refresh token informado expirou, realize o login novamente.",
+        });
+      }
+
+      // Todas as validações foram executadas, criar novo token de acesso
+      const newToken = await this.createToken({
+        id: userId,
+        email: userEmail,
+        name: userName,
+      });
+
+      if (newToken["status"] === "ok") {
+        // Token criado com sucesso, aplicar Refresh Token Rotation
+        await prisma.refreshToken.delete({
+          where: {
+            id: refreshToken,
+          },
+        });
+
+        // Retornar novos tokens de acesso que foram criados
+        return ok(newToken);
+      } else {
+        return ok({
+          status: "ok",
+          code: JWTFailure,
+          message: "Erro durante a criação de novo token de acesso através do refresh token.",
+        });
+      }
+    } else {
+      return ok({
+        status: "error",
+        code: InvalidRefreshToken,
+        message: "O refresh token informado não foi encontrado na base de dados de autenticação.",
+      });
+    }
   },
 
   async createToken(payload) {
     // Realiza assinatura do token com base no payload e no token secret da aplicação
     const accessToken = jwt.sign(payload, process.env.JWT_TOKEN_SECRET, {
-      expiresIn: 60 * 60 * 24,
+      // expiresIn: 60 * 60 * 24,
+      expiresIn: 30,
     });
 
     // Criação de um novo refresh token
@@ -135,7 +213,7 @@ module.exports = {
       data: {
         id: randomToken,
         email: payload["email"],
-        userId: payload["userId"],
+        userId: payload["id"],
         iat: iatString,
         exp: expString,
       },
@@ -158,16 +236,16 @@ module.exports = {
     }
   },
 
-  async verifyToken(token) {
+  async verifyToken(token, ignoreExpiration = false) {
     if (token) {
       try {
         // Tenta realizar validação do token informado
-        const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET, { ignoreExpiration });
 
         // Token validado com sucesso, extrair dados de usuário
         const user = await prisma.user.findFirst({
           where: {
-            id: parseInt(decoded["userId"]),
+            id: parseInt(decoded["id"]),
             email: decoded["email"],
           },
         });
@@ -182,11 +260,33 @@ module.exports = {
           };
         }
       } catch (error) {
-        return {
-          status: "error",
-          code: JWTFailure,
-          message: `Erro ao validar token JWT: ${error.message}`,
-        };
+        // Erros: https://github.com/auth0/node-jsonwebtoken
+        switch (error.name) {
+          case "TokenExpiredError":
+            return {
+              status: "error",
+              code: JWTExpired,
+              message: `Erro ao validar token JWT: ${error.message}`,
+            };
+          case "JsonWebTokenError":
+            return {
+              status: "error",
+              code: JWTFailure,
+              message: `Erro ao validar token JWT: ${error.message}`,
+            };
+          case "NotBeforeError":
+            return {
+              status: "error",
+              code: JWTNotBefore,
+              message: `Erro ao validar token JWT: ${error.message}`,
+            };
+          default:
+            return {
+              status: "error",
+              code: JWTFailure,
+              message: `Erro ao validar token JWT: ${error.message}`,
+            };
+        }
       }
     } else {
       return {
