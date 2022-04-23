@@ -115,6 +115,51 @@ module.exports = {
     }
   },
 
+  async createToken(payload, duration = 60 * 60 * 24) {
+    // Realiza assinatura do token com base no payload e no token secret da aplicação
+    const accessToken = jwt.sign(payload, process.env.JWT_TOKEN_SECRET, {
+      expiresIn: duration,
+    });
+
+    // Criação de um novo refresh token
+    const randomToken = crypto.randomBytes(64).toString("hex");
+
+    // Criação das datas "issued at" e "expiration" em formato unix ms
+    const iat = dayjs().valueOf();
+    const exp = dayjs(iat).add(7, "day").valueOf();
+
+    // Converte o formato das datas em segundos (desconsiderar últimos três caracteres)
+    const iatString = iat.toString().slice(0, 10);
+    const expString = exp.toString().slice(0, 10);
+
+    // Salvar o refresh token no banco de dados
+    const refresh = await prisma.refreshToken.create({
+      data: {
+        id: randomToken,
+        email: payload["email"],
+        userId: payload["id"],
+        iat: iatString,
+        exp: expString,
+      },
+    });
+
+    if (refresh) {
+      return {
+        status: "ok",
+        response: {
+          accessToken: accessToken,
+          refreshToken: randomToken,
+        },
+      };
+    } else {
+      return {
+        status: "error",
+        code: JWTFailure,
+        message: "Não foi possível realizar o registro do refresh token criado.",
+      };
+    }
+  },
+
   async refreshToken(token, refreshToken) {
     const userId = parseInt(token["id"]);
     const userEmail = token["email"];
@@ -187,52 +232,6 @@ module.exports = {
         code: InvalidRefreshToken,
         message: "O refresh token informado não foi encontrado na base de dados de autenticação.",
       });
-    }
-  },
-
-  async createToken(payload) {
-    // Realiza assinatura do token com base no payload e no token secret da aplicação
-    const accessToken = jwt.sign(payload, process.env.JWT_TOKEN_SECRET, {
-      // expiresIn: 60 * 60 * 24,
-      expiresIn: 30,
-    });
-
-    // Criação de um novo refresh token
-    const randomToken = crypto.randomBytes(64).toString("hex");
-
-    // Criação das datas "issued at" e "expiration" em formato unix ms
-    const iat = dayjs().valueOf();
-    const exp = dayjs(iat).add(7, "day").valueOf();
-
-    // Converte o formato das datas em segundos (desconsiderar últimos três caracteres)
-    const iatString = iat.toString().slice(0, 10);
-    const expString = exp.toString().slice(0, 10);
-
-    // Salvar o refresh token no banco de dados
-    const refresh = await prisma.refreshToken.create({
-      data: {
-        id: randomToken,
-        email: payload["email"],
-        userId: payload["id"],
-        iat: iatString,
-        exp: expString,
-      },
-    });
-
-    if (refresh) {
-      return {
-        status: "ok",
-        response: {
-          accessToken: accessToken,
-          refreshToken: randomToken,
-        },
-      };
-    } else {
-      return {
-        status: "error",
-        code: JWTFailure,
-        message: "Não foi possível realizar o registro do refresh token criado.",
-      };
     }
   },
 
