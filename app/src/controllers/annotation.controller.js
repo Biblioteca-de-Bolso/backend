@@ -32,7 +32,7 @@ module.exports = {
 
       const response = await AnnotationBusiness.create(token, bookId, title, text, page);
 
-      res.status(response.statusCode).json(response.body);
+      return res.status(response.statusCode).json(response.body);
     } catch (error) {
       return next(error);
     }

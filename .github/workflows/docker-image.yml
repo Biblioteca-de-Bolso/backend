@@ -10,8 +10,6 @@ on:
 env:
   API_LOCAL_PORT: ${{ secrets.API_LOCAL_PORT }}
   JWT_TOKEN_SECRET: ${{ secrets.JWT_TOKEN_SECRET }}
-  EMAIL_USER: ${{ secrets.EMAIL_USER }}
-  EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
   PRODUCTION_URL: ${{ secrets.PRODUCTION_URL }}
   CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
   GOOGLE_BOOKS_API: ${{ secrets.GOOGLE_BOOKS_API }}
@@ -35,8 +33,6 @@ jobs:
           touch .env
           echo API_LOCAL_PORT=${{ secrets.API_LOCAL_PORT }} >> .env
           echo JWT_TOKEN_SECRET=${{ secrets.JWT_TOKEN_SECRET }} >> .env
-          echo EMAIL_USER=${{ secrets.EMAIL_USER }} >> .env
-          echo EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }} >> .env
           echo PRODUCTION_URL=${{ secrets.PRODUCTION_URL }} >> .env
           echo GOOGLE_BOOKS_API=${{ secrets.GOOGLE_BOOKS_API }} >> .env
           echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env

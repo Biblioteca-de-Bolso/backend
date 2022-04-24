@@ -3,15 +3,16 @@ const dotenv = require("dotenv").config({ path: "../../../.env" });
 const prisma = require("../../src/prisma");
 
 module.exports = async () => {
-  console.log("Running Seeds.");
+  console.log("Running seeds.");
 
   const users = [
+    // A conta do Allan Turing é utilizada para o teste de ativação de conta de usuário
     {
       name: "Allan Turing",
       email: "allan@email.com",
       password: crypto.createHash("md5").update("allanturing").digest("hex"),
       active: false,
-      activationCode: "123456789",
+      activationCode: "1234567812345678",
       books: {
         createMany: {
           data: [
@@ -35,12 +36,13 @@ module.exports = async () => {
         },
       },
     },
+    // A conta da Ada é utilizada para o teste de leitura de usuário e de login
     {
       name: "Ada Lovelace",
       email: "ada@email.com",
       password: crypto.createHash("md5").update("adalovelace").digest("hex"),
       active: true,
-      activationCode: "123456789",
+      activationCode: "1234567812345678",
       books: {
         createMany: {
           data: [
@@ -64,12 +66,13 @@ module.exports = async () => {
         },
       },
     },
+    // A conta do Von Neumann deve permencer inativa para falhar no teste de login
     {
       name: "Von Neumann",
       email: "vonneumann@email.com",
       password: crypto.createHash("md5").update("vonneumann").digest("hex"),
-      active: true,
-      activationCode: "123456789",
+      active: false,
+      activationCode: "1234567812345678",
       books: {
         createMany: {
           data: [
@@ -93,12 +96,13 @@ module.exports = async () => {
         },
       },
     },
+    // A conta do Dennis é utilizada para o teste de remoção de usuário
     {
       name: "Dennis Ritchie",
       email: "dennisritchie@email.com",
       password: crypto.createHash("md5").update("dennisritchie").digest("hex"),
       active: true,
-      activationCode: "123456789",
+      activationCode: "1234567812345678",
       books: {
         createMany: {
           data: [
@@ -109,18 +113,6 @@ module.exports = async () => {
               isbn13: "9788550811482",
               publisher: "Editora do Livro de C",
               description: "Descrição do livro de C",
-              // annotations: {
-              //   createMany: {
-              //     data: [
-              //       {
-              //         userId: 4,
-              //         bookId: 7,
-              //         title: "Anotação sobre livro de C",
-              //         text: "C é muito legal",
-              //       },
-              //     ],
-              //   },
-              // },
             },
             {
               title: "Livro de Compiladores",
@@ -129,18 +121,6 @@ module.exports = async () => {
               isbn13: "9786588431214",
               publisher: "Editora do Livro de Compiladores",
               description: "Descrição do livro de Compiladores",
-              // annotations: {
-              //   createMany: {
-              //     data: [
-              //       {
-              //         userId: 4,
-              //         bookId: 8,
-              //         title: "Anotação sobre livro de Compiladores",
-              //         text: "Compiladores são muito legais",
-              //       },
-              //     ],
-              //   },
-              // },
             },
           ],
         },

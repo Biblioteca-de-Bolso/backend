@@ -45,7 +45,7 @@ module.exports = {
         thumbnail
       );
 
-      res.status(response.statusCode).json(response.body);
+      return res.status(response.statusCode).json(response.body);
     } catch (error) {
       return next(error);
     }

@@ -101,7 +101,7 @@ module.exports = {
     if (user) {
       // Verifica veracidade dos dados
       if (
-        user["id"] == token["userId"] &&
+        user["id"] == token["id"] &&
         user["email"] == token["email"] &&
         user["password"] == password
       ) {
@@ -172,7 +172,7 @@ module.exports = {
       delete user["password"];
 
       // Verificar permissão de acesso aos dados desse usuário
-      if (user["id"] == token["userId"] && user["email"] === token["email"]) {
+      if (user["id"] == token["id"] && user["email"] === token["email"]) {
         return ok({
           status: "ok",
           response: {

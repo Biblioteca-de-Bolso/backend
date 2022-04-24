@@ -8,7 +8,7 @@ const PlaygroundController = require("./controllers/playground.controller");
 const GoogleBooksController = require("./controllers/googlebooks.controller");
 const AnnotationController = require("./controllers/annotation.controller");
 
-const protectedRoute = require("./middlewares/auth");
+const { protectedRoute, refreshTokenRoute } = require("./middlewares/auth");
 
 // Rotas de Playground
 routes.get("/play/date", PlaygroundController.date);
@@ -16,7 +16,7 @@ routes.get("/play/date", PlaygroundController.date);
 // Rotas de Autenticação
 routes.post("/auth/login", AuthController.login);
 routes.get("/auth/verify", AuthController.verifyAccount);
-routes.post("/auth/refresh", AuthController.refreshToken);
+routes.post("/auth/refresh", refreshTokenRoute, AuthController.refreshToken);
 
 // Rotas de Usuário
 routes.post("/user", UserController.create);
