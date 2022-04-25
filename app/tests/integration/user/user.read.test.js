@@ -1,6 +1,8 @@
 const request = require("supertest");
-const app = require("../../app");
-const prisma = require("../../src/prisma");
+const app = require("../../../app");
+const { IncorrectParameter, UserNotFound, Forbidden } = require("../../../src/modules/codes");
+const prisma = require("../../../src/prisma");
+const { assertStatus, assertStatusCode, assertResponse, assertCode } = require("../../utils");
 
 describe("Leitura de Usuário", () => {
   jest.setTimeout(10000);
@@ -23,11 +25,9 @@ describe("Leitura de Usuário", () => {
   test("Não deve ler os dados de um usuário sem informar um token", async () => {
     const response = await request(app).get(`/api/user/${userId}`).send();
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("IncorrectParameter");
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
   });
 
   test("Deve realizar login e retornar um Access Token", async () => {
@@ -36,11 +36,9 @@ describe("Leitura de Usuário", () => {
       password: userPassword,
     });
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("ok");
-    expect(response.body).toHaveProperty("response");
-    expect(response.body.response).toHaveProperty("accessToken");
+    assertStatusCode(response, 200);
+    assertStatus(response, "ok");
+    assertResponse(response, ["accessToken", "refreshToken"]);
 
     if (response.body.response.accessToken) accessToken = response.body.response.accessToken;
   });
@@ -51,11 +49,9 @@ describe("Leitura de Usuário", () => {
       .set({ authorization: `Bearer ${accessToken}` })
       .send();
 
-    expect(response.statusCode).toBe(404);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("UserNotFound");
+    assertStatusCode(response, 404);
+    assertStatus(response, "error");
+    assertCode(response, UserNotFound);
   });
 
   test("Nao deve ler os dados de outro usuário", async () => {
@@ -64,11 +60,9 @@ describe("Leitura de Usuário", () => {
       .set({ authorization: `Bearer ${accessToken}` })
       .send();
 
-    expect(response.statusCode).toBe(403);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("Forbidden");
+    assertStatusCode(response, 403);
+    assertStatus(response, "error");
+    assertCode(response, Forbidden);
   });
 
   test("Deve ler os dados do usuário", async () => {
@@ -77,11 +71,10 @@ describe("Leitura de Usuário", () => {
       .set({ authorization: `Bearer ${accessToken}` })
       .send();
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("ok");
-    expect(response.body).toHaveProperty("response");
-    expect(response.body.response).toHaveProperty("user");
+    assertStatusCode(response, 200);
+    assertStatus(response, "ok");
+    assertResponse(response, "user");
+
     expect(response.body.response.user.id).toBe(userId);
   });
 });

@@ -1,6 +1,8 @@
 const request = require("supertest");
-const app = require("../../app");
-const prisma = require("../../src/prisma");
+const app = require("../../../app");
+const { IncorrectParameter } = require("../../../src/modules/codes");
+const prisma = require("../../../src/prisma");
+const { assertStatusCode, assertStatus, assertResponse, assertCode } = require("../../utils");
 
 describe("Busca de livros no Google Books", () => {
   jest.setTimeout(10000);
@@ -22,10 +24,9 @@ describe("Busca de livros no Google Books", () => {
   test("Não deve realizar a busca de um livro sem informar um token", async () => {
     const response = await request(app).get("/api/googlebooks").send();
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body.code).toBe("IncorrectParameter");
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
   });
 
   test("Deve realizar login e retornar um Access Token", async () => {
@@ -34,11 +35,9 @@ describe("Busca de livros no Google Books", () => {
       password: userPassword,
     });
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("ok");
-    expect(response.body).toHaveProperty("response");
-    expect(response.body.response).toHaveProperty("accessToken");
+    assertStatusCode(response, 200);
+    assertStatus(response, "ok");
+    assertResponse(response, ["accessToken", "refreshToken"]);
 
     if (response.body.response.accessToken) accessToken = response.body.response.accessToken;
   });
@@ -51,10 +50,9 @@ describe("Busca de livros no Google Books", () => {
       })
       .send();
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body.code).toBe("IncorrectParameter");
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
   });
 
   test("Deve realizar a busca de um livro", async () => {
@@ -65,11 +63,10 @@ describe("Busca de livros no Google Books", () => {
       })
       .send();
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("ok");
-    expect(response.body).toHaveProperty("response");
-    expect(response.body.response).toHaveProperty("books");
+    assertStatusCode(response, 200);
+    assertStatus(response, "ok");
+    assertResponse(response, "books");
+
     expect(response.body.response.books.length).toBeGreaterThan(0);
   });
 });

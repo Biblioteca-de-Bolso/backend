@@ -1,4 +1,4 @@
-const http = require("../../src/modules/http");
+const http = require("../../../src/modules/http");
 
 describe("Objetos de retorno HTTP", () => {
   test("O Objeto OK deve retornar código 200", async () => {
