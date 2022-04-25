@@ -1,8 +1,8 @@
 const request = require("supertest");
-const app = require("../../app");
-const { IncorrectParameter, AccountNotVerified } = require("../../src/modules/codes");
-const prisma = require("../../src/prisma");
-const { assertFailure, assertSuccess } = require("../utils");
+const app = require("../../../app");
+const { IncorrectParameter, AccountNotVerified } = require("../../../src/modules/codes");
+const prisma = require("../../../src/prisma");
+const { assertStatus, assertCode, assertStatusCode, assertResponse } = require("../../utils");
 
 describe("Realização de login", () => {
   jest.setTimeout(10000);
@@ -28,7 +28,9 @@ describe("Realização de login", () => {
       password: inactivePassword,
     });
 
-    assertFailure(response, 400, IncorrectParameter);
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
   });
 
   test("Não deve realizar login sem informar uma senha", async () => {
@@ -36,7 +38,9 @@ describe("Realização de login", () => {
       email: inactiveEmail,
     });
 
-    assertFailure(response, 400, IncorrectParameter);
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
   });
 
   test("Não deve realizar login de uma conta que não foi confirmada", async () => {
@@ -45,7 +49,9 @@ describe("Realização de login", () => {
       password: inactivePassword,
     });
 
-    assertFailure(response, 200, AccountNotVerified);
+    assertStatusCode(response, 200);
+    assertStatus(response, "error");
+    assertCode(response, AccountNotVerified);
   });
 
   test("Deve realizar login e retornar um Access Token", async () => {
@@ -54,6 +60,8 @@ describe("Realização de login", () => {
       password: userPassword,
     });
 
-    assertSuccess(response, 200, ["accessToken", "refreshToken"]);
+    assertStatusCode(response, 200);
+    assertStatus(response, "ok");
+    assertResponse(response, ["accessToken", "refreshToken"]);
   });
 });

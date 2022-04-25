@@ -1,8 +1,8 @@
 const request = require("supertest");
-const app = require("../../app");
-const { IncorrectParameter } = require("../../src/modules/codes");
-const prisma = require("../../src/prisma");
-const { assertFailure, assertSuccess } = require("../utils");
+const app = require("../../../app");
+const { IncorrectParameter } = require("../../../src/modules/codes");
+const prisma = require("../../../src/prisma");
+const { assertStatusCode, assertStatus, assertResponse, assertCode } = require("../../utils");
 
 describe("Busca de livros no Google Books", () => {
   jest.setTimeout(10000);
@@ -24,7 +24,9 @@ describe("Busca de livros no Google Books", () => {
   test("Não deve realizar a busca de um livro sem informar um token", async () => {
     const response = await request(app).get("/api/googlebooks").send();
 
-    assertFailure(response, 400, IncorrectParameter);
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
   });
 
   test("Deve realizar login e retornar um Access Token", async () => {
@@ -33,7 +35,9 @@ describe("Busca de livros no Google Books", () => {
       password: userPassword,
     });
 
-    assertSuccess(response, 200, ["accessToken", "refreshToken"]);
+    assertStatusCode(response, 200);
+    assertStatus(response, "ok");
+    assertResponse(response, ["accessToken", "refreshToken"]);
 
     if (response.body.response.accessToken) accessToken = response.body.response.accessToken;
   });
@@ -46,7 +50,9 @@ describe("Busca de livros no Google Books", () => {
       })
       .send();
 
-    assertFailure(response, 400, IncorrectParameter);
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
   });
 
   test("Deve realizar a busca de um livro", async () => {
@@ -57,7 +63,10 @@ describe("Busca de livros no Google Books", () => {
       })
       .send();
 
-    assertSuccess(response, 200, "books");
+    assertStatusCode(response, 200);
+    assertStatus(response, "ok");
+    assertResponse(response, "books");
+
     expect(response.body.response.books.length).toBeGreaterThan(0);
   });
 });

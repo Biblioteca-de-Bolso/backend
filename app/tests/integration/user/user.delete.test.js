@@ -1,8 +1,8 @@
 const request = require("supertest");
-const app = require("../../app");
-const { IncorrectParameter, Unauthorized } = require("../../src/modules/codes");
-const prisma = require("../../src/prisma");
-const { assertFailure, assertSuccess } = require("../utils");
+const app = require("../../../app");
+const { IncorrectParameter, Unauthorized } = require("../../../src/modules/codes");
+const prisma = require("../../../src/prisma");
+const { assertStatus, assertStatusCode, assertResponse, assertCode } = require("../../utils");
 
 describe("Remoção de Usuário", () => {
   jest.setTimeout(10000);
@@ -54,7 +54,9 @@ describe("Remoção de Usuário", () => {
   test("Não deve remover um usuário sem informar um token", async () => {
     const response = await request(app).delete(`/api/user`).send();
 
-    assertFailure(response, 400, IncorrectParameter);
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
   });
 
   test("Deve realizar login e retornar um Access Token", async () => {
@@ -63,7 +65,9 @@ describe("Remoção de Usuário", () => {
       password: userPassword,
     });
 
-    assertSuccess(response, 200, ["accessToken", "refreshToken"]);
+    assertStatusCode(response, 200);
+    assertStatus(response, "ok");
+    assertResponse(response, ["accessToken", "refreshToken"]);
 
     if (response.body.response.accessToken) accessToken = response.body.response.accessToken;
   });
@@ -77,7 +81,9 @@ describe("Remoção de Usuário", () => {
         password: userPassword,
       });
 
-    assertFailure(response, 400, IncorrectParameter);
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
   });
 
   test("Não deve remover um usuário sem informar um email", async () => {
@@ -89,7 +95,9 @@ describe("Remoção de Usuário", () => {
         password: userPassword,
       });
 
-    assertFailure(response, 400, IncorrectParameter);
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
   });
 
   test("Não deve remover um usuário sem informar uma senha", async () => {
@@ -101,7 +109,9 @@ describe("Remoção de Usuário", () => {
         email: userEmail,
       });
 
-    assertFailure(response, 400, IncorrectParameter);
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
   });
 
   test("Não deve remover os dados de usuário passando uma senha incorreta", async () => {
@@ -114,7 +124,9 @@ describe("Remoção de Usuário", () => {
         password: "wrongpassword",
       });
 
-    assertFailure(response, 401, Unauthorized);
+    assertStatusCode(response, 401);
+    assertStatus(response, "error");
+    assertCode(response, Unauthorized);
   });
 
   test("Não deve remover os dados de usuário passando uma senha incorreta", async () => {
@@ -127,7 +139,9 @@ describe("Remoção de Usuário", () => {
         password: "wrongpassword",
       });
 
-    assertFailure(response, 401, Unauthorized);
+    assertStatusCode(response, 401);
+    assertStatus(response, "error");
+    assertCode(response, Unauthorized);
   });
 
   test("Não deve remover os dados de usuário passando um id de outro usuário", async () => {
@@ -140,6 +154,8 @@ describe("Remoção de Usuário", () => {
         password: userPassword,
       });
 
-    assertFailure(response, 401, Unauthorized);
+    assertStatusCode(response, 401);
+    assertStatus(response, "error");
+    assertCode(response, Unauthorized);
   });
 });

@@ -1,6 +1,7 @@
 const request = require("supertest");
-const app = require("../../app");
-const prisma = require("../../src/prisma");
+const app = require("../../../app");
+const prisma = require("../../../src/prisma");
+const { assertStatusCode } = require("../../utils");
 
 describe("Verificação de conta de usuário", () => {
   jest.setTimeout(10000);
@@ -35,7 +36,7 @@ describe("Verificação de conta de usuário", () => {
       code: activationCode,
     });
 
-    expect(response.statusCode).toBe(400);
+    assertStatusCode(response, 400);
   });
 
   test("Não deve confirmar uma conta de usuário sem informar um email", async () => {
@@ -44,7 +45,7 @@ describe("Verificação de conta de usuário", () => {
       code: activationCode,
     });
 
-    expect(response.statusCode).toBe(400);
+    assertStatusCode(response, 400);
   });
 
   test("Não deve confirmar uma conta de usuário sem informar um activation code", async () => {
@@ -53,7 +54,7 @@ describe("Verificação de conta de usuário", () => {
       email: userEmail,
     });
 
-    expect(response.statusCode).toBe(400);
+    assertStatusCode(response, 400);
   });
 
   test("Deve confirmar uma conta de usuário", async () => {
@@ -63,7 +64,7 @@ describe("Verificação de conta de usuário", () => {
       code: activationCode,
     });
 
-    expect(response.statusCode).toBe(200);
+    assertStatusCode(response, 200);
   });
 
   test("Não deve confirmar uma conta de usuário que já foi confirmada", async () => {
@@ -73,7 +74,7 @@ describe("Verificação de conta de usuário", () => {
       code: activationCode,
     });
 
-    expect(response.statusCode).toBe(400);
+    assertStatusCode(response, 400);
   });
 
   test("Deve retornar estado da conta de usuário como ativo", async () => {

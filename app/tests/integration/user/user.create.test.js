@@ -1,8 +1,8 @@
 const request = require("supertest");
-const app = require("../../app");
-const { IncorrectParameter, EmailAlreadyInUse } = require("../../src/modules/codes");
-const prisma = require("../../src/prisma");
-const { assertFailure, assertSuccess } = require("../utils");
+const app = require("../../../app");
+const { IncorrectParameter, EmailAlreadyInUse } = require("../../../src/modules/codes");
+const prisma = require("../../../src/prisma");
+const { assertStatus, assertCode, assertStatusCode, assertResponse } = require("../../utils");
 
 describe("Criação de Usuário", () => {
   jest.setTimeout(10000);
@@ -25,7 +25,9 @@ describe("Criação de Usuário", () => {
       password: userPassword,
     });
 
-    assertFailure(response, 400, IncorrectParameter);
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
   });
 
   test("Não deve criar um usuário sem fornecer um nome", async () => {
@@ -34,7 +36,9 @@ describe("Criação de Usuário", () => {
       password: userPassword,
     });
 
-    assertFailure(response, 400, IncorrectParameter);
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
   });
 
   test("Não deve criar um usuário sem fornecer uma senha", async () => {
@@ -43,7 +47,9 @@ describe("Criação de Usuário", () => {
       name: userName,
     });
 
-    assertFailure(response, 400, IncorrectParameter);
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
   });
 
   test("Deve criar um novo usuário e retornar suas informações", async () => {
@@ -53,7 +59,9 @@ describe("Criação de Usuário", () => {
       password: userPassword,
     });
 
-    assertSuccess(response, 201, "user");
+    assertStatusCode(response, 201);
+    assertStatus(response, "ok");
+    assertResponse(response, "user");
   });
 
   test("Não deve criar um usuário com email que já está cadastrado", async () => {
@@ -63,6 +71,8 @@ describe("Criação de Usuário", () => {
       password: userPassword,
     });
 
-    assertFailure(response, 409, EmailAlreadyInUse);
+    assertStatusCode(response, 409);
+    assertStatus(response, "error");
+    assertCode(response, EmailAlreadyInUse);
   });
 });

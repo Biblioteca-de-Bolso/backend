@@ -1,8 +1,8 @@
 const request = require("supertest");
-const app = require("../../app");
-const { IncorrectParameter, UserNotFound, Forbidden } = require("../../src/modules/codes");
-const prisma = require("../../src/prisma");
-const { assertFailure, assertSuccess } = require("../utils");
+const app = require("../../../app");
+const { IncorrectParameter, UserNotFound, Forbidden } = require("../../../src/modules/codes");
+const prisma = require("../../../src/prisma");
+const { assertStatus, assertStatusCode, assertResponse, assertCode } = require("../../utils");
 
 describe("Leitura de Usuário", () => {
   jest.setTimeout(10000);
@@ -25,7 +25,9 @@ describe("Leitura de Usuário", () => {
   test("Não deve ler os dados de um usuário sem informar um token", async () => {
     const response = await request(app).get(`/api/user/${userId}`).send();
 
-    assertFailure(response, 400, IncorrectParameter);
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
   });
 
   test("Deve realizar login e retornar um Access Token", async () => {
@@ -34,7 +36,9 @@ describe("Leitura de Usuário", () => {
       password: userPassword,
     });
 
-    assertSuccess(response, 200, ["accessToken", "refreshToken"]);
+    assertStatusCode(response, 200);
+    assertStatus(response, "ok");
+    assertResponse(response, ["accessToken", "refreshToken"]);
 
     if (response.body.response.accessToken) accessToken = response.body.response.accessToken;
   });
@@ -45,7 +49,9 @@ describe("Leitura de Usuário", () => {
       .set({ authorization: `Bearer ${accessToken}` })
       .send();
 
-    assertFailure(response, 404, UserNotFound);
+    assertStatusCode(response, 404);
+    assertStatus(response, "error");
+    assertCode(response, UserNotFound);
   });
 
   test("Nao deve ler os dados de outro usuário", async () => {
@@ -54,7 +60,9 @@ describe("Leitura de Usuário", () => {
       .set({ authorization: `Bearer ${accessToken}` })
       .send();
 
-    assertFailure(response, 403, Forbidden);
+    assertStatusCode(response, 403);
+    assertStatus(response, "error");
+    assertCode(response, Forbidden);
   });
 
   test("Deve ler os dados do usuário", async () => {
@@ -63,7 +71,9 @@ describe("Leitura de Usuário", () => {
       .set({ authorization: `Bearer ${accessToken}` })
       .send();
 
-    assertSuccess(response, 200, "user");
+    assertStatusCode(response, 200);
+    assertStatus(response, "ok");
+    assertResponse(response, "user");
 
     expect(response.body.response.user.id).toBe(userId);
   });
