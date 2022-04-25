@@ -1,6 +1,8 @@
 const request = require("supertest");
 const app = require("../../app");
+const { IncorrectParameter, EmailAlreadyInUse } = require("../../src/modules/codes");
 const prisma = require("../../src/prisma");
+const { assertFailure, assertSuccess } = require("../utils");
 
 describe("Criação de Usuário", () => {
   jest.setTimeout(10000);
@@ -23,7 +25,7 @@ describe("Criação de Usuário", () => {
       password: userPassword,
     });
 
-    expect(response.statusCode).toBe(400);
+    assertFailure(response, 400, IncorrectParameter);
   });
 
   test("Não deve criar um usuário sem fornecer um nome", async () => {
@@ -32,7 +34,7 @@ describe("Criação de Usuário", () => {
       password: userPassword,
     });
 
-    expect(response.statusCode).toBe(400);
+    assertFailure(response, 400, IncorrectParameter);
   });
 
   test("Não deve criar um usuário sem fornecer uma senha", async () => {
@@ -41,7 +43,7 @@ describe("Criação de Usuário", () => {
       name: userName,
     });
 
-    expect(response.statusCode).toBe(400);
+    assertFailure(response, 400, IncorrectParameter);
   });
 
   test("Deve criar um novo usuário e retornar suas informações", async () => {
@@ -51,11 +53,7 @@ describe("Criação de Usuário", () => {
       password: userPassword,
     });
 
-    expect(response.statusCode).toBe(201);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("ok");
-    expect(response.body).toHaveProperty("response");
-    expect(response.body.response).toHaveProperty("user");
+    assertSuccess(response, 201, "user");
   });
 
   test("Não deve criar um usuário com email que já está cadastrado", async () => {
@@ -65,8 +63,6 @@ describe("Criação de Usuário", () => {
       password: userPassword,
     });
 
-    expect(response.statusCode).toBe(409);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
+    assertFailure(response, 409, EmailAlreadyInUse);
   });
 });

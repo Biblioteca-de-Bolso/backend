@@ -1,6 +1,8 @@
 const request = require("supertest");
 const app = require("../../app");
+const { IncorrectParameter, AccountNotVerified } = require("../../src/modules/codes");
 const prisma = require("../../src/prisma");
+const { assertFailure, assertSuccess } = require("../utils");
 
 describe("Realização de login", () => {
   jest.setTimeout(10000);
@@ -26,11 +28,7 @@ describe("Realização de login", () => {
       password: inactivePassword,
     });
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("IncorrectParameter");
+    assertFailure(response, 400, IncorrectParameter);
   });
 
   test("Não deve realizar login sem informar uma senha", async () => {
@@ -38,11 +36,7 @@ describe("Realização de login", () => {
       email: inactiveEmail,
     });
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("IncorrectParameter");
+    assertFailure(response, 400, IncorrectParameter);
   });
 
   test("Não deve realizar login de uma conta que não foi confirmada", async () => {
@@ -51,11 +45,7 @@ describe("Realização de login", () => {
       password: inactivePassword,
     });
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("AccountNotVerified");
+    assertFailure(response, 200, AccountNotVerified);
   });
 
   test("Deve realizar login e retornar um Access Token", async () => {
@@ -64,11 +54,6 @@ describe("Realização de login", () => {
       password: userPassword,
     });
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("ok");
-    expect(response.body).toHaveProperty("response");
-    expect(response.body.response).toHaveProperty("accessToken");
-    expect(response.body.response).toHaveProperty("refreshToken");
+    assertSuccess(response, 200, ["accessToken", "refreshToken"]);
   });
 });

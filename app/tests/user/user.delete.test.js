@@ -1,6 +1,8 @@
 const request = require("supertest");
 const app = require("../../app");
+const { IncorrectParameter, Unauthorized } = require("../../src/modules/codes");
 const prisma = require("../../src/prisma");
+const { assertFailure, assertSuccess } = require("../utils");
 
 describe("Remoção de Usuário", () => {
   jest.setTimeout(10000);
@@ -52,11 +54,7 @@ describe("Remoção de Usuário", () => {
   test("Não deve remover um usuário sem informar um token", async () => {
     const response = await request(app).delete(`/api/user`).send();
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("IncorrectParameter");
+    assertFailure(response, 400, IncorrectParameter);
   });
 
   test("Deve realizar login e retornar um Access Token", async () => {
@@ -65,11 +63,7 @@ describe("Remoção de Usuário", () => {
       password: userPassword,
     });
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("ok");
-    expect(response.body).toHaveProperty("response");
-    expect(response.body.response).toHaveProperty("accessToken");
+    assertSuccess(response, 200, ["accessToken", "refreshToken"]);
 
     if (response.body.response.accessToken) accessToken = response.body.response.accessToken;
   });
@@ -83,11 +77,7 @@ describe("Remoção de Usuário", () => {
         password: userPassword,
       });
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("IncorrectParameter");
+    assertFailure(response, 400, IncorrectParameter);
   });
 
   test("Não deve remover um usuário sem informar um email", async () => {
@@ -99,11 +89,7 @@ describe("Remoção de Usuário", () => {
         password: userPassword,
       });
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("IncorrectParameter");
+    assertFailure(response, 400, IncorrectParameter);
   });
 
   test("Não deve remover um usuário sem informar uma senha", async () => {
@@ -115,11 +101,7 @@ describe("Remoção de Usuário", () => {
         email: userEmail,
       });
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("IncorrectParameter");
+    assertFailure(response, 400, IncorrectParameter);
   });
 
   test("Não deve remover os dados de usuário passando uma senha incorreta", async () => {
@@ -132,11 +114,7 @@ describe("Remoção de Usuário", () => {
         password: "wrongpassword",
       });
 
-    expect(response.statusCode).toBe(401);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("Unauthorized");
+    assertFailure(response, 401, Unauthorized);
   });
 
   test("Não deve remover os dados de usuário passando uma senha incorreta", async () => {
@@ -149,11 +127,7 @@ describe("Remoção de Usuário", () => {
         password: "wrongpassword",
       });
 
-    expect(response.statusCode).toBe(401);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("Unauthorized");
+    assertFailure(response, 401, Unauthorized);
   });
 
   test("Não deve remover os dados de usuário passando um id de outro usuário", async () => {
@@ -166,10 +140,6 @@ describe("Remoção de Usuário", () => {
         password: userPassword,
       });
 
-    expect(response.statusCode).toBe(401);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("Unauthorized");
+    assertFailure(response, 401, Unauthorized);
   });
 });

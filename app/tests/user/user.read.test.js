@@ -1,6 +1,8 @@
 const request = require("supertest");
 const app = require("../../app");
+const { IncorrectParameter, UserNotFound, Forbidden } = require("../../src/modules/codes");
 const prisma = require("../../src/prisma");
+const { assertFailure, assertSuccess } = require("../utils");
 
 describe("Leitura de Usuário", () => {
   jest.setTimeout(10000);
@@ -23,11 +25,7 @@ describe("Leitura de Usuário", () => {
   test("Não deve ler os dados de um usuário sem informar um token", async () => {
     const response = await request(app).get(`/api/user/${userId}`).send();
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("IncorrectParameter");
+    assertFailure(response, 400, IncorrectParameter);
   });
 
   test("Deve realizar login e retornar um Access Token", async () => {
@@ -36,11 +34,7 @@ describe("Leitura de Usuário", () => {
       password: userPassword,
     });
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("ok");
-    expect(response.body).toHaveProperty("response");
-    expect(response.body.response).toHaveProperty("accessToken");
+    assertSuccess(response, 200, ["accessToken", "refreshToken"]);
 
     if (response.body.response.accessToken) accessToken = response.body.response.accessToken;
   });
@@ -51,11 +45,7 @@ describe("Leitura de Usuário", () => {
       .set({ authorization: `Bearer ${accessToken}` })
       .send();
 
-    expect(response.statusCode).toBe(404);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("UserNotFound");
+    assertFailure(response, 404, UserNotFound);
   });
 
   test("Nao deve ler os dados de outro usuário", async () => {
@@ -64,11 +54,7 @@ describe("Leitura de Usuário", () => {
       .set({ authorization: `Bearer ${accessToken}` })
       .send();
 
-    expect(response.statusCode).toBe(403);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body).toHaveProperty("code");
-    expect(response.body.code).toBe("Forbidden");
+    assertFailure(response, 403, Forbidden);
   });
 
   test("Deve ler os dados do usuário", async () => {
@@ -77,11 +63,8 @@ describe("Leitura de Usuário", () => {
       .set({ authorization: `Bearer ${accessToken}` })
       .send();
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("ok");
-    expect(response.body).toHaveProperty("response");
-    expect(response.body.response).toHaveProperty("user");
+    assertSuccess(response, 200, "user");
+
     expect(response.body.response.user.id).toBe(userId);
   });
 });

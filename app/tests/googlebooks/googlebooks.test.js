@@ -1,6 +1,8 @@
 const request = require("supertest");
 const app = require("../../app");
+const { IncorrectParameter } = require("../../src/modules/codes");
 const prisma = require("../../src/prisma");
+const { assertFailure, assertSuccess } = require("../utils");
 
 describe("Busca de livros no Google Books", () => {
   jest.setTimeout(10000);
@@ -22,10 +24,7 @@ describe("Busca de livros no Google Books", () => {
   test("Não deve realizar a busca de um livro sem informar um token", async () => {
     const response = await request(app).get("/api/googlebooks").send();
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body.code).toBe("IncorrectParameter");
+    assertFailure(response, 400, IncorrectParameter);
   });
 
   test("Deve realizar login e retornar um Access Token", async () => {
@@ -34,11 +33,7 @@ describe("Busca de livros no Google Books", () => {
       password: userPassword,
     });
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("ok");
-    expect(response.body).toHaveProperty("response");
-    expect(response.body.response).toHaveProperty("accessToken");
+    assertSuccess(response, 200, ["accessToken", "refreshToken"]);
 
     if (response.body.response.accessToken) accessToken = response.body.response.accessToken;
   });
@@ -51,10 +46,7 @@ describe("Busca de livros no Google Books", () => {
       })
       .send();
 
-    expect(response.statusCode).toBe(400);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("error");
-    expect(response.body.code).toBe("IncorrectParameter");
+    assertFailure(response, 400, IncorrectParameter);
   });
 
   test("Deve realizar a busca de um livro", async () => {
@@ -65,11 +57,7 @@ describe("Busca de livros no Google Books", () => {
       })
       .send();
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveProperty("status");
-    expect(response.body.status).toBe("ok");
-    expect(response.body).toHaveProperty("response");
-    expect(response.body.response).toHaveProperty("books");
+    assertSuccess(response, 200, "books");
     expect(response.body.response.books.length).toBeGreaterThan(0);
   });
 });
