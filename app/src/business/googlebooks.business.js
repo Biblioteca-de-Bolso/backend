@@ -4,7 +4,7 @@ const { googleBooksAPI } = require("../services/googlebooks");
 const { InternalServerError } = require("../modules/codes");
 
 module.exports = {
-  async search(qstring, lang) {
+  async search(qstring, lang, maturity) {
     let books = [];
 
     await googleBooksAPI
@@ -13,6 +13,7 @@ module.exports = {
           key: process.env.GOOGLE_BOOKS_API,
           q: qstring,
           langRestrict: lang || "pt",
+          maxAllowedMaturityRating: maturity || "NOT_MATURE",
         },
       })
       .then((response) => {
