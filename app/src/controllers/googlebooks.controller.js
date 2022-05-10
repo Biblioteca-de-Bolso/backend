@@ -9,7 +9,7 @@ module.exports = {
   async search(req, res, next) {
     try {
       // Aquisição e validação dos parâmetros
-      const { qstring, lang, maturity } = req.query;
+      const { qstring, lang, maturity, printType, orderBy, isbnOnly } = req.query;
 
       const rules = [
         [qstring, QstringValidator],
@@ -22,7 +22,14 @@ module.exports = {
         return res.status(400).json(validationResult);
       }
 
-      const response = await GoogleBooksBusines.search(qstring, lang, maturity);
+      const response = await GoogleBooksBusines.search(
+        qstring,
+        lang,
+        maturity,
+        printType,
+        orderBy,
+        isbnOnly
+      );
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
