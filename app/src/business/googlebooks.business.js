@@ -4,8 +4,14 @@ const { googleBooksAPI } = require("../services/googlebooks");
 const { InternalServerError } = require("../modules/codes");
 
 module.exports = {
-  async search(qstring, lang) {
+  pushBook(array, book) {
+    array.push(book);
+  },
+
+  async search(qstring, lang, maturity, printType, orderBy, isbnOnly = true) {
     let books = [];
+
+    isbnOnly = isbnOnly === "true" ? true : false;
 
     await googleBooksAPI
       .get("/volumes", {
@@ -13,6 +19,9 @@ module.exports = {
           key: process.env.GOOGLE_BOOKS_API,
           q: qstring,
           langRestrict: lang || "pt",
+          maxAllowedMaturityRating: maturity || "not-mature",
+          printType: printType || "books",
+          orderBy: orderBy || "relevance",
         },
       })
       .then((response) => {
@@ -62,7 +71,7 @@ module.exports = {
             }
           }
 
-          books.push({
+          const bookObject = {
             ISBN_10: identifiers["ISBN_10"],
             ISBN_13: identifiers["ISBN_13"],
             title: book.volumeInfo["title"] || "",
@@ -71,7 +80,15 @@ module.exports = {
             publisher: book.volumeInfo["publisher"] || "",
             description: book.volumeInfo["description"] || "",
             thumbnail: thumbnail || "",
-          });
+          };
+
+          if (isbnOnly) {
+            if (identifiers["ISBN_10"] || identifiers["ISBN_13"]) {
+              books.push(bookObject);
+            }
+          } else {
+            books.push(bookObject);
+          }
         }
       })
       .catch((error) => {
