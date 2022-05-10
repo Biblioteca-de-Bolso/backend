@@ -8,7 +8,7 @@ module.exports = {
     array.push(book);
   },
 
-  async search(qstring, lang, maturity, printType, orderBy, isbnOnly = true) {
+  async search(qstring, lang, maturity, printType, orderBy, isbnOnly = "true") {
     let books = [];
 
     isbnOnly = isbnOnly === "true" ? true : false;
