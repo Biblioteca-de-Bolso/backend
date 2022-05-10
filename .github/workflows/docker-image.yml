@@ -15,6 +15,7 @@ env:
   GOOGLE_BOOKS_API: ${{ secrets.GOOGLE_BOOKS_API }}
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
   SEND_GRID_API: ${{ secrets.SEND_GRID_API }}
+  HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
 jobs:
   build:
@@ -46,3 +47,12 @@ jobs:
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           coverage-reports: ./app/coverage/clover.xml
+
+      - name: Heroku Deploy
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "bibliotecadebolso"
+          heroku_email: "diasrhenan@gmail.com"
+          buildpack: "https://github.com/timanovsky/subdir-heroku-buildpack.git"
+          appdir: "app"
