@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker Image
 
 on:
   workflow_dispatch:
@@ -15,6 +15,7 @@ env:
   GOOGLE_BOOKS_API: ${{ secrets.GOOGLE_BOOKS_API }}
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
   SEND_GRID_API: ${{ secrets.SEND_GRID_API }}
+  HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
 jobs:
   build:
