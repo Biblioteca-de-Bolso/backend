@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Docker Image
 
 on:
   workflow_dispatch:
@@ -47,11 +47,3 @@ jobs:
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           coverage-reports: ./app/coverage/clover.xml
-
-      - name: Heroku Deploy
-        uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "bibliotecadebolso"
-          heroku_email: "diasrhenan@gmail.com"
-          buildpack: "https://github.com/timanovsky/subdir-heroku-buildpack.git"
