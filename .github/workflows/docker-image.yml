@@ -55,4 +55,3 @@ jobs:
           heroku_app_name: "bibliotecadebolso"
           heroku_email: "diasrhenan@gmail.com"
           buildpack: "https://github.com/timanovsky/subdir-heroku-buildpack.git"
-          appdir: "app"
