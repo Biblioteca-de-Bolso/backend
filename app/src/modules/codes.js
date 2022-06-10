@@ -46,4 +46,7 @@ module.exports = {
 
   // A página solicitada não retornou nenhum resultado
   Empty: "Empty",
+
+  // Um livro com esse ISBN já foi cadastrado
+  DuplicatedISBN: "DuplicatedISBN",
 };
