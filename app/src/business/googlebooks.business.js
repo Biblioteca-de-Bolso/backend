@@ -74,7 +74,7 @@ module.exports = {
             ISBN_10: identifiers["ISBN_10"],
             ISBN_13: identifiers["ISBN_13"],
             title: book.volumeInfo["title"] || "",
-            subtite: book.volumeInfo["subtitle"] || "",
+            subtitle: book.volumeInfo["subtitle"] || "",
             author: author || "",
             publisher: book.volumeInfo["publisher"] || "",
             description: book.volumeInfo["description"] || "",
