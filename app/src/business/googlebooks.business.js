@@ -1,5 +1,4 @@
 const { ok, failure } = require("../modules/http");
-const { fileName } = require("../modules/debug");
 const { googleBooksAPI } = require("../services/googlebooks");
 const { InternalServerError } = require("../modules/codes");
 
@@ -37,7 +36,7 @@ module.exports = {
           };
 
           // Extração dos identificadores de Indústria
-          if (book.volumeInfo.hasOwnProperty("industryIdentifiers")) {
+          if (Object.prototype.hasOwnProperty.call(book.volumeInfo, "industryIdentifiers")) {
             if (book.volumeInfo["industryIdentifiers"].length > 1) {
               // Possui múltiplos identificadores de indústria
               for (const identifier of book.volumeInfo["industryIdentifiers"]) {
@@ -58,14 +57,14 @@ module.exports = {
           // Extração da capa do livro
           let thumbnail = "";
 
-          if (book.volumeInfo.hasOwnProperty("imageLinks")) {
-            thumbnail = book.volumeInfo["imageLinks"]["thumbnail"];
+          if (Object.prototype.hasOwnProperty.call(book.volumeInfo, "imageLinks")) {
+            thumbnail = book.volumeInfo["imageLinks"]["thumbnail"].replace("http://", "https://");
           }
 
           // Extração dos autores
           let author = "";
 
-          if (book.volumeInfo.hasOwnProperty("authors")) {
+          if (Object.prototype.hasOwnProperty.call(book.volumeInfo, "authors")) {
             for (const bookAuthor of book.volumeInfo["authors"]) {
               author += author.length === 0 ? bookAuthor : ", " + bookAuthor;
             }
