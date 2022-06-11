@@ -1,6 +1,6 @@
-const { ok, failure, notFound, forbidden } = require("../modules/http");
+const { ok, created, failure, notFound, forbidden, conflict } = require("../modules/http");
 const { isbn10to13, isbn13to10 } = require("../modules/isbn");
-const { DatabaseFailure, NotFound, Forbidden, Empty } = require("../modules/codes");
+const { DatabaseFailure, NotFound, Forbidden, DuplicatedISBN } = require("../modules/codes");
 const { PAGE_SIZE } = require("../modules/constants");
 
 const prisma = require("../prisma");
@@ -19,32 +19,53 @@ module.exports = {
       isbn10 && !isbn13 ? (isbn13 = isbn10to13(isbn10)) : (isbn10 = isbn13to10(isbn13));
     }
 
-    const book = await prisma.book.create({
-      data: {
-        userId,
-        title,
-        author: author || "",
-        isbn10: isbn10 || "",
-        isbn13: isbn13 || "",
-        publisher: publisher || "",
-        description: description || "",
-        thumbnail: thumbnail || "",
+    const book = await prisma.book.findFirst({
+      where: {
+        OR: [
+          {
+            isbn10: isbn10,
+          },
+          {
+            isbn13: isbn13,
+          },
+        ],
       },
     });
 
     if (book) {
-      return ok({
-        status: "ok",
-        response: {
-          book: book,
-        },
+      return conflict({
+        status: "error",
+        code: DuplicatedISBN,
+        message: "Já existe um livro cadastrado com o ISBN informado.",
       });
     } else {
-      return failure({
-        status: "error",
-        code: DatabaseFailure,
-        message: "Não foi possível inserir o livro na base de dados, tente novamente.",
+      const newBook = await prisma.book.create({
+        data: {
+          userId,
+          title,
+          author: author || "",
+          isbn10: isbn10 || "",
+          isbn13: isbn13 || "",
+          publisher: publisher || "",
+          description: description || "",
+          thumbnail: thumbnail || "",
+        },
       });
+
+      if (newBook) {
+        return created({
+          status: "ok",
+          response: {
+            book: newBook,
+          },
+        });
+      } else {
+        return failure({
+          status: "error",
+          code: DatabaseFailure,
+          message: "Não foi possível inserir o livro na base de dados, tente novamente.",
+        });
+      }
     }
   },
 
@@ -60,18 +81,18 @@ module.exports = {
     if (book) {
       const bookOwner = book["userId"];
 
-      if (bookOwner !== userId) {
-        return forbidden({
-          status: "error",
-          code: Forbidden,
-          message: "Este usuário não tem permissão para acessar o conteúdo solicitado.",
-        });
-      } else {
+      if (bookOwner === userId) {
         return ok({
           status: "ok",
           response: {
             book: book,
           },
+        });
+      } else {
+        return forbidden({
+          status: "error",
+          code: Forbidden,
+          message: "Este usuário não tem permissão para acessar o conteúdo solicitado.",
         });
       }
     } else {
