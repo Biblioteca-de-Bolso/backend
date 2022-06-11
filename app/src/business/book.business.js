@@ -81,18 +81,18 @@ module.exports = {
     if (book) {
       const bookOwner = book["userId"];
 
-      if (bookOwner !== userId) {
-        return forbidden({
-          status: "error",
-          code: Forbidden,
-          message: "Este usuário não tem permissão para acessar o conteúdo solicitado.",
-        });
-      } else {
+      if (bookOwner === userId) {
         return ok({
           status: "ok",
           response: {
             book: book,
           },
+        });
+      } else {
+        return forbidden({
+          status: "error",
+          code: Forbidden,
+          message: "Este usuário não tem permissão para acessar o conteúdo solicitado.",
         });
       }
     } else {
