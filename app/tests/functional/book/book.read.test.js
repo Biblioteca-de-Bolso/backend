@@ -1,11 +1,6 @@
 const request = require("supertest");
 const app = require("../../../app");
-const {
-  IncorrectParameter,
-  UserNotFound,
-  Forbidden,
-  NotFound,
-} = require("../../../src/modules/codes");
+const { IncorrectParameter, Forbidden, NotFound } = require("../../../src/modules/codes");
 const prisma = require("../../../src/prisma");
 const { assertStatus, assertStatusCode, assertResponse, assertCode } = require("../../utils");
 
@@ -22,7 +17,7 @@ describe("Leitura de Livo Cadastrado", () => {
 
   let accessToken = "";
 
-  // Allan Turing
+  // Ada Lovelace
   const targetBookId = 3;
   const userEmail = "ada@email.com";
   const userPassword = "adalovelace";

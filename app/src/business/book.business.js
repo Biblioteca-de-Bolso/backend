@@ -1,4 +1,4 @@
-const { ok, failure, notFound, forbidden, conflict } = require("../modules/http");
+const { ok, created, failure, notFound, forbidden, conflict } = require("../modules/http");
 const { isbn10to13, isbn13to10 } = require("../modules/isbn");
 const { DatabaseFailure, NotFound, Forbidden, DuplicatedISBN } = require("../modules/codes");
 const { PAGE_SIZE } = require("../modules/constants");
@@ -53,7 +53,7 @@ module.exports = {
       });
 
       if (newBook) {
-        return ok({
+        return created({
           status: "ok",
           response: {
             book: newBook,
