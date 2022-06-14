@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv").config({ path: "../.env" });
 const customErrorHandler = require("./src/middlewares/error");
-const { NotFound } = require("./src/modules/codes");
+const { OkStatus, NotFound } = require("./src/modules/codes");
 
 const app = express();
 
@@ -18,7 +18,7 @@ app.use("/api", require("./src/routes"));
 
 app.get(["/", "/api"], async (req, res) => {
   return res.status(200).json({
-    status: "ok",
+    status: OkStatus,
     response: {
       message: "Biblioteca de Bolso - API",
       homepage: "https://github.com/Biblioteca-de-Bolso/backend",

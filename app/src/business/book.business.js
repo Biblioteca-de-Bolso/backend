@@ -1,6 +1,13 @@
 const { ok, created, failure, notFound, forbidden, conflict } = require("../modules/http");
 const { isbn10to13, isbn13to10 } = require("../modules/isbn");
-const { DatabaseFailure, NotFound, Forbidden, DuplicatedISBN } = require("../modules/codes");
+const {
+  OkStatus,
+  ErrorStatus,
+  DatabaseFailure,
+  NotFound,
+  Forbidden,
+  DuplicatedISBN,
+} = require("../modules/codes");
 const { PAGE_SIZE } = require("../modules/constants");
 
 const prisma = require("../prisma");
@@ -34,7 +41,7 @@ module.exports = {
 
     if (book) {
       return conflict({
-        status: "error",
+        status: ErrorStatus,
         code: DuplicatedISBN,
         message: "Já existe um livro cadastrado com o ISBN informado.",
       });
@@ -54,14 +61,14 @@ module.exports = {
 
       if (newBook) {
         return created({
-          status: "ok",
+          status: OkStatus,
           response: {
             book: newBook,
           },
         });
       } else {
         return failure({
-          status: "error",
+          status: ErrorStatus,
           code: DatabaseFailure,
           message: "Não foi possível inserir o livro na base de dados, tente novamente.",
         });
@@ -83,21 +90,21 @@ module.exports = {
 
       if (bookOwner === userId) {
         return ok({
-          status: "ok",
+          status: OkStatus,
           response: {
             book: book,
           },
         });
       } else {
         return forbidden({
-          status: "error",
+          status: ErrorStatus,
           code: Forbidden,
           message: "Este usuário não tem permissão para acessar o conteúdo solicitado.",
         });
       }
     } else {
       return notFound({
-        status: "error",
+        status: ErrorStatus,
         code: NotFound,
         message: "O livro informado não foi encontrado.",
       });
@@ -119,10 +126,64 @@ module.exports = {
 
     if (books) {
       return ok({
-        status: "ok",
+        status: OkStatus,
         response: {
           books: books,
         },
+      });
+    }
+  },
+
+  async delete(token, bookId) {
+    const userId = parseInt(token["id"]);
+
+    const book = await prisma.book.findUnique({
+      where: {
+        id: bookId,
+      },
+    });
+
+    if (book) {
+      if (book.userId === userId) {
+        const deleted = await prisma.$transaction([
+          prisma.annotation.deleteMany({
+            where: {
+              bookId,
+            },
+          }),
+          prisma.book.deleteMany({
+            where: {
+              id: bookId,
+            },
+          }),
+        ]);
+
+        if (deleted) {
+          return ok({
+            status: OkStatus,
+            response: {
+              message: "O livro e os dados relacionados foram apagados com sucesso.",
+            },
+          });
+        } else {
+          return failure({
+            status: ErrorStatus,
+            code: DatabaseFailure,
+            message: "Não foi possível realizar a exclusão de um ou mais dados do banco de dados.",
+          });
+        }
+      } else {
+        return forbidden({
+          status: ErrorStatus,
+          code: Forbidden,
+          message: "O usuário informado não possui o privilégio para executar essa ação.",
+        });
+      }
+    } else {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "O livro informado não foi encontrado.",
       });
     }
   },

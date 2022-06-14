@@ -15,9 +15,11 @@ const {
   unauthorized,
 } = require("../modules/http");
 const {
+  OkStatus,
+  ErrorStatus,
   EmailAlreadyInUse,
   DatabaseFailure,
-  UserNotFound,
+  NotFound,
   Forbidden,
   Unauthorized,
 } = require("../modules/codes");
@@ -32,7 +34,7 @@ module.exports = {
 
     if (user) {
       return conflict({
-        status: "error",
+        status: ErrorStatus,
         code: EmailAlreadyInUse,
         message: "Este endereço de email já foi cadastrado por outro usuário.",
       });
@@ -68,14 +70,14 @@ module.exports = {
         }
 
         return created({
-          status: "ok",
+          status: OkStatus,
           response: {
             user: user,
           },
         });
       } else {
         return failure({
-          status: "error",
+          status: ErrorStatus,
           code: DatabaseFailure,
           message: "Não foi possível inserir o novo usuário no banco de dados.",
         });
@@ -132,28 +134,28 @@ module.exports = {
         // Verifica sucesso da exclusão
         if (deleted) {
           return ok({
-            status: "ok",
+            status: OkStatus,
             response: {
               message: "Conta e dados de usuário removidos com sucesso.",
             },
           });
         } else {
           return failure({
-            status: "error",
+            status: ErrorStatus,
             code: DatabaseFailure,
             message: "Não foi possível realizar a exclusão de um ou mais dados do banco de dados.",
           });
         }
       } else {
         return forbidden({
-          status: "error",
+          status: ErrorStatus,
           code: Forbidden,
           message: "O usuário informado não possui permissão para completar esta ação.",
         });
       }
     } else {
       return unauthorized({
-        status: "error",
+        status: ErrorStatus,
         code: Unauthorized,
         message: "Não foi possível completar a solicitação, verifique os parâmetros informados.",
       });
@@ -174,22 +176,22 @@ module.exports = {
       // Verificar permissão de acesso aos dados desse usuário
       if (user["id"] == token["id"] && user["email"] === token["email"]) {
         return ok({
-          status: "ok",
+          status: OkStatus,
           response: {
             user: user,
           },
         });
       } else {
         return forbidden({
-          status: "error",
+          status: ErrorStatus,
           code: Forbidden,
           message: "Este usuário não possui permissão para acessar a informação solicitada.",
         });
       }
     } else {
       return notFound({
-        status: "error",
-        code: UserNotFound,
+        status: ErrorStatus,
+        code: NotFound,
         message: "Este usuário não foi encontrado.",
       });
     }
