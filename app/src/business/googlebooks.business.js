@@ -1,6 +1,6 @@
 const { ok, failure } = require("../modules/http");
 const { googleBooksAPI } = require("../services/googlebooks");
-const { InternalServerError } = require("../modules/codes");
+const { OkStatus, ErrorStatus, InternalServerError } = require("../modules/codes");
 
 module.exports = {
   pushBook(array, book) {
@@ -92,14 +92,14 @@ module.exports = {
       })
       .catch((error) => {
         return failure({
-          status: "error",
+          status: ErrorStatus,
           code: InternalServerError,
           message: error.message,
         });
       });
 
     return ok({
-      status: "ok",
+      status: OkStatus,
       response: {
         books: books,
       },

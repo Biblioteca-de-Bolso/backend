@@ -43,6 +43,7 @@ module.exports = async () => {
       password: crypto.createHash("md5").update("adalovelace").digest("hex"),
       active: true,
       activationCode: "1234567812345678",
+      // O livro de ID 4 (segundo livro da Ada) é utilizado para o teste de exclusão
       books: {
         createMany: {
           data: [

@@ -98,4 +98,30 @@ module.exports = {
       next(error);
     }
   },
+
+  async delete(req, res, next) {
+    try {
+      // Aquisição do token
+      const { token } = req;
+
+      // Aquisição e validação dos parâmetros
+      const bookId = parseInt(req.body["bookId"]);
+
+      const rules = [[bookId, BookIdValidator]];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult.status === "error") {
+        return res.status(400).json(validationResult);
+      }
+
+      // Token validado, prosseguir com a requisição
+      const response = await BookBusiness.delete(token, bookId);
+
+      // Retornar com resultado da operação
+      return res.status(response.statusCode).json(response.body);
+    } catch (error) {
+      next(error);
+    }
+  },
 };

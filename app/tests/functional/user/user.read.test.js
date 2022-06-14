@@ -1,6 +1,6 @@
 const request = require("supertest");
 const app = require("../../../app");
-const { IncorrectParameter, UserNotFound, Forbidden } = require("../../../src/modules/codes");
+const { IncorrectParameter, NotFound, Forbidden } = require("../../../src/modules/codes");
 const prisma = require("../../../src/prisma");
 const { assertStatus, assertStatusCode, assertResponse, assertCode } = require("../../utils");
 
@@ -51,7 +51,7 @@ describe("Leitura de Usuário", () => {
 
     assertStatusCode(response, 404);
     assertStatus(response, "error");
-    assertCode(response, UserNotFound);
+    assertCode(response, NotFound);
   });
 
   test("Nao deve ler os dados de outro usuário", async () => {
