@@ -131,3 +131,6 @@ dist
 
 # Custom - Postgres persistent data
 postgres-data
+
+# Custom - Multer Uploads
+uploads

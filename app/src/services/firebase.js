@@ -1,5 +1,6 @@
 // https://firebase.google.com/docs/web/setup#available-libraries
-import { initializeApp } from "firebase/app";
+const { initializeApp } = require("firebase/app");
+const { getStorage } = require("firebase/storage");
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -11,3 +12,6 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+
+module.exports = { app, storage };

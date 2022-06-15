@@ -1,5 +1,6 @@
 const { ok, created, failure, notFound, forbidden, conflict } = require("../modules/http");
 const { isbn10to13, isbn13to10 } = require("../modules/isbn");
+const { storage } = require("../services/firebase");
 const {
   OkStatus,
   ErrorStatus,
@@ -13,7 +14,7 @@ const { PAGE_SIZE } = require("../modules/constants");
 const prisma = require("../prisma");
 
 module.exports = {
-  async create(token, title, author, isbn, publisher, description, thumbnail) {
+  async create(token, title, author, isbn, publisher, description, thumbnail, thumbnailFile) {
     const userId = parseInt(token["id"]);
 
     // Executa verificação de ISBN informado
@@ -58,6 +59,16 @@ module.exports = {
         message: "Já existe um livro cadastrado com o ISBN informado.",
       });
     } else {
+      // Verificação de thumbnail
+      let finalThumbnail = "";
+
+      if (thumbnail && !thumbnailFile) {
+        // Será utilizado a URL fornecida como thumbnail
+        finalThumbnail = thumbnail;
+      } else if (thumbnailFile) {
+        // Será utilizado o arquivo enviado como thumbnail
+      }
+
       const newBook = await prisma.book.create({
         data: {
           userId,
