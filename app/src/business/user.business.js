@@ -2,7 +2,7 @@ const crypto = require("crypto");
 const validator = require("validator");
 
 const prisma = require("../prisma");
-const mail = require("../services/mail");
+const sendgrid = require("../services/sendgrid");
 const { fileName } = require("../modules/debug");
 
 const {
@@ -56,14 +56,14 @@ module.exports = {
         // Não enviar email de cadastro em ambiente de teste
         if (process.env.NODE_ENV !== "test" && true) {
           try {
-            const { emailHtml, emailText } = await mail.composeEmail(
+            const { emailHtml, emailText } = await sendgrid.composeEmail(
               user["id"],
               user["name"],
               user["email"],
               user["activationCode"]
             );
 
-            await mail.sendEmail(user["email"], emailText, emailHtml);
+            await sendgrid.sendEmail(user["email"], emailText, emailHtml);
           } catch (error) {
             console.log(fileName(), `Erro durante envio de email: ${error.message}`);
           }

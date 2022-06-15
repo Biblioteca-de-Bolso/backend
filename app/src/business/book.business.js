@@ -36,6 +36,18 @@ module.exports = {
             isbn13: isbn13,
           },
         ],
+        NOT: [
+          {
+            isbn10: {
+              equals: "",
+            },
+          },
+          {
+            isbn13: {
+              equals: "",
+            },
+          },
+        ],
       },
     });
 
