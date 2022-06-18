@@ -20,6 +20,9 @@ module.exports = {
       // Validação dos parâmetros
       const { title, author, isbn, publisher, description, thumbnail } = req.body;
 
+      // Extração da foto de upload
+      const thumbnailFile = req.file;
+
       const rules = [
         [title, TitleValidator, { required: true }],
         [author, AuthorValidator, { required: false }],
@@ -42,7 +45,8 @@ module.exports = {
         isbn,
         publisher,
         description,
-        thumbnail
+        thumbnail,
+        thumbnailFile
       );
 
       return res.status(response.statusCode).json(response.body);
