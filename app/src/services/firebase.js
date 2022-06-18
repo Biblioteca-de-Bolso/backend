@@ -17,6 +17,8 @@ const storage = getStorage(app);
 
 function uploadPicture(picture) {
   return new Promise((resolve, reject) => {
+    console.log("firebase.js - Dentro da função de upload de imagem para o Firebase");
+
     const filename = picture.destination + picture.filename;
     const storageRef = ref(storage, filename);
     const file = fs.readFileSync(filename);
