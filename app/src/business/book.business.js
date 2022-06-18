@@ -1,5 +1,6 @@
 const { ok, created, failure, notFound, forbidden, conflict } = require("../modules/http");
 const { isbn10to13, isbn13to10 } = require("../modules/isbn");
+const { uploadPicture, extractPathFromURL, deletePicure } = require("../services/firebase");
 const {
   OkStatus,
   ErrorStatus,
@@ -13,7 +14,7 @@ const { PAGE_SIZE } = require("../modules/constants");
 const prisma = require("../prisma");
 
 module.exports = {
-  async create(token, title, author, isbn, publisher, description, thumbnail) {
+  async create(token, title, author, isbn, publisher, description, thumbnail, thumbnailFile) {
     const userId = parseInt(token["id"]);
 
     // Executa verificação de ISBN informado
@@ -58,6 +59,25 @@ module.exports = {
         message: "Já existe um livro cadastrado com o ISBN informado.",
       });
     } else {
+      // Verificação de thumbnail
+      let finalThumbnail = "";
+
+      if (thumbnail && !thumbnailFile) {
+        // Será utilizado a URL fornecida como thumbnail
+        finalThumbnail = thumbnail;
+      } else if (thumbnailFile) {
+        // Será utilizado o arquivo enviado como thumbnail
+        try {
+          finalThumbnail = await uploadPicture(thumbnailFile);
+        } catch (error) {
+          return failure({
+            status: ErrorStatus,
+            code: DatabaseFailure,
+            message: `Falha durante criação de livro: ${error.message}`,
+          });
+        }
+      }
+
       const newBook = await prisma.book.create({
         data: {
           userId,
@@ -67,7 +87,7 @@ module.exports = {
           isbn13: isbn13 || "",
           publisher: publisher || "",
           description: description || "",
-          thumbnail: thumbnail || "",
+          thumbnail: finalThumbnail || "",
         },
       });
 
@@ -79,6 +99,22 @@ module.exports = {
           },
         });
       } else {
+        // Falha no registro do livro do banco de dados
+        // Remover o arquivo enviado ao Firebase Storage
+        const firebasePath = extractPathFromURL(finalThumbnail);
+
+        if (firebasePath) {
+          try {
+            await deletePicure(firebasePath);
+          } catch (error) {
+            return failure({
+              status: ErrorStatus,
+              code: DatabaseFailure,
+              message: "Não foi possível inserir o livro na base de dados, tente novamente.",
+            });
+          }
+        }
+
         return failure({
           status: ErrorStatus,
           code: DatabaseFailure,
@@ -157,6 +193,21 @@ module.exports = {
 
     if (book) {
       if (book.userId === userId) {
+        // Verifica se o livro possui uma imagem hospedada no Firebase Storage
+        const firebasePath = extractPathFromURL(book.thumbnail);
+
+        if (firebasePath) {
+          try {
+            await deletePicure(firebasePath);
+          } catch (error) {
+            return failure({
+              status: ErrorStatus,
+              code: DatabaseFailure,
+              message: "Falha na exclusão do livro.",
+            });
+          }
+        }
+
         const deleted = await prisma.$transaction([
           prisma.annotation.deleteMany({
             where: {
