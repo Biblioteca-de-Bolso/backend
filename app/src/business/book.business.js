@@ -15,8 +15,6 @@ const prisma = require("../prisma");
 
 module.exports = {
   async create(token, title, author, isbn, publisher, description, thumbnail, thumbnailFile) {
-    console.log("book.business.js - Acessando função de criação de livro");
-
     const userId = parseInt(token["id"]);
 
     // Executa verificação de ISBN informado
@@ -61,8 +59,6 @@ module.exports = {
         message: "Já existe um livro cadastrado com o ISBN informado.",
       });
     } else {
-      console.log("book.business.js - Iniciando verificação de thumbnail");
-
       // Verificação de thumbnail
       let finalThumbnail = "";
 
@@ -72,8 +68,6 @@ module.exports = {
       } else if (thumbnailFile) {
         // Será utilizado o arquivo enviado como thumbnail
         try {
-          console.log("book.business.js - Disparando chamada de criação de arquivo no Firebase");
-
           finalThumbnail = await uploadPicture(thumbnailFile);
         } catch (error) {
           return failure({

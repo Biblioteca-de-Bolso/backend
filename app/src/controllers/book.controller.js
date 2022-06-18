@@ -14,7 +14,6 @@ const validation = require("../modules/validation");
 module.exports = {
   async create(req, res, next) {
     try {
-      console.log("book.controller.js - Acessando rota de criação de livro");
       // Aquisição do token
       const { token } = req;
 
@@ -38,8 +37,6 @@ module.exports = {
       if (validationResult.status === "error") {
         return res.status(400).json(validationResult);
       }
-
-      console.log("book.controller.js - Instanciando Business");
 
       const response = await BookBusiness.create(
         token,
