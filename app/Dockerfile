@@ -1,4 +1,4 @@
-FROM node:16-alpine
+FROM node:18-alpine
 
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /wait
 
