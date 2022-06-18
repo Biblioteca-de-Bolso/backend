@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "API de Backend do projeto Biblioteca de Bolso",
   "main": "server.js",
-  "engines": {
-    "node": ">=16.0.0"
-  },
   "scripts": {
     "build": "npx prisma generate",
     "test": "jest",
