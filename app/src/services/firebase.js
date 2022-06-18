@@ -21,8 +21,6 @@ function uploadPicture(picture) {
     const storageRef = ref(storage, filename);
     const file = fs.readFileSync(filename);
 
-    console.log({ storageRef, filename, file });
-
     try {
       uploadBytes(storageRef, file)
         .then(() => {

@@ -200,11 +200,17 @@ module.exports = {
           try {
             await deletePicure(firebasePath);
           } catch (error) {
-            return failure({
-              status: ErrorStatus,
-              code: DatabaseFailure,
-              message: "Falha na exclusão do livro.",
-            });
+            if (error.code === "storage/object-not-found") {
+              console.log(
+                "O arquivo de imagem para este livro não foi encontrado no Firebase Storage. Prosseguindo com remoção dos outros dados."
+              );
+            } else {
+              return failure({
+                status: ErrorStatus,
+                code: DatabaseFailure,
+                message: `Falha na exclusão de livro: ${error.message}`,
+              });
+            }
           }
         }
 
