@@ -38,13 +38,13 @@ services:
       POSTGRES_DATABASE: bibliotecadebolso
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
-  firebase:
-    container_name: bibliotecadebolso_firebase
-    build: ./firebase
-    ports:
-      - 9199:9199
-    volumes:
-      - .cache/firebase/emulators/:/usr/src/firebase/.cache/firebase/emulators/ 
+  # firebase:
+  #   container_name: bibliotecadebolso_firebase
+  #   build: ./firebase
+  #   ports:
+  #     - 9199:9199
+  #   volumes:
+  #     - .cache/firebase/emulators/:/usr/src/firebase/.cache/firebase/emulators/ 
 volumes:
   node_modules: {}
 networks: 

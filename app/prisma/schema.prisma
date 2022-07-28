@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl"]
 }
 
@@ -9,54 +9,54 @@ datasource db {
 }
 
 model User {
-  id              Int           @id @unique @default(autoincrement())
-  name            String        @db.VarChar(64)
-  email           String        @unique @db.VarChar(64) 
-  password        String        @db.VarChar(32) 
-  active          Boolean?      @db.Boolean @default(false)
-  activationCode  String?       @db.VarChar(16)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id             Int      @id @unique @default(autoincrement())
+  name           String   @db.VarChar(64)
+  email          String   @unique @db.VarChar(64)
+  password       String   @db.VarChar(32)
+  active         Boolean? @default(false) @db.Boolean
+  activationCode String?  @db.VarChar(16)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  refreshTokens   RefreshToken[]
-  books           Book[]
-  annotations     Annotation[]
+  refreshTokens RefreshToken[]
+  books         Book[]
+  annotations   Annotation[]
 
   @@map("user")
 }
 
 model RefreshToken {
-  id              String    @id @unique @db.VarChar(128)
-  email           String    @db.VarChar(64)
-  userId          Int          
-  iat             String    @db.VarChar(10)
-  exp             String    @db.VarChar(10)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id        String   @id @unique @db.VarChar(128)
+  email     String   @db.VarChar(64)
+  userId    Int
+  iat       String   @db.VarChar(10)
+  exp       String   @db.VarChar(10)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user            User      @relation(fields: [userId], references: [id]) 
+  user User @relation(fields: [userId], references: [id])
 
   @@map("refreshToken")
 }
 
 model Book {
-  id              Int           @id @unique @default(autoincrement())
-  userId          Int
-  title           String        @db.VarChar(128)
-  author          String?       @db.VarChar(128)
-  isbn10          String?       @db.VarChar(10)
-  isbn13          String?       @db.VarChar(13)
-  publisher       String?       @db.VarChar(128)
-  description     String?       @db.Text
-  thumbnail       String?       @db.VarChar(255)
-  readStatus      ReadStatus?   @default(NO_STATUS)
-  borrowStatus    BorrowStatus? @default(RETURNED)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id           Int           @id @unique @default(autoincrement())
+  userId       Int
+  title        String        @db.VarChar(128)
+  author       String?       @db.VarChar(128)
+  isbn10       String?       @db.VarChar(10)
+  isbn13       String?       @db.VarChar(13)
+  publisher    String?       @db.VarChar(128)
+  description  String?       @db.Text
+  thumbnail    String?       @db.VarChar(255)
+  readStatus   ReadStatus?   @default(NO_STATUS)
+  borrowStatus BorrowStatus? @default(RETURNED)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
-  user            User          @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
-  annotations     Annotation[]
+  annotations Annotation[]
 
   @@map("book")
 }
@@ -75,17 +75,17 @@ enum ReadStatus {
 }
 
 model Annotation {
-  id        Int       @id @unique @default(autoincrement())
+  id        Int      @id @unique @default(autoincrement())
   userId    Int
-  bookId    Int     
-  title     String    @db.VarChar(128)
-  text      String    @db.Text
-  page      Int?       
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  bookId    Int
+  title     String   @db.VarChar(128)
+  text      String   @db.Text
+  reference String?  @db.VarChar(128)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user      User      @relation(fields: [userId], references: [id])
-  book      Book      @relation(fields: [bookId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  book Book @relation(fields: [bookId], references: [id])
 
   @@map("annotation")
 }

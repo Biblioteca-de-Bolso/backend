@@ -10,10 +10,8 @@ const validation = require("../modules/validation");
 module.exports = {
   async create(req, res, next) {
     try {
-      // Aquisição do token
       const { token } = req;
 
-      // Validação dos parâmetros
       const bookId = parseInt(req.body["bookId"]);
       const { title, text, page } = req.body;
 
