@@ -91,6 +91,8 @@ module.exports = {
   },
 
   async delete(token, userId, email, password) {
+    userId = parseInt(userId);
+
     // Aplicar hash MD5 na senha, se necessário
     if (!validator.isMD5(password)) {
       password = crypto.createHash("md5").update(password).digest("hex");
@@ -99,7 +101,7 @@ module.exports = {
     // Adquirir dados do usuário informado
     const user = await prisma.user.findFirst({
       where: {
-        id: parseInt(userId),
+        id: userId,
         email: email,
         password: password,
       },
@@ -116,22 +118,22 @@ module.exports = {
         const deleted = await prisma.$transaction([
           prisma.annotation.deleteMany({
             where: {
-              userId: parseInt(userId),
+              userId,
             },
           }),
           prisma.book.deleteMany({
             where: {
-              userId: parseInt(userId),
+              userId,
             },
           }),
           prisma.refreshToken.deleteMany({
             where: {
-              userId: parseInt(userId),
+              userId,
             },
           }),
           prisma.user.delete({
             where: {
-              id: parseInt(userId),
+              id: userId,
             },
           }),
         ]);

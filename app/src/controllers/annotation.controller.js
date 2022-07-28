@@ -3,7 +3,7 @@ const AnnotationBusiness = require("../business/annotation.business");
 const BookIdValidator = require("../validators/book/id.rules");
 const TitleValidator = require("../validators/annotation/title.rules");
 const TextValidator = require("../validators/annotation/text.rules");
-const PageValidator = require("../validators/shared/page.rules");
+const ReferenceValidator = require("../validators/annotation/reference.rules");
 
 const validation = require("../modules/validation");
 
@@ -13,13 +13,13 @@ module.exports = {
       const { token } = req;
 
       const bookId = parseInt(req.body["bookId"]);
-      const { title, text, page } = req.body;
+      const { title, text, reference } = req.body;
 
       const rules = [
         [bookId, BookIdValidator, { required: true }],
         [title, TitleValidator, { required: true }],
-        [text, TextValidator, { required: false }],
-        [page, PageValidator, { required: false }],
+        [text, TextValidator, { required: true }],
+        [reference, ReferenceValidator, { required: false }],
       ];
 
       const validationResult = validation.run(rules);
@@ -28,7 +28,7 @@ module.exports = {
         return res.status(400).json(validationResult);
       }
 
-      const response = await AnnotationBusiness.create(token, bookId, title, text, page);
+      const response = await AnnotationBusiness.create(token, bookId, title, text, reference);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
