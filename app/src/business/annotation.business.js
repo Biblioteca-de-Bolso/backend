@@ -1,5 +1,5 @@
-const { OkStatus, ErrorStatus, NotFound } = require("../modules/codes");
-const { ok } = require("../modules/http");
+const { OkStatus, ErrorStatus, NotFound, DatabaseFailure } = require("../modules/codes");
+const { ok, failure } = require("../modules/http");
 const prisma = require("../prisma");
 
 module.exports = {
@@ -36,6 +36,12 @@ module.exports = {
           response: {
             ...annotation,
           },
+        });
+      } else {
+        return failure({
+          status: ErrorStatus,
+          code: DatabaseFailure,
+          message: "Não foi possível realizar a criação da anotação.",
         });
       }
     } else {
