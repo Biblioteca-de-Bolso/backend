@@ -54,7 +54,7 @@ module.exports = {
 
       if (user) {
         // Não enviar email de cadastro em ambiente de teste
-        if (process.env.NODE_ENV !== "test" && true) {
+        if (process.env.NODE_ENV === "production") {
           try {
             const { emailHtml, emailText } = await sendgrid.composeEmail(
               user["id"],
@@ -67,6 +67,11 @@ module.exports = {
           } catch (error) {
             console.log(fileName(), `Erro durante envio de email: ${error.message}`);
           }
+        } else {
+          console.log(
+            fileName(),
+            "Criação de usuário em ambiente de testes, pulando etapa de envio de email."
+          );
         }
 
         return created({
