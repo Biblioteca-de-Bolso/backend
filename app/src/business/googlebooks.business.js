@@ -3,10 +3,6 @@ const { googleBooksAPI } = require("../services/googlebooks");
 const { OkStatus, ErrorStatus, InternalServerError } = require("../modules/codes");
 
 module.exports = {
-  pushBook(array, book) {
-    array.push(book);
-  },
-
   async search(qstring, lang, maturity, printType, orderBy, isbnOnly = "true") {
     let books = [];
 
