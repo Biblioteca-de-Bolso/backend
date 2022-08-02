@@ -1,5 +1,5 @@
 const { OkStatus, ErrorStatus, NotFound, DatabaseFailure } = require("../modules/codes");
-const { ok, failure } = require("../modules/http");
+const { ok, created, failure } = require("../modules/http");
 const prisma = require("../prisma");
 const { PAGE_SIZE } = require("../modules/constants");
 
@@ -30,10 +30,10 @@ module.exports = {
       });
 
       if (annotation) {
-        return ok({
+        return created({
           status: OkStatus,
           response: {
-            ...annotation,
+            annotation: annotation,
           },
         });
       } else {

@@ -44,6 +44,7 @@ module.exports = async () => {
       active: true,
       activationCode: "1234567812345678",
       // O livro de ID 4 (segundo livro da Ada) é utilizado para o teste de exclusão
+      // O livro de ID 3 (primeiro livro da Ada) é utilizado para o teste de criar anotação
       books: {
         createMany: {
           data: [
