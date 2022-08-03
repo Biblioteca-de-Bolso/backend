@@ -1,5 +1,5 @@
-const { OkStatus, ErrorStatus, NotFound, DatabaseFailure } = require("../modules/codes");
-const { ok, created, failure } = require("../modules/http");
+const { OkStatus, ErrorStatus, NotFound, DatabaseFailure, Forbidden } = require("../modules/codes");
+const { ok, created, failure, notFound, forbidden } = require("../modules/http");
 const prisma = require("../prisma");
 const { PAGE_SIZE } = require("../modules/constants");
 
@@ -83,6 +83,39 @@ module.exports = {
         status: ErrorStatus,
         code: NotFound,
         message: "Nenhuma anotação encontrada para os filtros especificados.",
+      });
+    }
+  },
+
+  async read(userId, annotationId) {
+    const annotation = await prisma.annotation.findFirst({
+      where: {
+        id: annotationId,
+      },
+    });
+
+    if (annotation) {
+      const annotationOwner = annotation["userId"];
+
+      if (annotationOwner === userId) {
+        return ok({
+          status: OkStatus,
+          response: {
+            annotation: annotation,
+          },
+        });
+      } else {
+        return forbidden({
+          status: ErrorStatus,
+          code: Forbidden,
+          message: "Este usuário não tem permissão para acessar o conteúdo solicitado.",
+        });
+      }
+    } else {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "A anotação informada não foi encontrada.",
       });
     }
   },

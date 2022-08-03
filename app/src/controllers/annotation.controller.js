@@ -5,6 +5,7 @@ const TitleValidator = require("../validators/annotation/title.rules");
 const TextValidator = require("../validators/annotation/text.rules");
 const ReferenceValidator = require("../validators/annotation/reference.rules");
 const PageValidator = require("../validators/shared/page.rules");
+const AnnotationIdValidator = require("../validators/annotation/id.rules");
 
 const validation = require("../modules/validation");
 
@@ -60,6 +61,32 @@ module.exports = {
 
       const response = await AnnotationBusiness.list(userId, page, bookId);
 
+      return res.status(response.statusCode).json(response.body);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async read(req, res, next) {
+    try {
+      const { token } = req;
+
+      const userId = parseInt(token["id"]);
+
+      const id = parseInt(req.params["id"]);
+
+      const rules = [[id, AnnotationIdValidator]];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult.status === "error") {
+        return res.status(400).json(validationResult);
+      }
+
+      // Token validado, prosseguir com a requisição
+      const response = await AnnotationBusiness.read(userId, id);
+
+      // Retornar com resultado da operação
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
