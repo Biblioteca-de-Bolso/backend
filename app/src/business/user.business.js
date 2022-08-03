@@ -68,10 +68,12 @@ module.exports = {
             console.log(fileName(), `Erro durante envio de email: ${error.message}`);
           }
         } else {
-          console.log(
-            fileName(),
-            "Criação de usuário em ambiente de testes, pulando etapa de envio de email."
-          );
+          if (process.env.NODE_ENV !== "test") {
+            console.log(
+              fileName(),
+              "Criação de usuário em ambiente de testes/desenvolvimento, pulando etapa de envio de email."
+            );
+          }
         }
 
         return created({
