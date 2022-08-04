@@ -12,7 +12,6 @@ module.exports = {
     if (input) {
       if (
         !validator.isLength(input, {
-          min: 1,
           max: 128,
         })
       ) {

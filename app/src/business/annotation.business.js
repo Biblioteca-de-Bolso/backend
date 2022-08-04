@@ -1,5 +1,12 @@
-const { OkStatus, ErrorStatus, NotFound, DatabaseFailure, Forbidden } = require("../modules/codes");
-const { ok, created, failure, notFound, forbidden } = require("../modules/http");
+const {
+  OkStatus,
+  ErrorStatus,
+  NotFound,
+  DatabaseFailure,
+  Forbidden,
+  IncorrectParameter,
+} = require("../modules/codes");
+const { ok, created, failure, notFound, forbidden, badRequest } = require("../modules/http");
 const prisma = require("../prisma");
 const { PAGE_SIZE } = require("../modules/constants");
 
@@ -151,6 +158,41 @@ module.exports = {
             message: "Não foi possível realizar a exclusão de um ou mais dados do banco de dados.",
           });
         }
+      } else {
+        return forbidden({
+          status: ErrorStatus,
+          code: Forbidden,
+          message: "O usuário informado não possui o privilégio para executar essa ação.",
+        });
+      }
+    } else {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "A anotação informada não foi encontrada.",
+      });
+    }
+  },
+
+  async update(userId, bookId, title, text, reference) {
+    const newData = {};
+
+    // Se os parâmetros existem nessa etapa, então eles já foram validados
+    // Por exemplo, temos certeza que o "title" e "text" não estão vazios
+    // Outros campos, como "reference", podem ser vazios
+    if (title) newData.title = title;
+    if (text) newData.text = text;
+    if (reference) newData.reference = reference;
+
+    const book = await prisma.annotation.findUnique({
+      where: {
+        id: annotationId,
+      },
+    });
+
+    if (book) {
+      if (annotationId.userId === userId) {
+        //
       } else {
         return forbidden({
           status: ErrorStatus,

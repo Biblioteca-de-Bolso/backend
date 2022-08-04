@@ -116,4 +116,40 @@ module.exports = {
       next(error);
     }
   },
+
+  async update(req, res, next) {
+    try {
+      const { token } = req;
+
+      const userId = parseInt(token["id"], 10);
+
+      const annotationId = parseInt(req.body["annotationId"], 10);
+      const { title, text, reference } = req.body;
+
+      const rules = [
+        [annotationId, AnnotationIdValidator, { required: false }],
+        [title, TitleValidator, { required: false }],
+        [text, TextValidator, { required: false }],
+        [reference, ReferenceValidator, { required: false }],
+      ];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult.status === "error") {
+        return res.status(400).json(validationResult);
+      }
+
+      const response = await AnnotationBusiness.update(
+        userId,
+        annotationId,
+        title,
+        text,
+        reference
+      );
+
+      return res.status(response.statusCode).json(response.body);
+    } catch (error) {
+      return next(error);
+    }
+  },
 };
