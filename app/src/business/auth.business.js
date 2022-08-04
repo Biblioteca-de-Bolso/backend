@@ -42,7 +42,7 @@ module.exports = {
       if (user["active"]) {
         // Construir o payload do token com os dados necessários
         const payload = {
-          id: parseInt(user["id"]),
+          id: parseInt(user["id"], 10),
           email: user["email"],
           name: user["name"],
         };
@@ -163,7 +163,7 @@ module.exports = {
   },
 
   async refreshToken(token, refreshToken) {
-    const userId = parseInt(token["id"]);
+    const userId = parseInt(token["id"], 10);
     const userEmail = token["email"];
     const userName = token["name"];
 
@@ -175,7 +175,7 @@ module.exports = {
 
     if (refresh) {
       // Verificação de autenticidade do refresh token informado
-      if (userId !== parseInt(refresh["userId"]) || userEmail !== refresh["email"]) {
+      if (userId !== parseInt(refresh["userId"], 10) || userEmail !== refresh["email"]) {
         return forbidden({
           status: ErrorStatus,
           code: Forbidden,
@@ -187,7 +187,7 @@ module.exports = {
       // Verificações de validade do refresh token informado
       const currentTime = dayjs().valueOf().toString().slice(0, 10);
 
-      if (currentTime < parseInt(refresh["iat"])) {
+      if (currentTime < parseInt(refresh["iat"], 10)) {
         return ok({
           status: ErrorStatus,
           code: RefreshTokenNotBefore,
@@ -196,7 +196,7 @@ module.exports = {
         });
       }
 
-      if (currentTime > parseInt(refresh["exp"])) {
+      if (currentTime > parseInt(refresh["exp"], 10)) {
         return ok({
           status: ErrorStatus,
           code: RefreshTokenExpired,
@@ -246,7 +246,7 @@ module.exports = {
         // Token validado com sucesso, extrair dados de usuário
         const user = await prisma.user.findFirst({
           where: {
-            id: parseInt(decoded["id"]),
+            id: parseInt(decoded["id"], 10),
             email: decoded["email"],
           },
         });

@@ -42,7 +42,7 @@ module.exports = {
       const { token } = req;
 
       // Aquisição e validação de parâmetros
-      const userId = parseInt(req.body["id"]);
+      const userId = parseInt(req.body["id"], 10);
       const { email, password } = req.body;
 
       const rules = [
@@ -72,7 +72,7 @@ module.exports = {
       const { token } = req;
 
       // Aquisição e validação de parâmetros
-      const userId = parseInt(req.params["id"]);
+      const userId = parseInt(req.params["id"], 10);
 
       const rules = [[userId, UserIdValidator]];
 

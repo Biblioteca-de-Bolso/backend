@@ -60,7 +60,7 @@ module.exports = {
     };
 
     if (bookId) {
-      whereClausule.bookId = parseInt(bookId);
+      whereClausule.bookId = parseInt(bookId, 10);
     }
 
     const annotations = await prisma.annotation.findMany({

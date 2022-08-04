@@ -21,7 +21,7 @@ module.exports = {
     let weights = [];
 
     for (let i = 0; i < isbn.length; i++) {
-      weights.push(parseInt(isbn[i]) * multipliers[i % 2]);
+      weights.push(parseInt(isbn[i]) * multipliers[i % 2], 10);
     }
 
     // 4 - Add weights from step 3
@@ -51,7 +51,7 @@ module.exports = {
     let weights = [];
 
     for (let i = 0; i < isbn.length; i++) {
-      weights.push(parseInt(isbn[i]) * multipliers[i]);
+      weights.push(parseInt(isbn[i], 10) * multipliers[i]);
     }
 
     // 4 - Add weights from step 3
