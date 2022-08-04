@@ -13,7 +13,7 @@ function run(rules) {
     let required = true;
 
     if (options) {
-      if (options.hasOwnProperty("required")) required = options["required"];
+      if (Object.prototype.hasOwnProperty.call(options, "required")) required = options["required"];
     }
 
     const result = rule.validate(field, required);
