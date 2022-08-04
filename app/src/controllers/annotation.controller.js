@@ -109,10 +109,8 @@ module.exports = {
         return res.status(400).json(validationResult);
       }
 
-      // Token validado, prosseguir com a requisição
-      const response = await AnnotationBusiness.read(userId, id);
+      const response = await AnnotationBusiness.delete(userId, id);
 
-      // Retornar com resultado da operação
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);

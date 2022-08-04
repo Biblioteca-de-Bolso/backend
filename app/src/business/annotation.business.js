@@ -119,4 +119,51 @@ module.exports = {
       });
     }
   },
+
+  async delete(userId, annotationId) {
+    const annotation = await prisma.annotation.findUnique({
+      where: {
+        id: annotationId,
+      },
+    });
+
+    if (annotation) {
+      if (annotation.userId === userId) {
+        const deleted = await prisma.$transaction([
+          prisma.annotation.delete({
+            where: {
+              id: annotationId,
+            },
+          }),
+        ]);
+
+        if (deleted) {
+          return ok({
+            status: OkStatus,
+            response: {
+              message: "A anotação foi removida com sucesso.",
+            },
+          });
+        } else {
+          return failure({
+            status: ErrorStatus,
+            code: DatabaseFailure,
+            message: "Não foi possível realizar a exclusão de um ou mais dados do banco de dados.",
+          });
+        }
+      } else {
+        return forbidden({
+          status: ErrorStatus,
+          code: Forbidden,
+          message: "O usuário informado não possui o privilégio para executar essa ação.",
+        });
+      }
+    } else {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "A anotação informada não foi encontrada.",
+      });
+    }
+  },
 };
