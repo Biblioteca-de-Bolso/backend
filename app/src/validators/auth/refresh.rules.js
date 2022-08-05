@@ -7,7 +7,7 @@ module.exports = {
       return validationError("É necessário informar um refresh token válido.");
     }
 
-    if (input) {
+    if (input !== undefined && input !== null) {
       if (
         !validator.isLength(input, {
           min: 128,

@@ -7,7 +7,7 @@ module.exports = {
       return validationError("É necessário informar um nome de usuário.");
     }
 
-    if (input) {
+    if (input !== undefined && input !== null) {
       if (
         !validator.isAlphanumeric(input, "pt-BR", {
           ignore: "' ",

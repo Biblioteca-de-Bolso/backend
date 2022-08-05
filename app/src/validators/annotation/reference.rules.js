@@ -9,7 +9,7 @@ module.exports = {
       );
     }
 
-    if (input) {
+    if (input !== undefined && input !== null) {
       if (
         !validator.isLength(input, {
           max: 128,

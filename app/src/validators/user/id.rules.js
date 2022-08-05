@@ -7,7 +7,7 @@ module.exports = {
       return validationError("É necessário informar o ID do usuário.");
     }
 
-    if (input) {
+    if (input !== undefined && input !== null) {
       if (
         !validator.isInt(input.toString(), {
           min: 0,

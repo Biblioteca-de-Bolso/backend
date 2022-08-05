@@ -7,7 +7,7 @@ module.exports = {
       return validationError("É necessário informar o ID do livro.");
     }
 
-    if (input) {
+    if (input !== undefined && input !== null) {
       if (
         !validator.isInt(input.toString(), {
           min: 0,

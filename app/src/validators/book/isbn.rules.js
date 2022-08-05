@@ -7,7 +7,7 @@ module.exports = {
       return validationError("É necessário informar o ISBN do livro.");
     }
 
-    if (input) {
+    if (input !== undefined && input !== null) {
       if (!validator.isISBN(input, 10) && !validator.isISBN(input, 13)) {
         return validationError("O ISBN informado deve obedecer os padrões ISBN 10 ou ISBN 13.");
       }
