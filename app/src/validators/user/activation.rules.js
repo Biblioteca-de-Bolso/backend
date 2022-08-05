@@ -7,7 +7,7 @@ module.exports = {
       return validationError("É necessário informar um código de ativação.");
     }
 
-    if (input) {
+    if (input !== undefined && input !== null) {
       if (!validator.isAlphanumeric(input)) {
         return validationError("O código de ativação informado não é válido.");
       }

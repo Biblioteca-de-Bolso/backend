@@ -14,9 +14,9 @@ module.exports = {
     try {
       const { token } = req;
 
-      const userId = parseInt(token["id"]);
+      const userId = parseInt(token["id"], 10);
 
-      const bookId = parseInt(req.body["bookId"]);
+      const bookId = parseInt(req.body["bookId"], 10);
       const { title, text, reference } = req.body;
 
       const rules = [
@@ -44,7 +44,7 @@ module.exports = {
     try {
       const { token } = req;
 
-      const userId = parseInt(token["id"]);
+      const userId = parseInt(token["id"], 10);
 
       const { page, bookId } = req.query;
 
@@ -71,9 +71,9 @@ module.exports = {
     try {
       const { token } = req;
 
-      const userId = parseInt(token["id"]);
+      const userId = parseInt(token["id"], 10);
 
-      const id = parseInt(req.params["id"]);
+      const id = parseInt(req.params["id"], 10);
 
       const rules = [[id, AnnotationIdValidator]];
 
@@ -90,6 +90,66 @@ module.exports = {
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
+    }
+  },
+
+  async delete(req, res, next) {
+    try {
+      const { token } = req;
+
+      const userId = parseInt(token["id"], 10);
+
+      const id = parseInt(req.params["id"], 10);
+
+      const rules = [[id, AnnotationIdValidator]];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult.status === "error") {
+        return res.status(400).json(validationResult);
+      }
+
+      const response = await AnnotationBusiness.delete(userId, id);
+
+      return res.status(response.statusCode).json(response.body);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async update(req, res, next) {
+    try {
+      const { token } = req;
+
+      const userId = parseInt(token["id"], 10);
+
+      const annotationId = parseInt(req.body["annotationId"], 10);
+      const { title, text, reference } = req.body;
+
+      const rules = [
+        [annotationId, AnnotationIdValidator, { required: false }],
+        [title, TitleValidator, { required: false }],
+        [text, TextValidator, { required: false }],
+        [reference, ReferenceValidator, { required: false }],
+      ];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult.status === "error") {
+        return res.status(400).json(validationResult);
+      }
+
+      const response = await AnnotationBusiness.update(
+        userId,
+        annotationId,
+        title,
+        text,
+        reference
+      );
+
+      return res.status(response.statusCode).json(response.body);
+    } catch (error) {
+      return next(error);
     }
   },
 };

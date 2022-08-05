@@ -40,7 +40,7 @@ module.exports = {
   async verifyAccount(req, res, next) {
     try {
       // Aquisição e validação dos parâmetros
-      const userId = parseInt(req.query["id"]);
+      const userId = parseInt(req.query["id"], 10);
       const email = req.query["email"];
       const activationCode = req.query["code"];
 

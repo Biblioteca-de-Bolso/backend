@@ -7,7 +7,7 @@ module.exports = {
       return validationError("É necessário informar um endereço de email.");
     }
 
-    if (input) {
+    if (input !== undefined && input !== null) {
       if (!validator.isEmail(input)) {
         return validationError("O formato de email inserido não é válido.");
       }

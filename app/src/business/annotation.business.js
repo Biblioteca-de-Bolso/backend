@@ -1,5 +1,12 @@
-const { OkStatus, ErrorStatus, NotFound, DatabaseFailure, Forbidden } = require("../modules/codes");
-const { ok, created, failure, notFound, forbidden } = require("../modules/http");
+const {
+  OkStatus,
+  ErrorStatus,
+  NotFound,
+  DatabaseFailure,
+  Forbidden,
+  IncorrectParameter,
+} = require("../modules/codes");
+const { ok, created, failure, notFound, forbidden, badRequest } = require("../modules/http");
 const prisma = require("../prisma");
 const { PAGE_SIZE } = require("../modules/constants");
 
@@ -60,7 +67,7 @@ module.exports = {
     };
 
     if (bookId) {
-      whereClausule.bookId = parseInt(bookId);
+      whereClausule.bookId = parseInt(bookId, 10);
     }
 
     const annotations = await prisma.annotation.findMany({
@@ -109,6 +116,108 @@ module.exports = {
           status: ErrorStatus,
           code: Forbidden,
           message: "Este usuário não tem permissão para acessar o conteúdo solicitado.",
+        });
+      }
+    } else {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "A anotação informada não foi encontrada.",
+      });
+    }
+  },
+
+  async delete(userId, annotationId) {
+    const annotation = await prisma.annotation.findUnique({
+      where: {
+        id: annotationId,
+      },
+    });
+
+    if (annotation) {
+      if (annotation.userId === userId) {
+        const deleted = await prisma.$transaction([
+          prisma.annotation.delete({
+            where: {
+              id: annotationId,
+            },
+          }),
+        ]);
+
+        if (deleted) {
+          return ok({
+            status: OkStatus,
+            response: {
+              message: "A anotação foi removida com sucesso.",
+            },
+          });
+        } else {
+          return failure({
+            status: ErrorStatus,
+            code: DatabaseFailure,
+            message: "Não foi possível realizar a exclusão de um ou mais dados do banco de dados.",
+          });
+        }
+      } else {
+        return forbidden({
+          status: ErrorStatus,
+          code: Forbidden,
+          message: "O usuário informado não possui o privilégio para executar essa ação.",
+        });
+      }
+    } else {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "A anotação informada não foi encontrada.",
+      });
+    }
+  },
+
+  async update(userId, annotationId, title, text, reference) {
+    const data = {};
+
+    // Se os parâmetros existem nessa etapa, então eles já foram validados
+    // Por exemplo, temos certeza que o "title" e "text" não estão vazios
+    // Outros campos, como "reference", podem ser vazios
+    if (title !== undefined) data.title = title;
+    if (text !== undefined) data.text = text;
+    if (reference !== undefined) data.reference = reference;
+
+    const annotation = await prisma.annotation.findUnique({
+      where: {
+        id: annotationId,
+      },
+    });
+
+    if (annotation) {
+      if (annotation.userId === userId) {
+        const updated = await prisma.annotation.update({
+          where: {
+            id: annotationId,
+          },
+          data,
+        });
+
+        if (updated) {
+          return ok({
+            status: OkStatus,
+            response: {
+              annotation: updated,
+            },
+          });
+        } else {
+          return failure({
+            status: ErrorStatus,
+            code: DatabaseFailure,
+            message: "Não foi possível atualizar um ou mais dados do banco de dados.",
+          });
+        }
+      } else {
+        return forbidden({
+          status: ErrorStatus,
+          code: Forbidden,
+          message: "O usuário informado não possui o privilégio para executar essa ação.",
         });
       }
     } else {

@@ -7,7 +7,7 @@ module.exports = {
       return validationError("É necessário informar a descrição do livro.");
     }
 
-    if (input) {
+    if (input !== undefined && input !== null) {
       if (
         !validator.isLength(input, {
           min: 1,

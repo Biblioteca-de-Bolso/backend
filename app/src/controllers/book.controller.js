@@ -60,7 +60,7 @@ module.exports = {
     const { token } = req;
 
     // Aquisição e validação dos parâmetros
-    const id = parseInt(req.params["id"]);
+    const id = parseInt(req.params["id"], 10);
 
     const rules = [[id, BookIdValidator]];
 
@@ -109,7 +109,7 @@ module.exports = {
       const { token } = req;
 
       // Aquisição e validação dos parâmetros
-      const bookId = parseInt(req.body["bookId"]);
+      const bookId = parseInt(req.body["bookId"], 10);
 
       const rules = [[bookId, BookIdValidator]];
 

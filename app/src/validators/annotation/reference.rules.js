@@ -9,10 +9,9 @@ module.exports = {
       );
     }
 
-    if (input) {
+    if (input !== undefined && input !== null) {
       if (
         !validator.isLength(input, {
-          min: 1,
           max: 128,
         })
       ) {

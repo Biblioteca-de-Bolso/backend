@@ -93,7 +93,7 @@ module.exports = {
   },
 
   async delete(token, userId, email, password) {
-    userId = parseInt(userId);
+    userId = parseInt(userId, 10);
 
     // Aplicar hash MD5 na senha, se necessário
     if (!validator.isMD5(password)) {

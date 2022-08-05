@@ -7,7 +7,7 @@ module.exports = {
       return validationError("É necessário inserir uma senha válida.");
     }
 
-    if (input) {
+    if (input !== undefined && input !== null) {
       if (!validator.isLength(input, { min: 8, max: 32 })) {
         return validationError("A senha deve ter entre 8 e 32 caracteres.");
       }
