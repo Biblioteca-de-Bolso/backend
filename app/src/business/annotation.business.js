@@ -174,25 +174,45 @@ module.exports = {
     }
   },
 
-  async update(userId, bookId, title, text, reference) {
-    const newData = {};
+  async update(userId, annotationId, title, text, reference) {
+    const data = {};
 
     // Se os parâmetros existem nessa etapa, então eles já foram validados
     // Por exemplo, temos certeza que o "title" e "text" não estão vazios
     // Outros campos, como "reference", podem ser vazios
-    if (title) newData.title = title;
-    if (text) newData.text = text;
-    if (reference) newData.reference = reference;
+    if (title !== undefined) data.title = title;
+    if (text !== undefined) data.text = text;
+    if (reference !== undefined) data.reference = reference;
 
-    const book = await prisma.annotation.findUnique({
+    const annotation = await prisma.annotation.findUnique({
       where: {
         id: annotationId,
       },
     });
 
-    if (book) {
-      if (annotationId.userId === userId) {
-        //
+    if (annotation) {
+      if (annotation.userId === userId) {
+        const updated = await prisma.annotation.update({
+          where: {
+            id: annotationId,
+          },
+          data,
+        });
+
+        if (updated) {
+          return ok({
+            status: OkStatus,
+            response: {
+              annotation: updated,
+            },
+          });
+        } else {
+          return failure({
+            status: ErrorStatus,
+            code: DatabaseFailure,
+            message: "Não foi possível atualizar um ou mais dados do banco de dados.",
+          });
+        }
       } else {
         return forbidden({
           status: ErrorStatus,
