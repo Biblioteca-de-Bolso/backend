@@ -8,13 +8,15 @@ module.exports = {
     }
 
     if (input !== undefined && input !== null) {
-      if (
-        !validator.isLength(input, {
-          min: 1,
-          max: 5000,
-        })
-      ) {
-        return validationError("A descrição do livro deve ter entre 1 e 5000 caracteres.");
+      if (input.length > 0) {
+        if (
+          !validator.isLength(input, {
+            min: 1,
+            max: 5000,
+          })
+        ) {
+          return validationError("A descrição do livro deve ter entre 1 e 5000 caracteres.");
+        }
       }
     }
 

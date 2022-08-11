@@ -10,12 +10,14 @@ module.exports = {
     }
 
     if (input !== undefined && input !== null) {
-      if (
-        !validator.isLength(input, {
-          max: 128,
-        })
-      ) {
-        return validationError("A referência informada informado não é válida.");
+      if (input.length > 0) {
+        if (
+          !validator.isLength(input, {
+            max: 128,
+          })
+        ) {
+          return validationError("A referência informada informado não é válida.");
+        }
       }
     }
 

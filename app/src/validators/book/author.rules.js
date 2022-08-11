@@ -8,13 +8,15 @@ module.exports = {
     }
 
     if (input !== undefined && input !== null) {
-      if (
-        !validator.isLength(input, {
-          min: 1,
-          max: 128,
-        })
-      ) {
-        return validationError("O(s) autor(es) do livro devem ter entre 1 e 128 caracteres.");
+      if (input.length > 0) {
+        if (
+          !validator.isLength(input, {
+            min: 1,
+            max: 128,
+          })
+        ) {
+          return validationError("O(s) autor(es) do livro devem ter entre 1 e 128 caracteres.");
+        }
       }
     }
 

@@ -8,8 +8,10 @@ module.exports = {
     }
 
     if (input !== undefined && input !== null) {
-      if (!validator.isEmail(input)) {
-        return validationError("O formato de email inserido não é válido.");
+      if (input.length > 0) {
+        if (!validator.isEmail(input)) {
+          return validationError("O formato de email inserido não é válido.");
+        }
       }
     }
 
