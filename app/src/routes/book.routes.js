@@ -9,6 +9,7 @@ function load(routes) {
   routes.get("/book/:id", protectedRoute, controller.read);
   routes.delete("/book", protectedRoute, controller.delete);
   routes.post("/book", protectedRoute, booksThumbnails.single("thumbnailFile"), controller.create);
+  routes.put("/book", protectedRoute, controller.update);
 
 }
 

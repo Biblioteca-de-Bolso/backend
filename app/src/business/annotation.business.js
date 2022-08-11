@@ -1,11 +1,4 @@
-const {
-  OkStatus,
-  ErrorStatus,
-  NotFound,
-  DatabaseFailure,
-  Forbidden,
-  IncorrectParameter,
-} = require("../modules/codes");
+const { OkStatus, ErrorStatus, NotFound, DatabaseFailure, Forbidden } = require("../modules/codes");
 const { ok, created, failure, notFound, forbidden, badRequest } = require("../modules/http");
 const prisma = require("../prisma");
 const { PAGE_SIZE } = require("../modules/constants");

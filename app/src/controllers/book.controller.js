@@ -8,6 +8,8 @@ const DescriptionValidator = require("../validators/book/description.rules");
 const ThumbnailValidator = require("../validators/book/thumbnail.rules");
 const BookIdValidator = require("../validators/book/id.rules");
 const PageValidator = require("../validators/shared/page.rules");
+const BorrowStatusValidator = require("../validators/book/borrowStatus.rules");
+const ReadStatusValidator = require("../validators/book/readStatus.rules");
 
 const validation = require("../modules/validation");
 
@@ -123,6 +125,62 @@ module.exports = {
       const response = await BookBusiness.delete(token, bookId);
 
       // Retornar com resultado da operação
+      return res.status(response.statusCode).json(response.body);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async update(req, res, next) {
+    try {
+      // Aquisição do token
+      const { token } = req;
+
+      // Aquisição do ID do usuário
+      const userId = parseInt(token["id"], 10);
+
+      // Validação dos parâmetros
+      const {
+        bookId,
+        title,
+        author,
+        isbn,
+        publisher,
+        description,
+        thumbnail,
+        readStatus,
+        borrowStatus,
+      } = req.body;
+
+      const rules = [
+        [bookId, BookIdValidator, { required: true }],
+        [title, TitleValidator, { required: false }],
+        [author, AuthorValidator, { required: false }],
+        [isbn, ISBNValidator, { required: false }],
+        [publisher, PublisherValidator, { required: false }],
+        [description, DescriptionValidator, { required: false }],
+        [thumbnail, ThumbnailValidator, { required: false }],
+      ];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult.status === "error") {
+        return res.status(400).json(validationResult);
+      }
+
+      const response = await BookBusiness.update(
+        userId,
+        bookId,
+        title,
+        author,
+        isbn,
+        publisher,
+        description,
+        thumbnail,
+        readStatus,
+        borrowStatus
+      );
+
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
