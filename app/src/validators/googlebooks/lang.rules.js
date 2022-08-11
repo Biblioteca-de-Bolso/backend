@@ -197,10 +197,12 @@ module.exports = {
     }
 
     if (input !== undefined && input !== null) {
-      if (!ISO6391.has(input)) {
-        return validationError(
-          "O código de linguagem informado não é válido. Para códigos válidos, utilizar códigos ISO 639-1: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes"
-        );
+      if (input.length > 0) {
+        if (!ISO6391.has(input)) {
+          return validationError(
+            "O código de linguagem informado não é válido. Para códigos válidos, utilizar códigos ISO 639-1: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes"
+          );
+        }
       }
     }
 

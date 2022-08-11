@@ -8,17 +8,19 @@ module.exports = {
     }
 
     if (input !== undefined && input !== null) {
-      if (
-        !validator.isLength(input, {
-          min: 1,
-          max: 255,
-        })
-      ) {
-        return validationError("A URL para capa do livro deve ter entre 1 e 255 caracteres.");
-      }
+      if (input.length > 0) {
+        if (
+          !validator.isLength(input, {
+            min: 1,
+            max: 255,
+          })
+        ) {
+          return validationError("A URL para capa do livro deve ter entre 1 e 255 caracteres.");
+        }
 
-      if (!validator.isURL(input)) {
-        return validationError("A URL de capa do livro informada não é válida.");
+        if (!validator.isURL(input)) {
+          return validationError("A URL de capa do livro informada não é válida.");
+        }
       }
     }
 
