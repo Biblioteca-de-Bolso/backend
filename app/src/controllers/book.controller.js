@@ -160,6 +160,8 @@ module.exports = {
         [publisher, PublisherValidator, { required: false }],
         [description, DescriptionValidator, { required: false }],
         [thumbnail, ThumbnailValidator, { required: false }],
+        [readStatus, ReadStatusValidator, { required: true }],
+        [borrowStatus, BorrowStatusValidator, { required: true }],
       ];
 
       const validationResult = validation.run(rules);
