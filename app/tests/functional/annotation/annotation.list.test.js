@@ -10,7 +10,7 @@ const {
 const prisma = require("../../../src/prisma");
 const { assertStatus, assertCode, assertStatusCode, assertResponse } = require("../../utils");
 
-describe("Leitura de Anotações", () => {
+describe("Listagem de Anotações", () => {
   jest.setTimeout(10000);
 
   beforeAll(async () => {
@@ -27,14 +27,11 @@ describe("Leitura de Anotações", () => {
   const userEmail = "charlesbabbage@email.com";
   const userPassword = "charlesbabbage";
 
-  // ID da anotação do Charles
-  const annotationId = 1;
+  // ID das anotaçãos do Charles
+  const userAnnotations = [1, 2];
 
-  // ID da anotação da Ada Lovelace
-  const forbiddenAnnotationId = 3;
-
-  test("Não deve ler uma anotação sem informar um token", async () => {
-    const response = await request(app).get(`/api/annotation/${annotationId}`).send();
+  test("Não deve listar as anotações sem informar um token", async () => {
+    const response = await request(app).get(`/api/annotation`).send();
 
     assertStatusCode(response, 400);
     assertStatus(response, ErrorStatus);
@@ -54,36 +51,27 @@ describe("Leitura de Anotações", () => {
     if (response.body.response.accessToken) accessToken = response.body.response.accessToken;
   });
 
-  test("Não deve ler uma anotação com ID inexistente", async () => {
+  test("Deve listar todas as anotações de um usuário", async () => {
     const response = await request(app)
-      .get("/api/annotation/9999")
-      .set({ authorization: `Bearer ${accessToken}` })
-      .send();
-
-    assertStatusCode(response, 404);
-    assertStatus(response, ErrorStatus);
-    assertCode(response, NotFound);
-  });
-
-  test("Não deve ler uma anotação que pertence a outro usuário", async () => {
-    const response = await request(app)
-      .get(`/api/annotation/${forbiddenAnnotationId}`)
-      .set({ authorization: `Bearer ${accessToken}` })
-      .send();
-
-    assertStatusCode(response, 403);
-    assertStatus(response, ErrorStatus);
-    assertCode(response, Forbidden);
-  });
-
-  test("Deve ler uma anotação e retornar suas informações", async () => {
-    const response = await request(app)
-      .get(`/api/annotation/${annotationId}`)
+      .get(`/api/annotation`)
       .set({ authorization: `Bearer ${accessToken}` })
       .send();
 
     assertStatusCode(response, 200);
-    assertStatus(response, OkStatus);
-    assertResponse(response, "annotation");
+    assertStatus(response, "ok");
+    assertResponse(response, "annotations");
+
+    expect(response.body.response.annotations.length).toBe(userAnnotations.length);
+
+    // Extrair os Id das anotações retornadas
+    const returnedIds = response.body.response.annotations.map((annotation) => annotation.id);
+
+    // Compara os Id dos livros retornados com o esperado
+    const checked = returnedIds.map((id, idx) => (id === userAnnotations[idx] ? true : false));
+
+    // Função para verificar se todos os elementos de uma array são "true"
+    const allTrue = (arr) => arr.every((v) => v === true);
+
+    expect(allTrue(checked)).toBe(true);
   });
 });

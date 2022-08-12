@@ -174,7 +174,15 @@ module.exports = async () => {
       text: "A matemática discreta é muito legal",
       reference: "Cap 2, Pag 6",
     },
-    // Anotação de ID 2, da Ada Lovelace no livro 3
+    // Anotação de ID 2, do Charles Babbage no livro 10
+    {
+      userId: 5,
+      bookId: 10,
+      title: "Anotação sobre Máquinas Digitais",
+      text: "Máquinas Digitais são melhores que analógicas?",
+      reference: "Cap VI",
+    },
+    // Anotação de ID 3, da Ada Lovelace no livro 3
     {
       userId: 2,
       bookId: 3,
