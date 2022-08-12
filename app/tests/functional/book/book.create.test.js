@@ -71,6 +71,23 @@ describe("Criação de Livro", () => {
     assertCode(response, IncorrectParameter);
   });
 
+  test("Não deve criar um livro fornecendo um título vazio", async () => {
+    const response = await request(app)
+      .post("/api/book")
+      .set({ authorization: `Bearer ${accessToken}` })
+      .send({
+        title: "",
+        isbn: isbn13,
+        author,
+        publisher,
+        description,
+      });
+
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
+  });
+
   test("Deve criar um novo livro e retornar suas informações", async () => {
     const response = await request(app)
       .post("/api/book")
