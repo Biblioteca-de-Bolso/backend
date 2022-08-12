@@ -257,4 +257,122 @@ module.exports = {
       });
     }
   },
+
+  async update(
+    userId,
+    bookId,
+    title,
+    author,
+    isbn,
+    publisher,
+    description,
+    thumbnail,
+    readStatus,
+    borrowStatus
+  ) {
+    const data = {
+      title,
+      author,
+      publisher,
+      description,
+      thumbnail,
+      readStatus,
+      borrowStatus,
+    };
+
+    const book = await prisma.book.findUnique({
+      where: {
+        id: bookId,
+      },
+    });
+
+    if (book) {
+      if (book.userId === userId) {
+        // Livro existe e usuário possui as permissões para edita-lo
+
+        // Criar ISBN 10 e 13 com base no ISBN informado
+        let isbn10 = "";
+        let isbn13 = "";
+
+        if (isbn) {
+          isbn.length === 10 ? (isbn10 = isbn) : (isbn13 = isbn);
+          isbn10 && !isbn13 ? (isbn13 = isbn10to13(isbn10)) : (isbn10 = isbn13to10(isbn13));
+        }
+
+        data.isbn10 = isbn10;
+        data.isbn13 = isbn13;
+
+        // Primeiro, verificar se o usuário está tentando inserir um novo ISBN que já existe
+        if (isbn10 !== book.isbn10 && isbn13 !== book.isbn13) {
+          const bookWithNewIsbn = await prisma.book.findFirst({
+            where: {
+              OR: [
+                {
+                  isbn10: isbn10,
+                },
+                {
+                  isbn13: isbn13,
+                },
+              ],
+              NOT: [
+                {
+                  isbn10: {
+                    equals: "",
+                  },
+                },
+                {
+                  isbn13: {
+                    equals: "",
+                  },
+                },
+              ],
+              userId,
+            },
+          });
+
+          if (bookWithNewIsbn) {
+            return conflict({
+              status: ErrorStatus,
+              code: DuplicatedISBN,
+              message: "Já existe um livro cadastrado com o ISBN informado.",
+            });
+          }
+        }
+
+        const updated = await prisma.book.update({
+          where: {
+            id: bookId,
+          },
+          data,
+        });
+
+        if (updated) {
+          return ok({
+            status: OkStatus,
+            response: {
+              book: updated,
+            },
+          });
+        } else {
+          return failure({
+            status: ErrorStatus,
+            code: DatabaseFailure,
+            message: "Não foi possível atualizar um ou mais dados do banco de dados.",
+          });
+        }
+      } else {
+        return forbidden({
+          status: ErrorStatus,
+          code: Forbidden,
+          message: "O usuário informado não possui o privilégio para executar essa ação.",
+        });
+      }
+    } else {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "O livro informado não foi encontrado.",
+      });
+    }
+  },
 };
