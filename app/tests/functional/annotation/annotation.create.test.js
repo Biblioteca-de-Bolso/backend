@@ -83,11 +83,43 @@ describe("Criação de Anotações", () => {
     assertCode(response, IncorrectParameter);
   });
 
+  test("Não deve criar uma anotação fornecendo um título vazio", async () => {
+    const response = await request(app)
+      .post("/api/annotation")
+      .set({ authorization: `Bearer ${accessToken}` })
+      .send({
+        title: "",
+        bookId,
+        text,
+        reference,
+      });
+
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
+  });
+
   test("Não deve criar uma anotação sem fornecer um conteúdo", async () => {
     const response = await request(app)
       .post("/api/annotation")
       .set({ authorization: `Bearer ${accessToken}` })
       .send({
+        bookId,
+        title,
+        reference,
+      });
+
+    assertStatusCode(response, 400);
+    assertStatus(response, "error");
+    assertCode(response, IncorrectParameter);
+  });
+
+  test("Não deve criar uma anotação fornecendo um conteúdo vazio", async () => {
+    const response = await request(app)
+      .post("/api/annotation")
+      .set({ authorization: `Bearer ${accessToken}` })
+      .send({
+        text: "",
         bookId,
         title,
         reference,

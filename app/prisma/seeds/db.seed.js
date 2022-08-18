@@ -45,8 +45,8 @@ module.exports = async () => {
       password: crypto.createHash("md5").update("adalovelace").digest("hex"),
       active: true,
       activationCode: "1234567812345678",
-      // O livro de ID 4 (segundo livro da Ada) é utilizado para o teste de exclusão
       // O livro de ID 3 (primeiro livro da Ada) é utilizado para o teste de criar anotação
+      // O livro de ID 4 (segundo livro da Ada) é utilizado para o teste de exclusão
       books: {
         createMany: {
           data: [
@@ -165,10 +165,43 @@ module.exports = async () => {
     },
   ];
 
+  const annotations = [
+    // Anotação de ID 1, do Charles Babbage no livro 9
+    {
+      userId: 5,
+      bookId: 9,
+      title: "Anotação sobre Matemática discreta",
+      text: "A matemática discreta é muito legal",
+      reference: "Cap 2, Pag 6",
+    },
+    // Anotação de ID 2, do Charles Babbage no livro 10
+    {
+      userId: 5,
+      bookId: 10,
+      title: "Anotação sobre Máquinas Digitais",
+      text: "Máquinas Digitais são melhores que analógicas?",
+      reference: "Cap VI",
+    },
+    // Anotação de ID 3, da Ada Lovelace no livro 3
+    {
+      userId: 2,
+      bookId: 3,
+      title: "Anotação sobre livro de programação",
+      text: "Programação é muito legal, pois eu que criei",
+      reference: "Página 287",
+    },
+  ];
+
   try {
     for (const user of users) {
       await prisma.user.create({
         data: user,
+      });
+    }
+
+    for (const annotation of annotations) {
+      await prisma.annotation.create({
+        data: annotation,
       });
     }
   } catch (error) {

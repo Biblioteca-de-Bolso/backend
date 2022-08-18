@@ -1,4 +1,12 @@
-const { ok, created, failure, notFound, forbidden, conflict } = require("../modules/http");
+const {
+  ok,
+  created,
+  failure,
+  notFound,
+  forbidden,
+  conflict,
+  badRequest,
+} = require("../modules/http");
 const { isbn10to13, isbn13to10 } = require("../modules/isbn");
 const { uploadPicture, extractPathFromURL, deletePicure } = require("../services/firebase");
 const {
@@ -8,6 +16,7 @@ const {
   NotFound,
   Forbidden,
   DuplicatedISBN,
+  IncorrectParameter,
 } = require("../modules/codes");
 const { PAGE_SIZE } = require("../modules/constants");
 
@@ -358,6 +367,99 @@ module.exports = {
             status: ErrorStatus,
             code: DatabaseFailure,
             message: "Não foi possível atualizar um ou mais dados do banco de dados.",
+          });
+        }
+      } else {
+        return forbidden({
+          status: ErrorStatus,
+          code: Forbidden,
+          message: "O usuário informado não possui o privilégio para executar essa ação.",
+        });
+      }
+    } else {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "O livro informado não foi encontrado.",
+      });
+    }
+  },
+
+  async updateThumbnail(userId, bookId, thumbnailFile) {
+    const book = await prisma.book.findUnique({
+      where: {
+        id: bookId,
+      },
+    });
+
+    if (book) {
+      if (book.userId === userId) {
+        if (thumbnailFile) {
+          let newThumbnail;
+          let oldThumbnail = book.thumbnail;
+
+          // Realizar o upload de nova imagem no Firebase
+          newThumbnail = await uploadPicture(thumbnailFile);
+
+          // Atualizar dados no banco de dados
+          const updated = await prisma.book.update({
+            where: {
+              id: bookId,
+            },
+            data: {
+              thumbnail: newThumbnail,
+            },
+          });
+
+          if (updated) {
+            // Atualização bem sucecida, prosseguir com remoção da imagem anterior
+            const firebasePath = extractPathFromURL(oldThumbnail);
+
+            if (firebasePath) {
+              try {
+                await deletePicure(firebasePath);
+              } catch (error) {
+                // A remoção da nova imagem falhou, no entanto, não vamos abortar o procedimento
+                // Uma imagem orfã permanecerá no Firebase, mas o livro foi atualizado corretamente
+                // Futuramente pode-ser estudado o impacto de uma função periódica de remoção de orfãos
+
+                // Caso não seja escolhido a solução de remoção, seria necessário voltar para a URL antiga
+                // Isso pode ser feito com uma transaction, mas novamente seria necessario remover a nova imagem
+                // De qualquer maneira geraria um código complexo em diversos níveis
+
+                // Por hora, apenas exibir o ocorrido em log, e retornar um resultado positivo para o cliente
+                console.log("Não foi possível remover a imagem anterior do Firebase.");
+              }
+            }
+
+            return ok({
+              status: OkStatus,
+              response: {
+                book: updated,
+              },
+            });
+          } else {
+            // Falha durante a atualização, necessário remover a nova imagem enviada
+            try {
+              await deletePicure(firebasePath);
+            } catch (error) {
+              // Verificar comentários no bloco anterior
+              // Nesse caso a operação de atualização falhou
+              // Novamente, apenas exibir o ocorrido em log e retornar com a resposta do cliente
+              console.log("Não foi possível remover a nova imagem do Firebase.");
+            }
+
+            return failure({
+              status: ErrorStatus,
+              code: DatabaseFailure,
+              message: "Não foi possível realizar a atualização da foto de capa do livro.",
+            });
+          }
+        } else if (thumbnailFile) {
+          return badRequest({
+            status: ErrorStatus,
+            code: IncorrectParameter,
+            message: "É necessário informar um arquivo válido de imagem.",
           });
         }
       } else {
