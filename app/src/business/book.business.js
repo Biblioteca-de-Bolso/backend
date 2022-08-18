@@ -426,7 +426,8 @@ module.exports = {
                 // Caso não seja escolhido a solução de remoção, seria necessário voltar para a URL antiga
                 // Isso pode ser feito com uma transaction, mas novamente seria necessario remover a nova imagem
                 // De qualquer maneira geraria um código complexo em diversos níveis
-                // Por hora, essa solução funciona ...
+
+                // Por hora, apenas exibir o ocorrido em log, e retornar um resultado positivo para o cliente
                 console.log("Não foi possível remover a imagem anterior do Firebase.");
               }
             }
@@ -443,6 +444,8 @@ module.exports = {
               await deletePicure(firebasePath);
             } catch (error) {
               // Verificar comentários no bloco anterior
+              // Nesse caso a operação de atualização falhou
+              // Novamente, apenas exibir o ocorrido em log e retornar com a resposta do cliente
               console.log("Não foi possível remover a nova imagem do Firebase.");
             }
 
