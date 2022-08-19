@@ -440,6 +440,8 @@ module.exports = {
             });
           } else {
             // Falha durante a atualização, necessário remover a nova imagem enviada
+            const firebasePath = extractPathFromURL(newThumbnail);
+
             try {
               await deletePicure(firebasePath);
             } catch (error) {
@@ -460,6 +462,65 @@ module.exports = {
             status: ErrorStatus,
             code: IncorrectParameter,
             message: "É necessário informar um arquivo válido de imagem.",
+          });
+        }
+      } else {
+        return forbidden({
+          status: ErrorStatus,
+          code: Forbidden,
+          message: "O usuário informado não possui o privilégio para executar essa ação.",
+        });
+      }
+    } else {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "O livro informado não foi encontrado.",
+      });
+    }
+  },
+
+  async removeThumbnail(userId, bookId) {
+    const book = await prisma.book.findUnique({
+      where: {
+        id: bookId,
+      },
+    });
+
+    if (book) {
+      if (book.userId === userId) {
+        const firebasePath = extractPathFromURL(book.thumbnail);
+
+        if (firebasePath) {
+          try {
+            await deletePicure(firebasePath);
+          } catch (error) {
+            // Seguindo política de imagens orfãs, verificar comentários anteriores
+            console.log("Não foi possível remover a imagem do Firebase.");
+          }
+        }
+
+        const updated = await prisma.book.update({
+          where: {
+            id: bookId,
+          },
+          data: {
+            thumbnail: "",
+          },
+        });
+
+        if (updated) {
+          return ok({
+            status: OkStatus,
+            response: {
+              book: updated,
+            },
+          });
+        } else {
+          return failure({
+            status: ErrorStatus,
+            code: DatabaseFailure,
+            message: "Não foi possível alterar os dados do livro no banco de dados.",
           });
         }
       } else {
