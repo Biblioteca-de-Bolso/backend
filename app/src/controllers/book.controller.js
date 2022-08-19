@@ -214,4 +214,28 @@ module.exports = {
       next(error);
     }
   },
+
+  async removeThumbnail(req, res, next) {
+    try {
+      const { token } = req;
+
+      const userId = parseInt(token["id"], 10);
+
+      const bookId = parseInt(req.body.bookId, 10);
+
+      const rules = [[bookId, BookIdValidator, { required: true }]];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult.status === "error") {
+        return res.status(400).json(validationResult);
+      }
+
+      const response = await BookBusiness.removeThumbnail(userId, bookId);
+
+      return res.status(response.statusCode).json(response.body);
+    } catch (error) {
+      next(error);
+    }
+  },
 };

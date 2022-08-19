@@ -11,6 +11,7 @@ function load(routes) {
   routes.post("/book", protectedRoute, thumbnails.single("thumbnailFile"), controller.create);
   routes.put("/book", protectedRoute, controller.update);
   routes.put("/book/thumbnail", protectedRoute, thumbnails.single("thumbnailFile"), controller.updateThumbnail);
+  routes.delete("/book/thumbnail", protectedRoute, controller.removeThumbnail);
 }
 
 module.exports = load;
