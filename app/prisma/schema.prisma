@@ -21,6 +21,7 @@ model User {
   refreshTokens RefreshToken[]
   books         Book[]
   annotations   Annotation[]
+  Borrow        Borrow[]
 
   @@map("user")
 }
@@ -56,28 +57,9 @@ model Book {
   user User @relation(fields: [userId], references: [id])
 
   annotations Annotation[]
+  Borrow      Borrow[]
 
   @@map("book")
-}
-
-// model Borrow {
-//   id           Int           @id @unique @default(autoincrement())
-//   borrowStatus BorrowStatus? @default(RETURNED)
-
-//   @@map("borrow")
-// }
-
-enum BorrowStatus {
-  PENDING
-  RETURNED
-}
-
-enum ReadStatus {
-  PLANNING
-  READING
-  CONCLUDED
-  DROPPED
-  NO_STATUS
 }
 
 model Annotation {
@@ -94,4 +76,32 @@ model Annotation {
   book Book @relation(fields: [bookId], references: [id])
 
   @@map("annotation")
+}
+
+model Borrow {
+  id             Int          @id @unique @default(autoincrement())
+  userId         Int
+  bookId         Int
+  contactName    String       @db.VarChar(64)
+  borrowStatus   BorrowStatus @default(RETURNED)
+  borrowDate     DateTime?
+  devolutionDate DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+  book Book @relation(fields: [bookId], references: [id])
+
+  @@map("borrow")
+}
+
+enum BorrowStatus {
+  PENDING
+  RETURNED
+}
+
+enum ReadStatus {
+  PLANNING
+  READING
+  CONCLUDED
+  DROPPED
+  NO_STATUS
 }
