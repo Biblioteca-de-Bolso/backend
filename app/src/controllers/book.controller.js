@@ -8,7 +8,6 @@ const DescriptionValidator = require("../validators/book/description.rules");
 const ThumbnailValidator = require("../validators/book/thumbnail.rules");
 const BookIdValidator = require("../validators/book/id.rules");
 const PageValidator = require("../validators/shared/page.rules");
-const BorrowStatusValidator = require("../validators/book/borrowStatus.rules");
 const ReadStatusValidator = require("../validators/book/readStatus.rules");
 
 const validation = require("../modules/validation");
@@ -140,17 +139,8 @@ module.exports = {
       const userId = parseInt(token["id"], 10);
 
       // Validação dos parâmetros
-      const {
-        bookId,
-        title,
-        author,
-        isbn,
-        publisher,
-        description,
-        thumbnail,
-        readStatus,
-        borrowStatus,
-      } = req.body;
+      const { bookId, title, author, isbn, publisher, description, thumbnail, readStatus } =
+        req.body;
 
       const rules = [
         [bookId, BookIdValidator, { required: true }],
@@ -161,7 +151,6 @@ module.exports = {
         [description, DescriptionValidator, { required: false }],
         [thumbnail, ThumbnailValidator, { required: false }],
         [readStatus, ReadStatusValidator, { required: true }],
-        [borrowStatus, BorrowStatusValidator, { required: true }],
       ];
 
       const validationResult = validation.run(rules);
@@ -179,8 +168,7 @@ module.exports = {
         publisher,
         description,
         thumbnail,
-        readStatus,
-        borrowStatus
+        readStatus
       );
 
       return res.status(response.statusCode).json(response.body);
