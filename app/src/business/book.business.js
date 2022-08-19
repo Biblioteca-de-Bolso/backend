@@ -267,18 +267,7 @@ module.exports = {
     }
   },
 
-  async update(
-    userId,
-    bookId,
-    title,
-    author,
-    isbn,
-    publisher,
-    description,
-    thumbnail,
-    readStatus,
-    borrowStatus
-  ) {
+  async update(userId, bookId, title, author, isbn, publisher, description, thumbnail, readStatus) {
     const data = {
       title,
       author,
@@ -286,7 +275,6 @@ module.exports = {
       description,
       thumbnail,
       readStatus,
-      borrowStatus,
     };
 
     const book = await prisma.book.findUnique({
