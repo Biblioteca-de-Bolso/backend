@@ -18,6 +18,8 @@ module.exports = {
       // Aquisição do token
       const { token } = req;
 
+      const userId = parseInt(token.id, 10);
+
       // Validação dos parâmetros
       const { title, author, isbn, publisher, description, thumbnail } = req.body;
 
@@ -40,7 +42,7 @@ module.exports = {
       }
 
       const response = await BookBusiness.create(
-        token,
+        userId,
         title,
         author,
         isbn,

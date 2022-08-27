@@ -18,36 +18,36 @@ module.exports = {
       },
     });
 
-    if (book) {
-      const annotation = await prisma.annotation.create({
-        data: {
-          userId,
-          bookId,
-          title,
-          text,
-          reference: reference || "",
-        },
-      });
-
-      if (annotation) {
-        return created({
-          status: OkStatus,
-          response: {
-            annotation: annotation,
-          },
-        });
-      } else {
-        return failure({
-          status: ErrorStatus,
-          code: DatabaseFailure,
-          message: "Não foi possível realizar a criação da anotação.",
-        });
-      }
-    } else {
+    if (!book) {
       return ok({
         status: ErrorStatus,
         code: NotFound,
         message: "Nenhum livro encontrado com o ID informado para este usuário.",
+      });
+    }
+
+    const annotation = await prisma.annotation.create({
+      data: {
+        userId,
+        bookId,
+        title,
+        text,
+        reference: reference || "",
+      },
+    });
+
+    if (annotation) {
+      return created({
+        status: OkStatus,
+        response: {
+          annotation: annotation,
+        },
+      });
+    } else {
+      return failure({
+        status: ErrorStatus,
+        code: DatabaseFailure,
+        message: "Não foi possível realizar a criação da anotação.",
       });
     }
   },
@@ -94,30 +94,28 @@ module.exports = {
       },
     });
 
-    if (annotation) {
-      const annotationOwner = annotation["userId"];
-
-      if (annotationOwner === userId) {
-        return ok({
-          status: OkStatus,
-          response: {
-            annotation: annotation,
-          },
-        });
-      } else {
-        return forbidden({
-          status: ErrorStatus,
-          code: Forbidden,
-          message: "Este usuário não tem permissão para acessar o conteúdo solicitado.",
-        });
-      }
-    } else {
+    if (!annotation) {
       return notFound({
         status: ErrorStatus,
         code: NotFound,
         message: "A anotação informada não foi encontrada.",
       });
     }
+
+    if (annotation.userId !== userId) {
+      return forbidden({
+        status: ErrorStatus,
+        code: Forbidden,
+        message: "Este usuário não tem permissão para acessar o conteúdo solicitado.",
+      });
+    }
+
+    return ok({
+      status: OkStatus,
+      response: {
+        annotation: annotation,
+      },
+    });
   },
 
   async delete(userId, annotationId) {
@@ -127,42 +125,42 @@ module.exports = {
       },
     });
 
-    if (annotation) {
-      if (annotation.userId === userId) {
-        const deleted = await prisma.$transaction([
-          prisma.annotation.delete({
-            where: {
-              id: annotationId,
-            },
-          }),
-        ]);
-
-        if (deleted) {
-          return ok({
-            status: OkStatus,
-            response: {
-              message: "A anotação foi removida com sucesso.",
-            },
-          });
-        } else {
-          return failure({
-            status: ErrorStatus,
-            code: DatabaseFailure,
-            message: "Não foi possível realizar a exclusão de um ou mais dados do banco de dados.",
-          });
-        }
-      } else {
-        return forbidden({
-          status: ErrorStatus,
-          code: Forbidden,
-          message: "O usuário informado não possui o privilégio para executar essa ação.",
-        });
-      }
-    } else {
+    if (!annotation) {
       return notFound({
         status: ErrorStatus,
         code: NotFound,
         message: "A anotação informada não foi encontrada.",
+      });
+    }
+
+    if (annotation.userId !== userId) {
+      return forbidden({
+        status: ErrorStatus,
+        code: Forbidden,
+        message: "O usuário informado não possui o privilégio para executar essa ação.",
+      });
+    }
+
+    const deleted = await prisma.$transaction([
+      prisma.annotation.delete({
+        where: {
+          id: annotationId,
+        },
+      }),
+    ]);
+
+    if (deleted) {
+      return ok({
+        status: OkStatus,
+        response: {
+          message: "A anotação foi removida com sucesso.",
+        },
+      });
+    } else {
+      return failure({
+        status: ErrorStatus,
+        code: DatabaseFailure,
+        message: "Não foi possível realizar a exclusão de um ou mais dados do banco de dados.",
       });
     }
   },
@@ -170,12 +168,9 @@ module.exports = {
   async update(userId, annotationId, title, text, reference) {
     const data = {};
 
-    // Se os parâmetros existem nessa etapa, então eles já foram validados
-    // Por exemplo, temos certeza que o "title" e "text" não estão vazios
-    // Outros campos, como "reference", podem ser vazios
-    if (title !== undefined) data.title = title;
-    if (text !== undefined) data.text = text;
-    if (reference !== undefined) data.reference = reference;
+    if (title !== undefined && title !== null) data.title = title;
+    if (text !== undefined && title !== null) data.text = text;
+    if (reference !== undefined && title !== null) data.reference = reference;
 
     const annotation = await prisma.annotation.findUnique({
       where: {
@@ -183,41 +178,41 @@ module.exports = {
       },
     });
 
-    if (annotation) {
-      if (annotation.userId === userId) {
-        const updated = await prisma.annotation.update({
-          where: {
-            id: annotationId,
-          },
-          data,
-        });
-
-        if (updated) {
-          return ok({
-            status: OkStatus,
-            response: {
-              annotation: updated,
-            },
-          });
-        } else {
-          return failure({
-            status: ErrorStatus,
-            code: DatabaseFailure,
-            message: "Não foi possível atualizar um ou mais dados do banco de dados.",
-          });
-        }
-      } else {
-        return forbidden({
-          status: ErrorStatus,
-          code: Forbidden,
-          message: "O usuário informado não possui o privilégio para executar essa ação.",
-        });
-      }
-    } else {
+    if (!annotation) {
       return notFound({
         status: ErrorStatus,
         code: NotFound,
         message: "A anotação informada não foi encontrada.",
+      });
+    }
+
+    if (annotation.userId !== userId) {
+      return forbidden({
+        status: ErrorStatus,
+        code: Forbidden,
+        message: "O usuário informado não possui o privilégio para executar essa ação.",
+      });
+    }
+
+    const updated = await prisma.annotation.update({
+      where: {
+        id: annotationId,
+      },
+      data,
+    });
+
+    if (updated) {
+      return ok({
+        status: OkStatus,
+        response: {
+          annotation: updated,
+        },
+      });
+    } else {
+      return failure({
+        status: ErrorStatus,
+        code: DatabaseFailure,
+        message: "Não foi possível atualizar um ou mais dados do banco de dados.",
       });
     }
   },
