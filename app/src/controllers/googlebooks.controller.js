@@ -12,8 +12,8 @@ module.exports = {
       const { qstring, lang, maturity, printType, orderBy, isbnOnly } = req.query;
 
       const rules = [
-        [qstring, QstringValidator],
-        [lang, LangValidator, { required: false }],
+        [qstring, QstringValidator, { required: true, allowEmpty: false }],
+        [lang, LangValidator, { required: false, allowEmpty: false }],
       ];
 
       const validationResult = validation.run(rules);

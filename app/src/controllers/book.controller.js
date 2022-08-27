@@ -18,6 +18,8 @@ module.exports = {
       // Aquisição do token
       const { token } = req;
 
+      const userId = parseInt(token.id, 10);
+
       // Validação dos parâmetros
       const { title, author, isbn, publisher, description, thumbnail } = req.body;
 
@@ -25,12 +27,12 @@ module.exports = {
       const thumbnailFile = req.file;
 
       const rules = [
-        [title, TitleValidator, { required: true }],
-        [author, AuthorValidator, { required: false }],
-        [isbn, ISBNValidator, { required: false }],
-        [publisher, PublisherValidator, { required: false }],
-        [description, DescriptionValidator, { required: false }],
-        [thumbnail, ThumbnailValidator, { required: false }],
+        [title, TitleValidator, { required: true, allowEmpty: false }],
+        [author, AuthorValidator, { required: false, allowEmpty: true }],
+        [isbn, ISBNValidator, { required: false, allowEmpty: true }],
+        [publisher, PublisherValidator, { required: false, allowEmpty: true }],
+        [description, DescriptionValidator, { required: false, allowEmpty: true }],
+        [thumbnail, ThumbnailValidator, { required: false, allowEmpty: true }],
       ];
 
       const validationResult = validation.run(rules);
@@ -40,7 +42,7 @@ module.exports = {
       }
 
       const response = await BookBusiness.create(
-        token,
+        userId,
         title,
         author,
         isbn,
@@ -63,7 +65,7 @@ module.exports = {
     // Aquisição e validação dos parâmetros
     const id = parseInt(req.params["id"], 10);
 
-    const rules = [[id, BookIdValidator]];
+    const rules = [[id, BookIdValidator, { required: true, allowEmpty: false }]];
 
     const validationResult = validation.run(rules);
 
@@ -86,7 +88,7 @@ module.exports = {
       // Aquisição e validação dos parâmetros
       const page = req.query["page"];
 
-      const rules = [[page, PageValidator, { required: false }]];
+      const rules = [[page, PageValidator, { required: false, allowEmpty: false }]];
 
       const validationResult = validation.run(rules);
 
@@ -112,7 +114,7 @@ module.exports = {
       // Aquisição e validação dos parâmetros
       const bookId = parseInt(req.body["bookId"], 10);
 
-      const rules = [[bookId, BookIdValidator]];
+      const rules = [[bookId, BookIdValidator, { required: true, allowEmpty: false }]];
 
       const validationResult = validation.run(rules);
 
@@ -130,7 +132,7 @@ module.exports = {
     }
   },
 
-  async update(req, res, next) {
+  async putUpdate(req, res, next) {
     try {
       // Aquisição do token
       const { token } = req;
@@ -143,14 +145,14 @@ module.exports = {
         req.body;
 
       const rules = [
-        [bookId, BookIdValidator, { required: true }],
-        [title, TitleValidator, { required: false }],
-        [author, AuthorValidator, { required: false }],
-        [isbn, ISBNValidator, { required: false }],
-        [publisher, PublisherValidator, { required: false }],
-        [description, DescriptionValidator, { required: false }],
-        [thumbnail, ThumbnailValidator, { required: false }],
-        [readStatus, ReadStatusValidator, { required: true }],
+        [bookId, BookIdValidator, { required: true, allowEmpty: false }],
+        [title, TitleValidator, { required: true, allowEmpty: false }],
+        [author, AuthorValidator, { required: true, allowEmpty: true }],
+        [isbn, ISBNValidator, { required: true, allowEmpty: true }],
+        [publisher, PublisherValidator, { required: true, allowEmpty: true }],
+        [description, DescriptionValidator, { required: true, allowEmpty: true }],
+        [thumbnail, ThumbnailValidator, { required: true, allowEmpty: true }],
+        [readStatus, ReadStatusValidator, { required: true, allowEmpty: false }],
       ];
 
       const validationResult = validation.run(rules);
@@ -161,7 +163,51 @@ module.exports = {
 
       const response = await BookBusiness.update(
         userId,
-        bookId,
+        parseInt(bookId),
+        title,
+        author,
+        isbn,
+        publisher,
+        description,
+        thumbnail,
+        readStatus
+      );
+
+      return res.status(response.statusCode).json(response.body);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async patchUpdate(req, res, next) {
+    try {
+      const { token } = req;
+
+      const userId = parseInt(token["id"], 10);
+
+      const { bookId, title, author, isbn, publisher, description, thumbnail, readStatus } =
+        req.body;
+
+      const rules = [
+        [bookId, BookIdValidator, { required: false, allowEmpty: false }],
+        [title, TitleValidator, { required: false, allowEmpty: false }],
+        [author, AuthorValidator, { required: false, allowEmpty: true }],
+        [isbn, ISBNValidator, { required: false, allowEmpty: true }],
+        [publisher, PublisherValidator, { required: false, allowEmpty: true }],
+        [description, DescriptionValidator, { required: false, allowEmpty: true }],
+        [thumbnail, ThumbnailValidator, { required: false, allowEmpty: true }],
+        [readStatus, ReadStatusValidator, { required: false, allowEmpty: false }],
+      ];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult.status === "error") {
+        return res.status(400).json(validationResult);
+      }
+
+      const response = await BookBusiness.update(
+        userId,
+        parseInt(bookId),
         title,
         author,
         isbn,
@@ -187,7 +233,7 @@ module.exports = {
 
       const thumbnailFile = req.file;
 
-      const rules = [[bookId, BookIdValidator, { required: true }]];
+      const rules = [[bookId, BookIdValidator, { required: true, allowEmpty: false }]];
 
       const validationResult = validation.run(rules);
 
@@ -211,7 +257,7 @@ module.exports = {
 
       const bookId = parseInt(req.body.bookId, 10);
 
-      const rules = [[bookId, BookIdValidator, { required: true }]];
+      const rules = [[bookId, BookIdValidator, { required: true, allowEmpty: false }]];
 
       const validationResult = validation.run(rules);
 

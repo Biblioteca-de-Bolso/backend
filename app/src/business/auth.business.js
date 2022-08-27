@@ -37,38 +37,38 @@ module.exports = {
       },
     });
 
-    if (user) {
-      // Dados de usuário encontrados, conferir por status da conta
-      if (user["active"]) {
-        // Construir o payload do token com os dados necessários
-        const payload = {
-          id: parseInt(user["id"], 10),
-          email: user["email"],
-          name: user["name"],
-        };
-
-        // Criar o token relacionado a esta operação de login
-        const token = await this.createToken(payload);
-
-        if (token.status === "error") {
-          return failure(token);
-        } else {
-          return ok(token);
-        }
-      } else {
-        return ok({
-          status: ErrorStatus,
-          code: AccountNotVerified,
-          message:
-            "Para realizar o login, é necessário realizar a confirmação de cadastro via email.",
-        });
-      }
-    } else {
+    if (!user) {
       return unauthorized({
         status: ErrorStatus,
         code: Unauthorized,
         message: "Usuário ou senha incorretos.",
       });
+    }
+
+    // Dados de usuário encontrados, conferir o status da conta
+    if (!user.active) {
+      return ok({
+        status: ErrorStatus,
+        code: AccountNotVerified,
+        message:
+          "Para realizar o login, é necessário realizar a confirmação de cadastro via email.",
+      });
+    }
+
+    // Construir o payload do token com os dados necessários
+    const payload = {
+      id: parseInt(user["id"], 10),
+      email: user["email"],
+      name: user["name"],
+    };
+
+    // Criar o token relacionado a esta operação de login
+    const token = await this.createToken(payload);
+
+    if (token.status === "error") {
+      return failure(token);
+    } else {
+      return ok(token);
     }
   },
 
@@ -83,36 +83,36 @@ module.exports = {
       },
     });
 
-    if (user) {
-      // Usuario encontrado, realizar modificação de ativação
-      const activeUser = await prisma.user.updateMany({
-        where: {
-          id: userId,
-          activationCode: activationCode,
-        },
-        data: { active: true },
-      });
-
-      // Os objetos a seguir são objetos simples, e não objetos http
-      if (activeUser) {
-        return {
-          status: OkStatus,
-          response: {
-            message: "Conta de usuário confirmada com sucesso.",
-          },
-        };
-      } else {
-        return {
-          status: ErrorStatus,
-          error: DatabaseFailure,
-          message: "Erro durante a confirmação de conta de usário.",
-        };
-      }
-    } else {
+    if (!user) {
       return {
         status: ErrorStatus,
         code: IncorrectParameter,
         message: "Os dados de usuários ou de confirmação não são válidos.",
+      };
+    }
+
+    // Usuario encontrado, realizar modificação de ativação
+    const activeUser = await prisma.user.updateMany({
+      where: {
+        id: userId,
+        activationCode: activationCode,
+      },
+      data: { active: true },
+    });
+
+    // Os objetos a seguir são objetos simples, e não objetos http
+    if (activeUser) {
+      return {
+        status: OkStatus,
+        response: {
+          message: "Conta de usuário confirmada com sucesso.",
+        },
+      };
+    } else {
+      return {
+        status: ErrorStatus,
+        error: DatabaseFailure,
+        message: "Erro durante a confirmação de conta de usário.",
       };
     }
   },
@@ -173,128 +173,128 @@ module.exports = {
       },
     });
 
-    if (refresh) {
-      // Verificação de autenticidade do refresh token informado
-      if (userId !== parseInt(refresh["userId"], 10) || userEmail !== refresh["email"]) {
-        return forbidden({
-          status: ErrorStatus,
-          code: Forbidden,
-          message:
-            "Os dados presentes no token não são válidos com os dados presentes no refresh token.",
-        });
-      }
-
-      // Verificações de validade do refresh token informado
-      const currentTime = dayjs().valueOf().toString().slice(0, 10);
-
-      if (currentTime < parseInt(refresh["iat"], 10)) {
-        return ok({
-          status: ErrorStatus,
-          code: RefreshTokenNotBefore,
-          message:
-            "O horário de criação do refresh token informado é anterior ao horário atual, ajuste o horário do seu dispositivo.",
-        });
-      }
-
-      if (currentTime > parseInt(refresh["exp"], 10)) {
-        return ok({
-          status: ErrorStatus,
-          code: RefreshTokenExpired,
-          message: "O refresh token informado expirou, realize o login novamente.",
-        });
-      }
-
-      // Todas as validações foram executadas, criar novo token de acesso
-      const newToken = await this.createToken({
-        id: userId,
-        email: userEmail,
-        name: userName,
-      });
-
-      if (newToken["status"] === "ok") {
-        // Token criado com sucesso, aplicar Refresh Token Rotation
-        await prisma.refreshToken.delete({
-          where: {
-            id: refreshToken,
-          },
-        });
-
-        // Retornar novos tokens de acesso que foram criados
-        return ok(newToken);
-      } else {
-        return ok({
-          status: OkStatus,
-          code: JWTFailure,
-          message: "Erro durante a criação de novo token de acesso através do refresh token.",
-        });
-      }
-    } else {
+    if (!refresh) {
       return ok({
         status: ErrorStatus,
         code: InvalidRefreshToken,
         message: "O refresh token informado não foi encontrado na base de dados de autenticação.",
       });
     }
+
+    // Verificação de autenticidade do refresh token informado
+    if (userId !== parseInt(refresh.userId, 10) || userEmail !== refresh.email) {
+      return forbidden({
+        status: ErrorStatus,
+        code: Forbidden,
+        message:
+          "Os dados presentes no token não são válidos com os dados presentes no refresh token.",
+      });
+    }
+
+    // Verificações de validade do refresh token informado
+    const currentTime = dayjs().valueOf().toString().slice(0, 10);
+
+    if (currentTime < parseInt(refresh["iat"], 10)) {
+      return ok({
+        status: ErrorStatus,
+        code: RefreshTokenNotBefore,
+        message:
+          "O horário de criação do refresh token informado é anterior ao horário atual, ajuste o horário do seu dispositivo.",
+      });
+    }
+
+    if (currentTime > parseInt(refresh["exp"], 10)) {
+      return ok({
+        status: ErrorStatus,
+        code: RefreshTokenExpired,
+        message: "O refresh token informado expirou, realize o login novamente.",
+      });
+    }
+
+    // Todas as validações foram executadas, criar novo token de acesso
+    const newToken = await this.createToken({
+      id: userId,
+      email: userEmail,
+      name: userName,
+    });
+
+    if (newToken["status"] === "ok") {
+      // Token criado com sucesso, aplicar Refresh Token Rotation
+      await prisma.refreshToken.delete({
+        where: {
+          id: refreshToken,
+        },
+      });
+
+      // Retornar novos tokens de acesso que foram criados
+      return ok(newToken);
+    } else {
+      return ok({
+        status: OkStatus,
+        code: JWTFailure,
+        message: "Erro durante a criação de novo token de acesso através do refresh token.",
+      });
+    }
   },
 
   async verifyToken(token, ignoreExpiration = false) {
-    if (token) {
-      try {
-        // Tenta realizar validação do token informado
-        const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET, { ignoreExpiration });
-
-        // Token validado com sucesso, extrair dados de usuário
-        const user = await prisma.user.findFirst({
-          where: {
-            id: parseInt(decoded["id"], 10),
-            email: decoded["email"],
-          },
-        });
-
-        if (user) {
-          return decoded;
-        } else {
-          return {
-            status: ErrorStatus,
-            code: JWTFailure,
-            message: "Dados de usuário presente no token não são válidos.",
-          };
-        }
-      } catch (error) {
-        // Erros: https://github.com/auth0/node-jsonwebtoken
-        switch (error.name) {
-          case "TokenExpiredError":
-            return {
-              status: ErrorStatus,
-              code: JWTExpired,
-              message: `Erro ao validar token JWT: ${error.message}`,
-            };
-          case "JsonWebTokenError":
-            return {
-              status: ErrorStatus,
-              code: JWTFailure,
-              message: `Erro ao validar token JWT: ${error.message}`,
-            };
-          case "NotBeforeError":
-            return {
-              status: ErrorStatus,
-              code: JWTNotBefore,
-              message: `Erro ao validar token JWT: ${error.message}`,
-            };
-          default:
-            return {
-              status: ErrorStatus,
-              code: JWTFailure,
-              message: `Erro ao validar token JWT: ${error.message}`,
-            };
-        }
-      }
-    } else {
+    if (!token) {
       return {
         status: ErrorStatus,
         code: IncorrectParameter,
         message: "Nenhum token de autenticação informado.",
       };
+    }
+
+    try {
+      // Tenta realizar validação do token informado
+      const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET, { ignoreExpiration });
+
+      // Token validado com sucesso, extrair dados de usuário
+      const user = await prisma.user.findFirst({
+        where: {
+          id: parseInt(decoded["id"], 10),
+          email: decoded["email"],
+        },
+      });
+
+      if (user) {
+        return decoded;
+      } else {
+        return {
+          status: ErrorStatus,
+          code: JWTFailure,
+          message: "Dados de usuário presente no token não são válidos.",
+        };
+      }
+    } catch (error) {
+      // Erros: https://github.com/auth0/node-jsonwebtoken
+      switch (error.name) {
+        case "TokenExpiredError":
+          return {
+            status: ErrorStatus,
+            code: JWTExpired,
+            message: `Erro ao validar token JWT: ${error.message}`,
+          };
+        case "JsonWebTokenError":
+          return {
+            status: ErrorStatus,
+            code: JWTFailure,
+            message: `Erro ao validar token JWT: ${error.message}`,
+          };
+        case "NotBeforeError":
+          return {
+            status: ErrorStatus,
+            code: JWTNotBefore,
+            message: `Erro ao validar token JWT: ${error.message}`,
+          };
+        default:
+          return {
+            status: ErrorStatus,
+            code: JWTFailure,
+            message: `Erro ao validar token JWT: ${error.message}`,
+          };
+      }
     }
   },
 };
