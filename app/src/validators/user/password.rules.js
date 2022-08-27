@@ -2,8 +2,12 @@ const validator = require("validator");
 const { validationError } = require("../../modules/validation");
 
 module.exports = {
-  validate(input, required) {
-    if (!input && required) {
+  validate(input, required, allowEmpty) {
+    if ((input === undefined || input === null) && required) {
+      return validationError("É necessário inserir uma senha válida.");
+    }
+
+    if (input === "" && !allowEmpty) {
       return validationError("É necessário inserir uma senha válida.");
     }
 

@@ -26,11 +26,11 @@ module.exports = {
 
       const rules = [
         [title, TitleValidator, { required: true, allowEmpty: false }],
-        [author, AuthorValidator, { required: false }],
-        [isbn, ISBNValidator, { required: false }],
-        [publisher, PublisherValidator, { required: false }],
-        [description, DescriptionValidator, { required: false }],
-        [thumbnail, ThumbnailValidator, { required: false }],
+        [author, AuthorValidator, { required: false, allowEmpty: true }],
+        [isbn, ISBNValidator, { required: false, allowEmpty: true }],
+        [publisher, PublisherValidator, { required: false, allowEmpty: true }],
+        [description, DescriptionValidator, { required: false, allowEmpty: true }],
+        [thumbnail, ThumbnailValidator, { required: false, allowEmpty: true }],
       ];
 
       const validationResult = validation.run(rules);
@@ -63,7 +63,7 @@ module.exports = {
     // Aquisição e validação dos parâmetros
     const id = parseInt(req.params["id"], 10);
 
-    const rules = [[id, BookIdValidator]];
+    const rules = [[id, BookIdValidator, { required: true, allowEmpty: false }]];
 
     const validationResult = validation.run(rules);
 
@@ -86,7 +86,7 @@ module.exports = {
       // Aquisição e validação dos parâmetros
       const page = req.query["page"];
 
-      const rules = [[page, PageValidator, { required: false }]];
+      const rules = [[page, PageValidator, { required: false, allowEmpty: false }]];
 
       const validationResult = validation.run(rules);
 
@@ -112,7 +112,7 @@ module.exports = {
       // Aquisição e validação dos parâmetros
       const bookId = parseInt(req.body["bookId"], 10);
 
-      const rules = [[bookId, BookIdValidator]];
+      const rules = [[bookId, BookIdValidator, { required: true, allowEmpty: false }]];
 
       const validationResult = validation.run(rules);
 
@@ -194,7 +194,7 @@ module.exports = {
 
       const thumbnailFile = req.file;
 
-      const rules = [[bookId, BookIdValidator, { required: true }]];
+      const rules = [[bookId, BookIdValidator, { required: true, allowEmpty: false }]];
 
       const validationResult = validation.run(rules);
 
@@ -218,7 +218,7 @@ module.exports = {
 
       const bookId = parseInt(req.body.bookId, 10);
 
-      const rules = [[bookId, BookIdValidator, { required: true }]];
+      const rules = [[bookId, BookIdValidator, { required: true, allowEmpty: false }]];
 
       const validationResult = validation.run(rules);
 

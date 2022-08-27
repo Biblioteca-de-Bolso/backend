@@ -17,8 +17,8 @@ module.exports = {
       const { email, password } = req.body;
 
       const rules = [
-        [email, EmailValidator],
-        [password, PasswordValidator],
+        [email, EmailValidator, { required: true, allowEmpty: false }],
+        [password, PasswordValidator, { required: true, allowEmpty: false }],
       ];
 
       const validationResult = validation.run(rules);
@@ -45,9 +45,9 @@ module.exports = {
       const activationCode = req.query["code"];
 
       const rules = [
-        [userId, UserIdValidator],
-        [email, EmailValidator],
-        [activationCode, ActivationValidator],
+        [userId, UserIdValidator, { required: true, allowEmpty: false }],
+        [email, EmailValidator, { required: true, allowEmpty: false }],
+        [activationCode, ActivationValidator, { required: true, allowEmpty: false }],
       ];
 
       const validationResult = validation.run(rules);
@@ -80,7 +80,7 @@ module.exports = {
       // Aquisição e validação dos parâmetros
       const { refreshToken } = req.body;
 
-      const rules = [[refreshToken, RefreshTokenValidator]];
+      const rules = [[refreshToken, RefreshTokenValidator, { required: true, allowEmpty: false }]];
 
       const validationResult = validation.run(rules);
 

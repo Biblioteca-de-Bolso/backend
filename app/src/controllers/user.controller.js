@@ -15,9 +15,9 @@ module.exports = {
 
       // Construir regras de validação
       const rules = [
-        [name, NameValidator],
-        [email, EmailValidator],
-        [password, PasswordValidator],
+        [name, NameValidator, { required: true, allowEmpty: false }],
+        [email, EmailValidator, { required: true, allowEmpty: false }],
+        [password, PasswordValidator, { required: true, allowEmpty: false }],
       ];
 
       // Validação dos parâmetros
@@ -46,9 +46,9 @@ module.exports = {
       const { email, password } = req.body;
 
       const rules = [
-        [userId, UserIdValidator],
-        [email, EmailValidator],
-        [password, PasswordValidator],
+        [userId, UserIdValidator, { required: true, allowEmpty: false }],
+        [email, EmailValidator, { required: true, allowEmpty: false }],
+        [password, PasswordValidator, { required: true, allowEmpty: false }],
       ];
 
       const validationResult = validation.run(rules);
@@ -74,7 +74,7 @@ module.exports = {
       // Aquisição e validação de parâmetros
       const userId = parseInt(req.params["id"], 10);
 
-      const rules = [[userId, UserIdValidator]];
+      const rules = [[userId, UserIdValidator, { required: true, allowEmpty: false }]];
 
       const validationResult = validation.run(rules);
 

@@ -20,10 +20,10 @@ module.exports = {
       const { title, text, reference } = req.body;
 
       const rules = [
-        [bookId, BookIdValidator, { required: true }],
-        [title, TitleValidator, { required: true }],
-        [text, TextValidator, { required: true }],
-        [reference, ReferenceValidator, { required: false }],
+        [bookId, BookIdValidator, { required: true, allowEmpty: false }],
+        [title, TitleValidator, { required: true, allowEmpty: false }],
+        [text, TextValidator, { required: true, allowEmpty: false }],
+        [reference, ReferenceValidator, { required: false, allowEmpty: true }],
       ];
 
       const validationResult = validation.run(rules);
@@ -49,8 +49,8 @@ module.exports = {
       const { page, bookId } = req.query;
 
       const rules = [
-        [page, PageValidator, { required: false }],
-        [bookId, BookIdValidator, { required: false }],
+        [page, PageValidator, { required: false, allowEmpty: false }],
+        [bookId, BookIdValidator, { required: false, allowEmpty: false }],
       ];
 
       const validationResult = validation.run(rules);
@@ -75,7 +75,7 @@ module.exports = {
 
       const id = parseInt(req.params["id"], 10);
 
-      const rules = [[id, AnnotationIdValidator]];
+      const rules = [[id, AnnotationIdValidator, { required: true, allowEmpty: false }]];
 
       const validationResult = validation.run(rules);
 
@@ -101,7 +101,7 @@ module.exports = {
 
       const id = parseInt(req.params["id"], 10);
 
-      const rules = [[id, AnnotationIdValidator]];
+      const rules = [[id, AnnotationIdValidator, { required: true, allowEmpty: false }]];
 
       const validationResult = validation.run(rules);
 
@@ -117,7 +117,7 @@ module.exports = {
     }
   },
 
-  async update(req, res, next) {
+  async putUpdate(req, res, next) {
     try {
       const { token } = req;
 
@@ -127,10 +127,10 @@ module.exports = {
       const { title, text, reference } = req.body;
 
       const rules = [
-        [annotationId, AnnotationIdValidator, { required: false }],
-        [title, TitleValidator, { required: false }],
-        [text, TextValidator, { required: false }],
-        [reference, ReferenceValidator, { required: false }],
+        [annotationId, AnnotationIdValidator, { required: false, allowEmpty: false }],
+        [title, TitleValidator, { required: false, allowEmpty: false }],
+        [text, TextValidator, { required: false, allowEmpty: false }],
+        [reference, ReferenceValidator, { required: false, allowEmpty: true }],
       ];
 
       const validationResult = validation.run(rules);
