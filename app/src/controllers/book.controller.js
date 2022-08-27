@@ -25,7 +25,7 @@ module.exports = {
       const thumbnailFile = req.file;
 
       const rules = [
-        [title, TitleValidator, { required: true }],
+        [title, TitleValidator, { required: true, allowEmpty: false }],
         [author, AuthorValidator, { required: false }],
         [isbn, ISBNValidator, { required: false }],
         [publisher, PublisherValidator, { required: false }],
@@ -130,7 +130,7 @@ module.exports = {
     }
   },
 
-  async update(req, res, next) {
+  async putUpdate(req, res, next) {
     try {
       // Aquisição do token
       const { token } = req;
@@ -143,14 +143,14 @@ module.exports = {
         req.body;
 
       const rules = [
-        [bookId, BookIdValidator, { required: true }],
-        [title, TitleValidator, { required: false }],
-        [author, AuthorValidator, { required: false }],
-        [isbn, ISBNValidator, { required: false }],
-        [publisher, PublisherValidator, { required: false }],
-        [description, DescriptionValidator, { required: false }],
-        [thumbnail, ThumbnailValidator, { required: false }],
-        [readStatus, ReadStatusValidator, { required: true }],
+        [bookId, BookIdValidator, { required: true, allowEmpty: false }],
+        [title, TitleValidator, { required: true, allowEmpty: false }],
+        [author, AuthorValidator, { required: true, allowEmpty: true }],
+        [isbn, ISBNValidator, { required: true, allowEmpty: true }],
+        [publisher, PublisherValidator, { required: true, allowEmpty: true }],
+        [description, DescriptionValidator, { required: true, allowEmpty: true }],
+        [thumbnail, ThumbnailValidator, { required: true, allowEmpty: true }],
+        [readStatus, ReadStatusValidator, { required: true, allowEmpty: false }],
       ];
 
       const validationResult = validation.run(rules);
@@ -161,7 +161,7 @@ module.exports = {
 
       const response = await BookBusiness.update(
         userId,
-        bookId,
+        parseInt(bookId),
         title,
         author,
         isbn,
@@ -172,6 +172,13 @@ module.exports = {
       );
 
       return res.status(response.statusCode).json(response.body);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async patchUpdate(req, res, next) {
+    try {
     } catch (error) {
       next(error);
     }
