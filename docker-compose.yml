@@ -17,9 +17,9 @@ services:
     command: >
       sh -c "
       /wait && 
-      npx prisma generate &&
-      npx prisma migrate deploy &&
-      npm run server"
+      yarn prisma generate &&
+      yarn prisma migrate deploy &&
+      yarn server"
     volumes:
       - ./app:/usr/src/app
       - ./app/node_modules:/usr/src/app/node_modules
@@ -37,14 +37,7 @@ services:
       POSTGRES_USER: bibliotecadebolso
       POSTGRES_DATABASE: bibliotecadebolso
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
-  # firebase:
-  #   container_name: bibliotecadebolso_firebase
-  #   build: ./firebase
-  #   ports:
-  #     - 9199:9199
-  #   volumes:
-  #     - .cache/firebase/emulators/:/usr/src/firebase/.cache/firebase/emulators/ 
+      - ./postgres-data:/var/lib/postgresql/data 
 volumes:
   node_modules: {}
 networks: 
