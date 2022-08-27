@@ -17,10 +17,10 @@ services:
       - database_test
     command: >
       sh -c "
-        /wait &&
-        npx prisma generate &&
-        npx prisma db push  &&
-        npm run test-coverage"
+      /wait &&
+      npx prisma generate &&
+      npx prisma db push  &&
+      yarn run test-coverage"
     volumes:
       - ./app/coverage:/usr/src/app/coverage
   database_test:
