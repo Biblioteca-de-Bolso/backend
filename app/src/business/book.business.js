@@ -268,14 +268,17 @@ module.exports = {
   },
 
   async update(userId, bookId, title, author, isbn, publisher, description, thumbnail, readStatus) {
-    const data = {
-      title,
-      author,
-      publisher,
-      description,
-      thumbnail,
-      readStatus,
-    };
+    const data = {};
+
+    if (title !== undefined && title !== null) data.title = title;
+    if (author !== undefined && author !== null) data.author = author;
+    if (publisher !== undefined && publisher !== null) data.publisher = publisher;
+    if (description !== undefined && description !== null) data.description = description;
+    if (thumbnail !== undefined && thumbnail !== null) data.thumbnail = thumbnail;
+    if (readStatus !== undefined && readStatus !== null) data.readStatus = readStatus;
+
+    if (isbn === "") data.isbn10 = "";
+    if (isbn === "") data.isbn13 = "";
 
     const book = await prisma.book.findUnique({
       where: {
@@ -283,92 +286,89 @@ module.exports = {
       },
     });
 
-    if (book) {
-      if (book.userId === userId) {
-        // Livro existe e usuário possui as permissões para edita-lo
-
-        // Criar ISBN 10 e 13 com base no ISBN informado
-        let isbn10 = "";
-        let isbn13 = "";
-
-        if (isbn) {
-          isbn.length === 10 ? (isbn10 = isbn) : (isbn13 = isbn);
-          isbn10 && !isbn13 ? (isbn13 = isbn10to13(isbn10)) : (isbn10 = isbn13to10(isbn13));
-        }
-
-        data.isbn10 = isbn10;
-        data.isbn13 = isbn13;
-
-        // Primeiro, verificar se o usuário está tentando inserir um novo ISBN que já existe
-        if (isbn10 !== book.isbn10 && isbn13 !== book.isbn13) {
-          const bookWithNewIsbn = await prisma.book.findFirst({
-            where: {
-              OR: [
-                {
-                  isbn10: isbn10,
-                },
-                {
-                  isbn13: isbn13,
-                },
-              ],
-              NOT: [
-                {
-                  isbn10: {
-                    equals: "",
-                  },
-                },
-                {
-                  isbn13: {
-                    equals: "",
-                  },
-                },
-              ],
-              userId,
-            },
-          });
-
-          if (bookWithNewIsbn) {
-            return conflict({
-              status: ErrorStatus,
-              code: DuplicatedISBN,
-              message: "Já existe um livro cadastrado com o ISBN informado.",
-            });
-          }
-        }
-
-        const updated = await prisma.book.update({
-          where: {
-            id: bookId,
-          },
-          data,
-        });
-
-        if (updated) {
-          return ok({
-            status: OkStatus,
-            response: {
-              book: updated,
-            },
-          });
-        } else {
-          return failure({
-            status: ErrorStatus,
-            code: DatabaseFailure,
-            message: "Não foi possível atualizar um ou mais dados do banco de dados.",
-          });
-        }
-      } else {
-        return forbidden({
-          status: ErrorStatus,
-          code: Forbidden,
-          message: "O usuário informado não possui o privilégio para executar essa ação.",
-        });
-      }
-    } else {
+    if (!book) {
       return notFound({
         status: ErrorStatus,
         code: NotFound,
         message: "O livro informado não foi encontrado.",
+      });
+    }
+
+    if (book.userId !== userId) {
+      return forbidden({
+        status: ErrorStatus,
+        code: Forbidden,
+        message: "O usuário informado não possui o privilégio para executar essa ação.",
+      });
+    }
+
+    if (isbn !== undefined && isbn !== null && isbn !== "") {
+      let isbn13 = "";
+      let isbn10 = "";
+
+      isbn.length === 10 ? (isbn10 = isbn) : (isbn13 = isbn);
+      isbn10 && !isbn13 ? (isbn13 = isbn10to13(isbn10)) : (isbn10 = isbn13to10(isbn13));
+
+      data.isbn10 = isbn10;
+      data.isbn13 = isbn13;
+
+      // Verificar se o usuário está tentando inserir um ISBN que já existe em outro livro
+      if (isbn10 !== book.isbn10 && isbn13 !== book.isbn13) {
+        const bookWithNewIsbn = await prisma.book.findFirst({
+          where: {
+            OR: [
+              {
+                isbn10: isbn10,
+              },
+              {
+                isbn13: isbn13,
+              },
+            ],
+            NOT: [
+              {
+                isbn10: {
+                  equals: "",
+                },
+              },
+              {
+                isbn13: {
+                  equals: "",
+                },
+              },
+            ],
+            userId,
+          },
+        });
+
+        if (bookWithNewIsbn) {
+          return conflict({
+            status: ErrorStatus,
+            code: DuplicatedISBN,
+            message: "Já existe um livro cadastrado com o ISBN informado.",
+          });
+        }
+      }
+    }
+
+    const updated = await prisma.book.update({
+      where: {
+        id: bookId,
+      },
+      data,
+    });
+
+    if (updated) {
+      return ok({
+        status: OkStatus,
+        response: {
+          book: updated,
+        },
+      });
+    } else {
+      return failure({
+        status: ErrorStatus,
+        code: DatabaseFailure,
+        message: "Não foi possível atualizar um ou mais dados do banco de dados.",
       });
     }
   },

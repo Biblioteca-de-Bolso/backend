@@ -179,6 +179,43 @@ module.exports = {
 
   async patchUpdate(req, res, next) {
     try {
+      const { token } = req;
+
+      const userId = parseInt(token["id"], 10);
+
+      const { bookId, title, author, isbn, publisher, description, thumbnail, readStatus } =
+        req.body;
+
+      const rules = [
+        [bookId, BookIdValidator, { required: false, allowEmpty: false }],
+        [title, TitleValidator, { required: false, allowEmpty: false }],
+        [author, AuthorValidator, { required: false, allowEmpty: true }],
+        [isbn, ISBNValidator, { required: false, allowEmpty: true }],
+        [publisher, PublisherValidator, { required: false, allowEmpty: true }],
+        [description, DescriptionValidator, { required: false, allowEmpty: true }],
+        [thumbnail, ThumbnailValidator, { required: false, allowEmpty: true }],
+        [readStatus, ReadStatusValidator, { required: false, allowEmpty: false }],
+      ];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult.status === "error") {
+        return res.status(400).json(validationResult);
+      }
+
+      const response = await BookBusiness.update(
+        userId,
+        parseInt(bookId),
+        title,
+        author,
+        isbn,
+        publisher,
+        description,
+        thumbnail,
+        readStatus
+      );
+
+      return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }
