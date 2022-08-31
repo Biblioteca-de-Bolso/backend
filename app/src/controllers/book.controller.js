@@ -229,7 +229,11 @@ module.exports = {
 
       const userId = parseInt(token["id"], 10);
 
-      const bookId = parseInt(req.body.bookId, 10);
+      let bookId = "";
+
+      if (req.body.bookId) {
+        bookId = parseInt(req.body.bookId.replace(/\D/g, ""), 10);
+      }
 
       const thumbnailFile = req.file;
 
@@ -255,7 +259,11 @@ module.exports = {
 
       const userId = parseInt(token["id"], 10);
 
-      const bookId = parseInt(req.body.bookId, 10);
+      let bookId = "";
+
+      if (req.body.bookId) {
+        bookId = parseInt(req.body.bookId.replace(/\D/g, ""), 10);
+      }
 
       const rules = [[bookId, BookIdValidator, { required: true, allowEmpty: false }]];
 
