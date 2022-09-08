@@ -82,13 +82,17 @@ module.exports = {
 
   async list(req, res, next) {
     try {
-      // Aquisição do token
       const { token } = req;
 
-      // Aquisição e validação dos parâmetros
-      const page = req.query["page"];
+      const userId = parseInt(token.id, 10);
 
-      const rules = [[page, PageValidator, { required: false, allowEmpty: false }]];
+      // Aquisição e validação dos parâmetros
+      const { page, readStatus } = req.query;
+
+      const rules = [
+        [page, PageValidator, { required: false, allowEmpty: false }],
+        [readStatus, ReadStatusValidator, { required: false, allowEmpty: false }],
+      ];
 
       const validationResult = validation.run(rules);
 
@@ -97,7 +101,7 @@ module.exports = {
       }
 
       // Token validado, prosseguir com a requisição
-      const response = await BookBusiness.list(token, page);
+      const response = await BookBusiness.list(userId, page, readStatus);
 
       // Retornar com resultado da operação
       return res.status(response.statusCode).json(response.body);

@@ -140,15 +140,17 @@ module.exports = {
     }
   },
 
-  async list(token, page) {
-    const userId = parseInt(token["id"], 10);
-
+  async list(userId, page, readStatus) {
     if (!page || page == 0) page = 1;
 
+    const whereClausule = {
+      userId,
+    };
+
+    if (readStatus) whereClausule.readStatus = readStatus;
+
     const books = await prisma.book.findMany({
-      where: {
-        userId: userId,
-      },
+      where: whereClausule,
       skip: (page - 1) * PAGE_SIZE,
       take: page * PAGE_SIZE,
     });
