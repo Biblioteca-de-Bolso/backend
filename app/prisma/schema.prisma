@@ -103,5 +103,4 @@ enum ReadStatus {
   READING
   CONCLUDED
   DROPPED
-  NO_STATUS
 }

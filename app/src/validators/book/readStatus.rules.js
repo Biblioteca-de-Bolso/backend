@@ -13,7 +13,7 @@ module.exports = {
 
     if (input !== undefined && input !== null) {
       if (input.length > 0) {
-        const validBorrows = ["PLANNING", "READING", "CONCLUDED", "DROPPED", "NO_STATUS"];
+        const validBorrows = ["PLANNING", "READING", "CONCLUDED", "DROPPED"];
 
         if (!validBorrows.includes(input)) {
           return validationError("A situação de leitura informada não é válida.");
