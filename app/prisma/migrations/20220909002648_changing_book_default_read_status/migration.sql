@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "book" ALTER COLUMN "readStatus" SET DEFAULT E'PLANNING';

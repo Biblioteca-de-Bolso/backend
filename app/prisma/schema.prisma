@@ -50,7 +50,7 @@ model Book {
   publisher   String?     @db.VarChar(128)
   description String?     @db.Text
   thumbnail   String?     @db.VarChar(255)
-  readStatus  ReadStatus? @default(NO_STATUS)
+  readStatus  ReadStatus? @default(PLANNING)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
