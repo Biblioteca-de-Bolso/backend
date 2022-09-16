@@ -209,6 +209,11 @@ module.exports = {
           bookId,
         },
       }),
+      prisma.borrow.deleteMany({
+        where: {
+          bookId,
+        },
+      }),
       prisma.book.deleteMany({
         where: {
           id: bookId,
