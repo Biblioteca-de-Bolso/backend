@@ -52,4 +52,7 @@ module.exports = {
 
   // Um livro com esse ISBN já foi cadastrado
   DuplicatedISBN: "DuplicatedISBN",
+
+  // Um livro com o ID informado já está emprestado
+  BookAlreadyBorrowed: "BookAlreadyBorrowed",
 };
