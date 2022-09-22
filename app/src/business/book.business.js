@@ -140,7 +140,7 @@ module.exports = {
     }
   },
 
-  async list(userId, page, readStatus) {
+  async list(userId, page, readStatus, search) {
     if (!page || page == 0) page = 1;
 
     const whereClausule = {
@@ -148,6 +148,23 @@ module.exports = {
     };
 
     if (readStatus) whereClausule.readStatus = readStatus;
+
+    if (search) {
+      search = search.split(" ").join(" & ").trim();
+
+      whereClausule.title = {
+        search,
+      };
+      whereClausule.description = {
+        search,
+      };
+      whereClausule.author = {
+        search,
+      };
+      whereClausule.publisher = {
+        search,
+      };
+    }
 
     const books = await prisma.book.findMany({
       where: whereClausule,
