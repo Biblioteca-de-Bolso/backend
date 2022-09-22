@@ -9,6 +9,7 @@ const ThumbnailValidator = require("../validators/book/thumbnail.rules");
 const BookIdValidator = require("../validators/book/id.rules");
 const PageValidator = require("../validators/shared/page.rules");
 const ReadStatusValidator = require("../validators/book/readStatus.rules");
+const SearchValidator = require("../validators/book/search.rules");
 
 const validation = require("../modules/validation");
 
@@ -87,11 +88,12 @@ module.exports = {
       const userId = parseInt(token.id, 10);
 
       // Aquisição e validação dos parâmetros
-      const { page, readStatus } = req.query;
+      const { page, readStatus, search } = req.query;
 
       const rules = [
         [page, PageValidator, { required: false, allowEmpty: false }],
         [readStatus, ReadStatusValidator, { required: false, allowEmpty: false }],
+        [search, SearchValidator, { required: false, allowEmpty: false }],
       ];
 
       const validationResult = validation.run(rules);
@@ -101,7 +103,7 @@ module.exports = {
       }
 
       // Token validado, prosseguir com a requisição
-      const response = await BookBusiness.list(userId, page, readStatus);
+      const response = await BookBusiness.list(userId, page, readStatus, search);
 
       // Retornar com resultado da operação
       return res.status(response.statusCode).json(response.body);
