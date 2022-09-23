@@ -119,12 +119,16 @@ module.exports = {
     }
   },
 
-  async list(userId, page) {
+  async list(userId, page, bookId) {
     if (!page || page == 0) page = 1;
 
-    const whereClausule = {
+    let whereClausule = {
       userId,
     };
+
+    if (bookId) {
+      whereClausule.bookId = parseInt(bookId, 10);
+    }
 
     const borrows = await prisma.borrow.findMany({
       where: whereClausule,
