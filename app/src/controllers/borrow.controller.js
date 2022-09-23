@@ -65,9 +65,12 @@ module.exports = {
 
       const userId = parseInt(token.id, 10);
 
-      const { page } = req.query;
+      const { page, bookId } = req.query;
 
-      const rules = [[page, PageValidator, { required: false, allowEmpty: false }]];
+      const rules = [
+        [page, PageValidator, { required: false, allowEmpty: false }],
+        [bookId, BookIdValidator, { required: false, allowEmpty: false }],
+      ];
 
       const validationResult = validation.run(rules);
 
@@ -75,7 +78,7 @@ module.exports = {
         return res.status(400).json(validationResult);
       }
 
-      const response = await BorrowBusiness.list(userId, page);
+      const response = await BorrowBusiness.list(userId, page, bookId);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {

@@ -150,13 +150,6 @@ module.exports = {
     if (readStatus) whereClausule.readStatus = readStatus;
 
     if (search) {
-      // search = search
-      //   .split(" ")
-      //   .map((word) => word.trim() + "*")
-      //   .join(" & ");
-
-      // console.log(search);
-
       whereClausule.OR = [
         {
           title: {
