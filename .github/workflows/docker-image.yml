@@ -39,9 +39,3 @@ jobs:
 
       - name: Build the Docker test image
         run: docker-compose -f docker-compose.test.yml up --exit-code-from backend_test --build
-
-      - name: Run codacy-coverage-reporter
-        uses: codacy/codacy-coverage-reporter-action@v1
-        with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: ./app/coverage/clover.xml
