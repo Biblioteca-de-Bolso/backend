@@ -150,20 +150,33 @@ module.exports = {
     if (readStatus) whereClausule.readStatus = readStatus;
 
     if (search) {
-      search = search.split(" ").join(" & ").trim();
+      // search = search
+      //   .split(" ")
+      //   .map((word) => word.trim() + "*")
+      //   .join(" & ");
 
-      whereClausule.title = {
-        search,
-      };
-      whereClausule.description = {
-        search,
-      };
-      whereClausule.author = {
-        search,
-      };
-      whereClausule.publisher = {
-        search,
-      };
+      // console.log(search);
+
+      whereClausule.OR = [
+        {
+          title: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          author: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          publisher: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ];
     }
 
     const books = await prisma.book.findMany({
