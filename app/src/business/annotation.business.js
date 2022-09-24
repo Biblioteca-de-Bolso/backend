@@ -69,6 +69,13 @@ module.exports = {
       },
       skip: (page - 1) * PAGE_SIZE,
       take: page * PAGE_SIZE,
+      include: {
+        book: {
+          select: {
+            title: true,
+          },
+        },
+      },
     });
 
     if (annotations) {
