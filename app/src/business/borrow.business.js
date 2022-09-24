@@ -119,7 +119,7 @@ module.exports = {
     }
   },
 
-  async list(userId, page, bookId) {
+  async list(userId, page, bookId, search) {
     if (!page || page == 0) page = 1;
 
     let whereClausule = {
@@ -130,8 +130,39 @@ module.exports = {
       whereClausule.bookId = parseInt(bookId, 10);
     }
 
+    const searchList = [
+      {
+        book: {
+          title: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      },
+      {
+        contactName: {
+          contains: search,
+          mode: "insensitive",
+        },
+      },
+    ];
+
+    if (search) {
+      whereClausule.OR = searchList;
+    }
+
     const borrows = await prisma.borrow.findMany({
       where: whereClausule,
+      include: {
+        book: {
+          select: {
+            title: true,
+          },
+        },
+      },
+      orderBy: {
+        borrowDate: "desc",
+      },
       skip: (page - 1) * PAGE_SIZE,
       take: page * PAGE_SIZE,
     });

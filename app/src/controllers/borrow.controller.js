@@ -4,6 +4,7 @@ const BookIdValidator = require("../validators/book/id.rules");
 const ContactNameValidator = require("../validators/borrow/contactName.rules");
 const BorrowIdValidator = require("../validators/borrow/id.rules");
 const PageValidator = require("../validators/shared/page.rules");
+const SearchValidator = require("../validators/borrow/search.rules");
 
 const validation = require("../modules/validation");
 
@@ -65,11 +66,12 @@ module.exports = {
 
       const userId = parseInt(token.id, 10);
 
-      const { page, bookId } = req.query;
+      const { page, bookId, search } = req.query;
 
       const rules = [
         [page, PageValidator, { required: false, allowEmpty: false }],
         [bookId, BookIdValidator, { required: false, allowEmpty: false }],
+        [search, SearchValidator, { required: false, allowEmpty: false }],
       ];
 
       const validationResult = validation.run(rules);
@@ -78,7 +80,7 @@ module.exports = {
         return res.status(400).json(validationResult);
       }
 
-      const response = await BorrowBusiness.list(userId, page, bookId);
+      const response = await BorrowBusiness.list(userId, page, bookId, search);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
