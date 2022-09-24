@@ -58,7 +58,7 @@ model Book {
   user User @relation(fields: [userId], references: [id])
 
   annotations Annotation[]
-  Borrow      Borrow[]
+  borrows     Borrow[]
 
   @@map("book")
 }

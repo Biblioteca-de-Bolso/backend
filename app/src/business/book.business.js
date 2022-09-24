@@ -114,6 +114,26 @@ module.exports = {
       where: {
         id: id,
       },
+      include: {
+        annotations: {
+          select: {
+            id: true,
+            title: true,
+            reference: true,
+            createdAt: true,
+          },
+          take: 10,
+        },
+        borrows: {
+          select: {
+            id: true,
+            contactName: true,
+            borrowStatus: true,
+            borrowDate: true,
+          },
+          take: 10,
+        },
+      },
     });
 
     if (!book) {
