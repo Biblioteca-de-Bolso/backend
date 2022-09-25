@@ -52,7 +52,7 @@ module.exports = {
     }
   },
 
-  async list(userId, page, bookId) {
+  async list(userId, page, bookId, search) {
     if (!page || page == 0) page = 1;
 
     const whereClausule = {
@@ -61,6 +61,37 @@ module.exports = {
 
     if (bookId) {
       whereClausule.bookId = parseInt(bookId, 10);
+    }
+
+    if (search) {
+      whereClausule.OR = [
+        {
+          title: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          text: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          reference: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+        {
+          book: {
+            title: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        },
+      ];
     }
 
     const annotations = await prisma.annotation.findMany({
