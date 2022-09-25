@@ -6,6 +6,8 @@ function load(routes) {
   routes.delete("/borrow", protectedRoute, controller.delete);
   routes.get("/borrow", protectedRoute, controller.list);
   routes.get("/borrow/:id", protectedRoute, controller.read);
+  routes.patch("/borrow", protectedRoute, controller.patchUpdate);
+
 
 }
 
