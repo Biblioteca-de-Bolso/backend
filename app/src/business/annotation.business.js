@@ -99,6 +99,13 @@ module.exports = {
       where: {
         id: annotationId,
       },
+      include: {
+        book: {
+          select: {
+            title: true,
+          },
+        },
+      },
     });
 
     if (!annotation) {
