@@ -87,4 +87,36 @@ module.exports = {
       next(error);
     }
   },
+
+  async read(req, res, next) {
+    const { token } = req;
+
+    const userId = parseInt(token.id, 10);
+
+    const borrowId = parseInt(req.params.id, 10);
+
+    const rules = [[borrowId, BorrowIdValidator, { required: true, allowEmpty: false }]];
+
+    const validationResult = validation.run(rules);
+
+    if (validationResult.status === "error") {
+      return res.status(400).json(validationResult);
+    }
+
+    const response = await BorrowBusiness.read(userId, borrowId);
+
+    return res.status(response.statusCode).json(response.body);
+  },
+
+  async patchUpdate(req, res, next) {
+    try {
+      const { token } = req;
+
+      const userId = parseInt(token.id, 10);
+
+      const {} = req.body;
+    } catch (error) {
+      next(error);
+    }
+  },
 };
