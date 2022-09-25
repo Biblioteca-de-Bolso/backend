@@ -174,4 +174,116 @@ module.exports = {
       },
     });
   },
+
+  async read(userId, borrowId) {
+    const borrow = await prisma.borrow.findUnique({
+      where: {
+        id: borrowId,
+      },
+      include: {
+        book: {
+          select: {
+            title: true,
+          },
+        },
+      },
+    });
+
+    if (!borrow) {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "O empréstimo informado não foi encontrado",
+      });
+    }
+
+    if (borrow.userId !== userId) {
+      return forbidden({
+        status: ErrorStatus,
+        code: Forbidden,
+        message: "O usuário informado não possui o privilégio para executar essa ação.",
+      });
+    }
+
+    return ok({
+      status: OkStatus,
+      response: {
+        borrow: {
+          ...borrow,
+        },
+      },
+    });
+  },
+
+  async update(userId, borrowId, contactName, borrowStatus) {
+    const data = {};
+
+    if (contactName !== undefined && contactName !== null) data.contactName = contactName;
+    if (borrowStatus !== undefined && borrowStatus !== null) data.borrowStatus = borrowStatus;
+
+    const borrow = await prisma.borrow.findUnique({
+      where: {
+        id: borrowId,
+      },
+    });
+
+    if (!borrow) {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "O empréstimo informado não foi encontrado.",
+      });
+    }
+
+    if (borrow.userId !== userId) {
+      return forbidden({
+        status: ErrorStatus,
+        code: Forbidden,
+        message: "O usuário informado não possui o privilégio para executar essa ação.",
+      });
+    }
+
+    if (borrowStatus === "PENDING") {
+      const borrowedBook = await prisma.borrow.findFirst({
+        where: {
+          id: borrowId,
+          borrowStatus: "PENDING",
+        },
+      });
+
+      if (borrowedBook) {
+        return conflict({
+          status: ErrorStatus,
+          code: BookAlreadyBorrowed,
+          message: "O livro informado já possui um empréstimo em aberto.",
+        });
+      }
+    }
+
+    if (borrowStatus === "RETURNED") {
+      data.devolutionDate = new Date();
+    }
+
+    const updated = await prisma.borrow.update({
+      where: {
+        id: borrowId,
+      },
+      data,
+    });
+
+    if (updated) {
+      return ok({
+        status: OkStatus,
+        response: {
+          borrow: updated,
+        },
+      });
+    } else {
+      return failure({
+        status: ErrorStatus,
+        code: DatabaseFailure,
+        message: "Não foi possível atualizar um ou mais dados do banco de dados.",
+      });
+    }
+  },
 };

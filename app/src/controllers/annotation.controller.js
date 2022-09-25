@@ -6,6 +6,7 @@ const TextValidator = require("../validators/annotation/text.rules");
 const ReferenceValidator = require("../validators/annotation/reference.rules");
 const PageValidator = require("../validators/shared/page.rules");
 const AnnotationIdValidator = require("../validators/annotation/id.rules");
+const AnnotationSearchValidator = require("../validators/annotation/search.rules");
 
 const validation = require("../modules/validation");
 
@@ -46,11 +47,12 @@ module.exports = {
 
       const userId = parseInt(token["id"], 10);
 
-      const { page, bookId } = req.query;
+      const { page, bookId, search } = req.query;
 
       const rules = [
         [page, PageValidator, { required: false, allowEmpty: false }],
         [bookId, BookIdValidator, { required: false, allowEmpty: false }],
+        [search, AnnotationSearchValidator, { required: false, allowEmpty: false }],
       ];
 
       const validationResult = validation.run(rules);
@@ -59,7 +61,7 @@ module.exports = {
         return res.status(400).json(validationResult);
       }
 
-      const response = await AnnotationBusiness.list(userId, page, bookId);
+      const response = await AnnotationBusiness.list(userId, page, bookId, search);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
