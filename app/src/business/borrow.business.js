@@ -10,6 +10,7 @@ const {
 } = require("../modules/codes");
 const { ok, notFound, forbidden, failure, conflict } = require("../modules/http");
 const { PAGE_SIZE } = require("../modules/constants");
+const { BorrowStatus } = require("@prisma/client");
 
 module.exports = {
   async create(userId, bookId, contactName) {
@@ -219,7 +220,6 @@ module.exports = {
     const data = {};
 
     if (contactName !== undefined && contactName !== null) data.contactName = contactName;
-    if (borrowStatus !== undefined && borrowStatus !== null) data.borrowStatus = borrowStatus;
 
     const borrow = await prisma.borrow.findUnique({
       where: {
@@ -243,20 +243,28 @@ module.exports = {
       });
     }
 
-    if (borrowStatus === "PENDING") {
-      const borrowedBook = await prisma.borrow.findFirst({
-        where: {
-          id: borrowId,
-          borrowStatus: "PENDING",
-        },
-      });
+    if (borrowStatus !== borrow.borrowStatus) {
+      if (borrowStatus !== undefined && borrowStatus !== null) data.borrowStatus = borrowStatus;
 
-      if (borrowedBook) {
-        return conflict({
-          status: ErrorStatus,
-          code: BookAlreadyBorrowed,
-          message: "O livro informado já possui um empréstimo em aberto.",
+      if (borrowStatus === "PENDING") {
+        console.log("Buscando por duplicata");
+
+        const borrowedBook = await prisma.borrow.findFirst({
+          where: {
+            bookId: borrow.bookId,
+            borrowStatus: "PENDING",
+          },
         });
+
+        console.log(borrowedBook);
+
+        if (borrowedBook) {
+          return conflict({
+            status: ErrorStatus,
+            code: BookAlreadyBorrowed,
+            message: "O livro informado já possui um empréstimo em aberto.",
+          });
+        }
       }
     }
 
