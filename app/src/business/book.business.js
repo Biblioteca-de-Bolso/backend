@@ -192,10 +192,29 @@ module.exports = {
       ];
     }
 
-    const books = await prisma.book.findMany({
+    let books = await prisma.book.findMany({
       where: whereClausule,
+      include: {
+        borrows: {
+          select: {
+            borrowStatus: true,
+          },
+          where: {
+            borrowStatus: "PENDING",
+          },
+          take: 1,
+        },
+      },
       skip: (page - 1) * PAGE_SIZE,
       take: page * PAGE_SIZE,
+    });
+
+    books = books.map((book) => {
+      book.currentlyBorrowed = book.borrows.length > 0 ? true : false;
+
+      delete book.borrows;
+
+      return book;
     });
 
     return ok({
