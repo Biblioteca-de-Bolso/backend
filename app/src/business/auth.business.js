@@ -5,7 +5,7 @@ const validator = require("validator");
 
 const prisma = require("../prisma");
 
-const { failure, unauthorized, ok, forbidden } = require("../modules/http");
+const { failure, unauthorized, ok, forbidden, notFound } = require("../modules/http");
 const {
   OkStatus,
   ErrorStatus,
@@ -20,6 +20,7 @@ const {
   RefreshTokenNotBefore,
   RefreshTokenExpired,
   Forbidden,
+  NotFound,
 } = require("../modules/codes");
 
 module.exports = {
@@ -297,4 +298,29 @@ module.exports = {
       }
     }
   },
+
+  async recoverPassword(email) {
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "O email informado não foi encontrado no sistema.",
+      });
+    }
+
+    const activeRequest = await prisma.findFirst({
+      where: {
+        userId: user.id,
+        active: true,
+      },
+    });
+  },
+
+  async changePassword() {},
 };

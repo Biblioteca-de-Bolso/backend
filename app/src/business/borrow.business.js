@@ -10,7 +10,6 @@ const {
 } = require("../modules/codes");
 const { ok, notFound, forbidden, failure, conflict } = require("../modules/http");
 const { PAGE_SIZE } = require("../modules/constants");
-const { BorrowStatus } = require("@prisma/client");
 
 module.exports = {
   async create(userId, bookId, contactName) {

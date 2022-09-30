@@ -95,4 +95,31 @@ module.exports = {
       next(error);
     }
   },
+
+  async recoverPassword(req, res, next) {
+    try {
+      const { email } = req.body;
+
+      const rules = [[email, EmailValidator, { required: true, allowEmpty: false }]];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult["status"] === "error") {
+        return res.status(400).json(validationResult);
+      }
+
+      const response = await AuthBusiness.recoverPassword(email);
+
+      return res.status(response.statusCode).json(response.body);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async changePassword(req, res, next) {
+    try {
+    } catch (error) {
+      next(error);
+    }
+  },
 };
