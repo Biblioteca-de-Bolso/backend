@@ -101,7 +101,7 @@ model Recover {
   id        Int      @id @unique @default(autoincrement())
   userId    Int
   code      String   @db.VarChar(16)
-  active    Boolean  @default(false) @db.Boolean
+  active    Boolean  @default(true) @db.Boolean
   redeemed  Boolean  @default(false) @db.Boolean
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

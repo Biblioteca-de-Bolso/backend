@@ -22,6 +22,7 @@ const {
   Forbidden,
   NotFound,
 } = require("../modules/codes");
+const { fail } = require("assert");
 
 module.exports = {
   async login(email, password) {
@@ -307,19 +308,56 @@ module.exports = {
     });
 
     if (!user) {
-      return notFound({
+      return unauthorized({
         status: ErrorStatus,
-        code: NotFound,
-        message: "O email informado não foi encontrado no sistema.",
+        code: Unauthorized,
+        message: "Não foi possível completar a requisição solicitada.",
       });
     }
 
-    const activeRequest = await prisma.findFirst({
+    const activeRequest = await prisma.recover.findMany({
       where: {
         userId: user.id,
         active: true,
       },
     });
+
+    if (activeRequest.length > 0) {
+      activeRequest.forEach(async (request) => {
+        await prisma.recover.update({
+          where: {
+            id: request.id,
+          },
+          data: {
+            active: false,
+          },
+        });
+      });
+    }
+
+    const recoverCode = crypto.randomBytes(8).toString("hex");
+
+    const recover = await prisma.recover.create({
+      data: {
+        userId: user.id,
+        code: recoverCode,
+      },
+    });
+
+    if (recover) {
+      return ok({
+        status: OkStatus,
+        response: {
+          recover: recover,
+        },
+      });
+    } else {
+      return failure({
+        status: ErrorStatus,
+        code: DatabaseFailure,
+        message: "Não foi possível realizar a criação de um ou mais dados do banco de dados.",
+      });
+    }
   },
 
   async changePassword() {},
