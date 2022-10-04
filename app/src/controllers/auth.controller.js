@@ -7,6 +7,7 @@ const EmailValidator = require("../validators/user/email.rules");
 const ActivationValidator = require("../validators/user/activation.rules");
 const UserIdValidator = require("../validators/user/id.rules");
 const RefreshTokenValidator = require("../validators/auth/refresh.rules");
+const RecoverCodeValidator = require("../validators/auth/recover.rules");
 
 const validation = require("../modules/validation");
 
@@ -118,6 +119,29 @@ module.exports = {
 
   async changePassword(req, res, next) {
     try {
+      const { email, recoverCode, newPassword, confirmPassword } = req.body;
+
+      const rules = [
+        [email, EmailValidator, { required: true, allowEmpty: false }],
+        [recoverCode, RecoverCodeValidator, { required: true, allowEmpty: false }],
+        [newPassword, PasswordValidator, { required: true, allowEmpty: false }],
+        [confirmPassword, PasswordValidator, { required: true, allowEmpty: false }],
+      ];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult["status"] === "error") {
+        return res.status(400).json(validationResult);
+      }
+
+      const response = await AuthBusiness.changePassword(
+        email,
+        recoverCode,
+        newPassword,
+        confirmPassword
+      );
+
+      return res.status(response.statusCode).json(response.body);
     } catch (error) {
       next(error);
     }

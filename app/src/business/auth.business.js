@@ -5,7 +5,15 @@ const validator = require("validator");
 
 const prisma = require("../prisma");
 
-const { failure, unauthorized, ok, forbidden, notFound } = require("../modules/http");
+const {
+  failure,
+  unauthorized,
+  ok,
+  forbidden,
+  notFound,
+  badRequest,
+  conflict,
+} = require("../modules/http");
 const {
   OkStatus,
   ErrorStatus,
@@ -21,8 +29,8 @@ const {
   RefreshTokenExpired,
   Forbidden,
   NotFound,
+  RecoverCodeRedeemed,
 } = require("../modules/codes");
-const { fail } = require("assert");
 
 module.exports = {
   async login(email, password) {
@@ -311,7 +319,7 @@ module.exports = {
       return unauthorized({
         status: ErrorStatus,
         code: Unauthorized,
-        message: "Não foi possível completar a requisição solicitada.",
+        message: "O email informado não foi encontrado na base de dados do sistema.",
       });
     }
 
@@ -360,5 +368,94 @@ module.exports = {
     }
   },
 
-  async changePassword() {},
+  async changePassword(email, recoverCode, newPassword, confirmPassword) {
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      return unauthorized({
+        status: ErrorStatus,
+        code: Unauthorized,
+        message: "O email informado não foi encontrado na base de dados do sistema.",
+      });
+    }
+
+    const recover = await prisma.recover.findFirst({
+      where: {
+        code: recoverCode,
+        userId: user.id,
+      },
+    });
+
+    if (!recover) {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "O código de recuperação informado não foi encontrado.",
+      });
+    }
+
+    if (recover.redeemed) {
+      return conflict({
+        status: ErrorStatus,
+        code: RecoverCodeRedeemed,
+        message: "O código de recuperação informado já foi utilizado.",
+      });
+    }
+
+    if (!recover.active) {
+      return unauthorized({
+        status: ErrorStatus,
+        code: Unauthorized,
+        message: "O código de recuperação informado expirou.",
+      });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return badRequest({
+        status: ErrorStatus,
+        code: IncorrectParameter,
+        message: "As senhas informadas não são idênticas.",
+      });
+    }
+
+    const redeemed = await prisma.recover.update({
+      where: {
+        id: recover.id,
+      },
+      data: {
+        active: false,
+        redeemed: true,
+      },
+    });
+
+    if (redeemed) {
+      const password = crypto.createHash("md5").update(newPassword).digest("hex");
+
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          password: password,
+        },
+      });
+
+      return ok({
+        status: OkStatus,
+        response: {
+          message: "A senha de usuário foi alterada com sucesso.",
+        },
+      });
+    } else {
+      return failure({
+        status: ErrorStatus,
+        code: DatabaseFailure,
+        message: "Não foi possível realizar a criação de um ou mais dados do banco de dados.",
+      });
+    }
+  },
 };
