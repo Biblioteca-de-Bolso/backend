@@ -6,6 +6,7 @@ module.exports = async () => {
   console.log("Running seeds.");
 
   const users = [
+    // User ID: 1
     // A conta do Allan Turing é utilizada para o teste de ativação de conta de usuário
     // Livros desse usuário: 1 e 2
     {
@@ -37,6 +38,7 @@ module.exports = async () => {
         },
       },
     },
+    // User ID: 2
     // A conta da Ada é utilizada para o teste de leitura de usuário e de login
     // Livros desse usuário: 3 e 4
     {
@@ -70,6 +72,7 @@ module.exports = async () => {
         },
       },
     },
+    // User ID: 3
     // A conta do Von Neumann deve permencer inativa para falhar no teste de login
     // Livros desse usuário: 5 e 6
     {
@@ -101,6 +104,7 @@ module.exports = async () => {
         },
       },
     },
+    // User ID: 4
     // A conta do Dennis é utilizada para o teste de remoção de usuário
     // Livros desse usuário: 7 e 8
     {
@@ -132,6 +136,7 @@ module.exports = async () => {
         },
       },
     },
+    // User ID: 5
     // A conta do Charles Babbage é utilizada nos testes de listagem de livros
     // Livros desse usuário: 9 e 10
     {
@@ -163,7 +168,62 @@ module.exports = async () => {
         },
       },
     },
+    // User ID: 6
+    // A conta do Andrew Tenenbaum será utilizada para testes de recuperação de senha
+    // Utilizado nos testes de solicitação de código de recuperação
+    {
+      name: "Andrew Tenenbaum",
+      email: "andrewtenenbaum@email.com",
+      password: crypto.createHash("md5").update("andrewtenenbaum").digest("hex"),
+      active: true,
+      activationCode: "1234567812345678",
+    },
+    // User ID: 7
+    // A conta do Johh Carmack será utilizada para testes de recuperação de senha
+    // Utilizado nos testes de alteração de senha de usuário
+    {
+      name: "John Carmack",
+      email: "johncarmack@email.com",
+      password: crypto.createHash("md5").update("johncarmack").digest("hex"),
+      active: true,
+      activationCode: "1234567812345678",
+      recovers: {
+        createMany: {
+          data: [
+            // Recover Code ID: 1
+            // Não foi ativado, pode ser utilizado
+            {
+              code: "1234567812345678",
+              active: true,
+              redeemed: false,
+            },
+            // Recover Code ID: 2
+            // Código expirado, está inativo, não pode ser utilizado
+            {
+              code: "1234567812345678",
+              active: false,
+              redeemed: false,
+            },
+            // Recover Code ID: 3
+            // Código já foi utilizado, não pode ser utilizado novamente
+            {
+              code: "1234567812345678",
+              active: false,
+              redeemed: true,
+            },
+          ],
+        },
+      },
+    },
   ];
+
+  // id        Int      @id @unique @default(autoincrement())
+  // userId    Int
+  // code      String   @db.VarChar(16)
+  // active    Boolean  @default(true) @db.Boolean
+  // redeemed  Boolean  @default(false) @db.Boolean
+  // createdAt DateTime @default(now())
+  // updatedAt DateTime @updatedAt
 
   const annotations = [
     // Anotação de ID 1, do Charles Babbage no livro 9
