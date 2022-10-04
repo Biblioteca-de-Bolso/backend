@@ -119,13 +119,12 @@ module.exports = {
 
   async changePassword(req, res, next) {
     try {
-      const { email, recoverCode, newPassword, confirmPassword } = req.body;
+      const { email, recoverCode, newPassword } = req.body;
 
       const rules = [
         [email, EmailValidator, { required: true, allowEmpty: false }],
         [recoverCode, RecoverCodeValidator, { required: true, allowEmpty: false }],
         [newPassword, PasswordValidator, { required: true, allowEmpty: false }],
-        [confirmPassword, PasswordValidator, { required: true, allowEmpty: false }],
       ];
 
       const validationResult = validation.run(rules);
@@ -134,12 +133,7 @@ module.exports = {
         return res.status(400).json(validationResult);
       }
 
-      const response = await AuthBusiness.changePassword(
-        email,
-        recoverCode,
-        newPassword,
-        confirmPassword
-      );
+      const response = await AuthBusiness.changePassword(email, recoverCode, newPassword);
 
       return res.status(response.statusCode).json(response.body);
     } catch (error) {

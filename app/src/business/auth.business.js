@@ -368,7 +368,7 @@ module.exports = {
     }
   },
 
-  async changePassword(email, recoverCode, newPassword, confirmPassword) {
+  async changePassword(email, recoverCode, newPassword) {
     const user = await prisma.user.findUnique({
       where: {
         email,
@@ -411,14 +411,6 @@ module.exports = {
         status: ErrorStatus,
         code: Unauthorized,
         message: "O código de recuperação informado expirou.",
-      });
-    }
-
-    if (newPassword !== confirmPassword) {
-      return badRequest({
-        status: ErrorStatus,
-        code: IncorrectParameter,
-        message: "As senhas informadas não são idênticas.",
       });
     }
 
