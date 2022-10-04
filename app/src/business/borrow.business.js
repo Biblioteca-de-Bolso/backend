@@ -10,7 +10,6 @@ const {
 } = require("../modules/codes");
 const { ok, notFound, forbidden, failure, conflict } = require("../modules/http");
 const { PAGE_SIZE } = require("../modules/constants");
-const { BorrowStatus } = require("@prisma/client");
 
 module.exports = {
   async create(userId, bookId, contactName) {
@@ -120,7 +119,7 @@ module.exports = {
     }
   },
 
-  async list(userId, page, bookId, search) {
+  async list(userId, page, bookId, search, borrowStatus) {
     if (!page || page == 0) page = 1;
 
     let whereClausule = {
@@ -129,6 +128,10 @@ module.exports = {
 
     if (bookId) {
       whereClausule.bookId = parseInt(bookId, 10);
+    }
+
+    if (borrowStatus) {
+      whereClausule.borrowStatus = borrowStatus;
     }
 
     const searchList = [

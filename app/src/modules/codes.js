@@ -55,4 +55,6 @@ module.exports = {
 
   // Um livro com o ID informado já está emprestado
   BookAlreadyBorrowed: "BookAlreadyBorrowed",
+
+  RecoverCodeRedeemed: "RecoverCodeRedeemed",
 };

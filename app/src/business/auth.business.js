@@ -5,7 +5,15 @@ const validator = require("validator");
 
 const prisma = require("../prisma");
 
-const { failure, unauthorized, ok, forbidden } = require("../modules/http");
+const {
+  failure,
+  unauthorized,
+  ok,
+  forbidden,
+  notFound,
+  badRequest,
+  conflict,
+} = require("../modules/http");
 const {
   OkStatus,
   ErrorStatus,
@@ -20,6 +28,8 @@ const {
   RefreshTokenNotBefore,
   RefreshTokenExpired,
   Forbidden,
+  NotFound,
+  RecoverCodeRedeemed,
 } = require("../modules/codes");
 
 module.exports = {
@@ -295,6 +305,149 @@ module.exports = {
             message: `Erro ao validar token JWT: ${error.message}`,
           };
       }
+    }
+  },
+
+  async recoverPassword(email) {
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      return unauthorized({
+        status: ErrorStatus,
+        code: Unauthorized,
+        message: "O email informado não foi encontrado na base de dados do sistema.",
+      });
+    }
+
+    const activeRequest = await prisma.recover.findMany({
+      where: {
+        userId: user.id,
+        active: true,
+      },
+    });
+
+    if (activeRequest.length > 0) {
+      activeRequest.forEach(async (request) => {
+        await prisma.recover.update({
+          where: {
+            id: request.id,
+          },
+          data: {
+            active: false,
+          },
+        });
+      });
+    }
+
+    const recoverCode = crypto.randomBytes(8).toString("hex");
+
+    const recover = await prisma.recover.create({
+      data: {
+        userId: user.id,
+        code: recoverCode,
+      },
+    });
+
+    if (recover) {
+      return ok({
+        status: OkStatus,
+        response: {
+          recover: recover,
+        },
+      });
+    } else {
+      return failure({
+        status: ErrorStatus,
+        code: DatabaseFailure,
+        message: "Não foi possível realizar a criação de um ou mais dados do banco de dados.",
+      });
+    }
+  },
+
+  async changePassword(email, recoverCode, newPassword) {
+    const user = await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      return unauthorized({
+        status: ErrorStatus,
+        code: Unauthorized,
+        message: "O email informado não foi encontrado na base de dados do sistema.",
+      });
+    }
+
+    const recover = await prisma.recover.findFirst({
+      where: {
+        code: recoverCode,
+        userId: user.id,
+      },
+    });
+
+    if (!recover) {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "O código de recuperação informado não foi encontrado.",
+      });
+    }
+
+    if (recover.redeemed) {
+      return conflict({
+        status: ErrorStatus,
+        code: RecoverCodeRedeemed,
+        message: "O código de recuperação informado já foi utilizado.",
+      });
+    }
+
+    if (!recover.active) {
+      return unauthorized({
+        status: ErrorStatus,
+        code: Unauthorized,
+        message: "O código de recuperação informado expirou.",
+      });
+    }
+
+    const redeemed = await prisma.recover.update({
+      where: {
+        id: recover.id,
+      },
+      data: {
+        active: false,
+        redeemed: true,
+      },
+    });
+
+    if (redeemed) {
+      const password = crypto.createHash("md5").update(newPassword).digest("hex");
+
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          password: password,
+        },
+      });
+
+      return ok({
+        status: OkStatus,
+        response: {
+          message: "A senha de usuário foi alterada com sucesso.",
+        },
+      });
+    } else {
+      return failure({
+        status: ErrorStatus,
+        code: DatabaseFailure,
+        message: "Não foi possível realizar a criação de um ou mais dados do banco de dados.",
+      });
     }
   },
 };

@@ -22,7 +22,8 @@ model User {
   refreshTokens RefreshToken[]
   books         Book[]
   annotations   Annotation[]
-  Borrow        Borrow[]
+  borrows       Borrow[]
+  recovers      Recover[]
 
   @@map("user")
 }
@@ -94,6 +95,20 @@ model Borrow {
   book Book @relation(fields: [bookId], references: [id])
 
   @@map("borrow")
+}
+
+model Recover {
+  id        Int      @id @unique @default(autoincrement())
+  userId    Int
+  code      String   @db.VarChar(16)
+  active    Boolean  @default(true) @db.Boolean
+  redeemed  Boolean  @default(false) @db.Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("recover")
 }
 
 enum BorrowStatus {
