@@ -5,15 +5,7 @@ const validator = require("validator");
 
 const prisma = require("../prisma");
 
-const {
-  failure,
-  unauthorized,
-  ok,
-  forbidden,
-  notFound,
-  badRequest,
-  conflict,
-} = require("../modules/http");
+const { failure, unauthorized, ok, forbidden, notFound, conflict } = require("../modules/http");
 const {
   OkStatus,
   ErrorStatus,
