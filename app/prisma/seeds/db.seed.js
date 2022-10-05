@@ -193,37 +193,20 @@ module.exports = async () => {
             // Recover Code ID: 1
             // Não foi ativado, pode ser utilizado
             {
-              code: "1234567812345678",
+              code: "e039fdcfc58dd51d",
               active: true,
-              redeemed: false,
             },
             // Recover Code ID: 2
             // Código expirado, está inativo, não pode ser utilizado
             {
-              code: "1234567812345678",
+              code: "ab4736e81ad05968",
               active: false,
-              redeemed: false,
-            },
-            // Recover Code ID: 3
-            // Código já foi utilizado, não pode ser utilizado novamente
-            {
-              code: "1234567812345678",
-              active: false,
-              redeemed: true,
             },
           ],
         },
       },
     },
   ];
-
-  // id        Int      @id @unique @default(autoincrement())
-  // userId    Int
-  // code      String   @db.VarChar(16)
-  // active    Boolean  @default(true) @db.Boolean
-  // redeemed  Boolean  @default(false) @db.Boolean
-  // createdAt DateTime @default(now())
-  // updatedAt DateTime @updatedAt
 
   const annotations = [
     // Anotação de ID 1, do Charles Babbage no livro 9
