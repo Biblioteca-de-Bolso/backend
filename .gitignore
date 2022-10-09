@@ -133,4 +133,4 @@ dist
 postgres-data
 uploads
 test
-pdf/*.pdf
+*.pdf
