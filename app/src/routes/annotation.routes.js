@@ -7,6 +7,8 @@ function load(routes) {
   routes.get("/annotation/:id", protectedRoute, controller.read);
   routes.delete("/annotation/:id", protectedRoute, controller.delete);
   routes.put("/annotation", protectedRoute, controller.putUpdate);
+  routes.get("/annotation/export/:id", protectedRoute, controller.export);
+
 }
 
 module.exports = load;

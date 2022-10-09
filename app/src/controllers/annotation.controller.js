@@ -1,3 +1,5 @@
+const fs = require("fs");
+
 const AnnotationBusiness = require("../business/annotation.business");
 
 const BookIdValidator = require("../validators/book/id.rules");
@@ -9,6 +11,7 @@ const AnnotationIdValidator = require("../validators/annotation/id.rules");
 const AnnotationSearchValidator = require("../validators/annotation/search.rules");
 
 const validation = require("../modules/validation");
+const { OkStatus } = require("../modules/codes");
 
 module.exports = {
   async create(req, res, next) {
@@ -152,6 +155,39 @@ module.exports = {
       return res.status(response.statusCode).json(response.body);
     } catch (error) {
       return next(error);
+    }
+  },
+
+  async export(req, res, next) {
+    try {
+      const { token } = req;
+
+      const userId = parseInt(token.id, 10);
+
+      const annotationId = parseInt(req.params.id, 10);
+
+      const rules = [[annotationId, AnnotationIdValidator, { required: true, allowEmpty: false }]];
+
+      const validationResult = validation.run(rules);
+
+      if (validationResult.status === "error") {
+        return res.status(400).json(validationResult);
+      }
+
+      const response = await AnnotationBusiness.export(userId, annotationId);
+
+      if (response.body.status === OkStatus) {
+        const filename = response.body.response.filename;
+
+        console.log(filename);
+
+        fs.createReadStream(filename).pipe(res);
+        return;
+      } else {
+        return res.status(response.statusCode).json(response.body);
+      }
+    } catch (error) {
+      next(error);
     }
   },
 };

@@ -2,6 +2,11 @@ const { OkStatus, ErrorStatus, NotFound, DatabaseFailure, Forbidden } = require(
 const { ok, created, failure, notFound, forbidden, badRequest } = require("../modules/http");
 const prisma = require("../prisma");
 const { PAGE_SIZE } = require("../modules/constants");
+const crypto = require("crypto");
+
+// const pdf = require("pdf-creator-node");
+const html_to_pdf = require("html-pdf-node");
+const fs = require("fs");
 
 module.exports = {
   async create(userId, bookId, title, text, reference) {
@@ -258,6 +263,73 @@ module.exports = {
         status: ErrorStatus,
         code: DatabaseFailure,
         message: "Não foi possível atualizar um ou mais dados do banco de dados.",
+      });
+    }
+  },
+
+  async export(userId, annotationId) {
+    const annotation = await prisma.annotation.findUnique({
+      where: {
+        id: annotationId,
+      },
+    });
+
+    if (!annotation) {
+      return notFound({
+        status: ErrorStatus,
+        code: NotFound,
+        message: "A anotação informada não foi encontrada.",
+      });
+    }
+
+    if (annotation.userId !== userId) {
+      return forbidden({
+        status: ErrorStatus,
+        code: Forbidden,
+        message: "O usuário informado não possui o privilégio para executar essa ação.",
+      });
+    }
+
+    let options = { format: "A4" };
+
+    const randomCode = crypto.randomBytes(16).toString("hex");
+
+    let baseHtml = fs.readFileSync("src/html/html_model.html").toString();
+
+    baseHtml = baseHtml.replace("#CONTENT", annotation.text);
+
+    const html = {
+      content: baseHtml,
+    };
+
+    try {
+      const filename = await html_to_pdf
+        .generatePdf(html, options)
+        .then((output) => {
+          const filename = `./pdf/${randomCode}.pdf`;
+
+          console.log("Tentando salvar arquivo");
+          fs.writeFileSync(filename, output);
+
+          console.log("Filename:", filename);
+
+          return filename;
+        })
+        .catch((error) => {
+          console.log("Erro antes:", error.message);
+        });
+
+      return ok({
+        status: OkStatus,
+        response: {
+          filename,
+        },
+      });
+    } catch (error) {
+      console.log("Falha durante a criação do arquivo de exportação de anotação.");
+      return failure({
+        status: ErrorStatus,
+        message: "Falha durante a criação do arquivo de exportação de anotação.",
       });
     }
   },

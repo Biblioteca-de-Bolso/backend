@@ -1,0 +1,44 @@
+const options = {
+      format: "A4",
+      orientation: "portrait",
+      border: "10mm",
+      header: {
+        height: "45mm",
+        contents: '<div style="text-align: center;">Author: Shyam Hajare</div>',
+      },
+      footer: {
+        height: "28mm",
+        contents: {
+          first: "Cover page",
+          2: "Second page", // Any page number is working. 1-based index
+          default: '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>', // fallback value
+          last: "Last Page",
+        },
+      },
+    };
+
+    const randomCode = crypto.randomBytes(16).toString("hex");
+
+    var document = {
+      html: annotation.text,
+      data: {},
+      path: `./pdfs/${randomCode}.pdf`,
+      type: "",
+    };
+
+    try {
+      const filename = await pdf.create(document, options);
+
+      return ok({
+        status: OkStatus,
+        response: {
+          ...filename,
+        },
+      });
+    } catch (error) {
+      console.log("Falha durante a criação do arquivo de exportação de anotação.");
+      return failure({
+        status: ErrorStatus,
+        message: "Falha durante a criação do arquivo de exportação de anotação.",
+      });
+    }

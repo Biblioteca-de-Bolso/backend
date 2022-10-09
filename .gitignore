@@ -129,9 +129,8 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# Custom - Postgres persistent data
+# Custom
 postgres-data
-
-# Custom - Multer Uploads
 uploads
 test
+*.pdf
