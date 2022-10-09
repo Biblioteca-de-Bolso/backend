@@ -31,7 +31,7 @@ module.exports = {
     let html = (await fs.readFile("src/html/recover.html")).toString();
 
     // Links
-    const recoverLink = `https://bibliotecadebolso.com.br/recover?email=${email}&recoverCode=${recoverCode}`;
+    const recoverLink = `https://bibliotecadebolso.com/recover?email=${email}&recoverCode=${recoverCode}`;
 
     // Realiza substituições
     html = html.replace("#USER_NAME", name.split(" ")[0]);
