@@ -62,7 +62,9 @@ module.exports = {
     }
 
     // Não enviar email de cadastro em ambiente de teste
-    if (process.env.NODE_ENV === "production") {
+    const sendEmailLocally = true;
+
+    if (process.env.NODE_ENV === "production" || sendEmailLocally) {
       try {
         const { emailHtml, emailText } = await sendgrid.composeEmail(
           user["id"],
@@ -144,6 +146,11 @@ module.exports = {
         },
       }),
       prisma.refreshToken.deleteMany({
+        where: {
+          userId,
+        },
+      }),
+      prisma.recover.deleteMany({
         where: {
           userId,
         },
