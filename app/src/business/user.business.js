@@ -62,16 +62,23 @@ module.exports = {
     }
 
     // Não enviar email de cadastro em ambiente de teste
-    if (process.env.NODE_ENV === "production") {
+    const sendEmailLocally = false;
+
+    if (process.env.NODE_ENV === "production" || sendEmailLocally) {
       try {
-        const { emailHtml, emailText } = await sendgrid.composeEmail(
-          user["id"],
-          user["name"],
-          user["email"],
-          user["activationCode"]
+        const { emailHtml, emailText } = await sendgrid.composeInviteEmail(
+          user.id,
+          user.name,
+          user.email,
+          user.activationCode
         );
 
-        await sendgrid.sendEmail(user["email"], emailText, emailHtml);
+        await sendgrid.sendEmail(
+          user.email,
+          emailText,
+          emailHtml,
+          "Bem vindo(a) à Biblioteca de Bolso!"
+        );
       } catch (error) {
         console.log(fileName(), `Erro durante envio de email: ${error.message}`);
       }
@@ -144,6 +151,11 @@ module.exports = {
         },
       }),
       prisma.refreshToken.deleteMany({
+        where: {
+          userId,
+        },
+      }),
+      prisma.recover.deleteMany({
         where: {
           userId,
         },

@@ -35,6 +35,8 @@ services:
       POSTGRES_PASSWORD: 123456789
       POSTGRES_USER: bibliotecadebolso_test
       POSTGRES_DATABASE: bibliotecadebolso_test
+volumes:
+  node_modules: {}
 networks: 
   bibliotecadebolso-network:
     driver: bridge

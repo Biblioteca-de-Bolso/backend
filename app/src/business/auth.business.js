@@ -2,6 +2,8 @@ const dayjs = require("dayjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const validator = require("validator");
+const { fileName } = require("../modules/debug");
+const sendgrid = require("../services/sendgrid");
 
 const prisma = require("../prisma");
 
@@ -345,6 +347,28 @@ module.exports = {
     });
 
     if (recover) {
+      // Enviar email de recuperação de senha
+      if (process.env.NODE_ENV !== "test") {
+        try {
+          const { emailHtml, emailText } = await sendgrid.composeRecoverEmail(
+            user.name,
+            user.email,
+            recoverCode
+          );
+
+          await sendgrid.sendEmail(
+            user.email,
+            emailText,
+            emailHtml,
+            "Alteração/Recuperação de Senha"
+          );
+
+          console.log("Email Enviado?");
+        } catch (error) {
+          console.log(fileName(), `Erro durante envio de email: ${error.message}`);
+        }
+      }
+
       return ok({
         status: OkStatus,
         response: {
