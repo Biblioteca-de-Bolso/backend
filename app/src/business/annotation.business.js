@@ -272,6 +272,13 @@ module.exports = {
       where: {
         id: annotationId,
       },
+      include: {
+        book: {
+          select: {
+            title: true,
+          },
+        },
+      },
     });
 
     if (!annotation) {
@@ -294,9 +301,12 @@ module.exports = {
 
     const randomCode = crypto.randomBytes(16).toString("hex");
 
-    let baseHtml = fs.readFileSync("src/html/html_model.html").toString();
+    let baseHtml = fs.readFileSync("src/html/annotation.html").toString();
 
     baseHtml = baseHtml.replace("#CONTENT", annotation.text);
+    baseHtml = baseHtml.replace("#BOOK_TITLE", annotation.book.title);
+    baseHtml = baseHtml.replace("#ANNOTATION_TITLE", annotation.title);
+    baseHtml = baseHtml.replace("#REFERENCE", annotation.reference || "");
 
     const html = {
       content: baseHtml,

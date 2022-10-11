@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Biblioteca de Bolso</title>
+  </head>
+  <style>
+    html {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    * {
+      line-height: 200%;
+    }
+
+    body {
+      padding: 50px;
+    }
+
+    .header {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    #book-title {
+      margin: 0;
+      padding: 0;
+    }
+
+    #annotation-title {
+      margin: 0;
+      padding: 0;
+    }
+
+    #annotation-reference {
+      margin: 0;
+      padding: 0;
+    }
+
+    .separator {
+      width: 100%;
+      height: 1px;
+      background-color: lightgray;
+      margin: 10px 0px;
+    }
+
+    .topo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+  <body>
+    <!-- <div class="separator"></div>
+    <div class="topo">
+      <strong>Biblioteca de Bolso</strong>
+      <img
+        src="https://github.com/Biblioteca-de-Bolso/backend/raw/main/docs/library_icon.png"
+        alt=""
+        width="50px"
+        height="50px"
+      />
+    </div> -->
+    <div class="separator"></div>
+
+    <div class="header">
+      <p id="book-title">#BOOK_TITLE</p>
+      <h3 id="annotation-title">#ANNOTATION_TITLE</h3>
+      <p id="annotation-reference"><em>#REFERENCE</em></p>
+    </div>
+    <div class="separator"></div>
+    <div class="annotation-body">#CONTENT</div>
+  </body>
+</html>
