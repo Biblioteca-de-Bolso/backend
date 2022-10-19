@@ -47,7 +47,7 @@ describe("Pesquisa de Livros Cadastrados", () => {
     assertCode(response, IncorrectParameter);
   });
 
-  test("Deve realizar uma busca que retorna apenas um resultado", async () => {
+  test("Deve realizar uma busca textual que retorna apenas um resultado", async () => {
     const response = await request(app)
       .get(`/api/book`)
       .set({ authorization: `Bearer ${accessToken}` })
@@ -62,7 +62,7 @@ describe("Pesquisa de Livros Cadastrados", () => {
     expect(response.body.response.books.length).toBe(1);
   });
 
-  test("Deve realizar uma busca que retorna dois resultados", async () => {
+  test("Deve realizar uma busca textual que retorna dois resultados", async () => {
     const response = await request(app)
       .get(`/api/book`)
       .set({ authorization: `Bearer ${accessToken}` })
@@ -77,12 +77,85 @@ describe("Pesquisa de Livros Cadastrados", () => {
     expect(response.body.response.books.length).toBe(2);
   });
 
-  test("Deve realizar uma busca que não retorna nenhum resultado", async () => {
+  test("Deve realizar uma busca textual que não retorna nenhum resultado", async () => {
     const response = await request(app)
       .get(`/api/book`)
       .set({ authorization: `Bearer ${accessToken}` })
       .query({
         search: "Blá Blá Blá",
+      });
+
+    assertStatusCode(response, 200);
+    assertStatus(response, OkStatus);
+    assertResponse(response, "books");
+
+    expect(response.body.response.books.length).toBe(0);
+  });
+
+  test("Não deve realizar uma pesquisa por livros sem informar um status de leitura vazio", async () => {
+    const response = await request(app)
+      .get(`/api/book`)
+      .set({ authorization: `Bearer ${accessToken}` })
+      .query({
+        readStatus: "",
+      });
+
+    assertStatusCode(response, 400);
+    assertStatus(response, ErrorStatus);
+    assertCode(response, IncorrectParameter);
+  });
+
+  test("Não deve realizar uma pesquisa por livros sem informar um status de leitura válido", async () => {
+    const response = await request(app)
+      .get(`/api/book`)
+      .set({ authorization: `Bearer ${accessToken}` })
+      .query({
+        readStatus: "Blá Blá Blá",
+      });
+
+    assertStatusCode(response, 400);
+    assertStatus(response, ErrorStatus);
+    assertCode(response, IncorrectParameter);
+  });
+
+  test("Deve realizar uma busca por status que retorna apenas um resultado", async () => {
+    const response = await request(app)
+      .get(`/api/book`)
+      .set({ authorization: `Bearer ${accessToken}` })
+      .query({
+        readStatus: "READING",
+      });
+
+    assertStatusCode(response, 200);
+    assertStatus(response, OkStatus);
+    assertResponse(response, "books");
+
+    expect(response.body.response.books.length).toBe(1);
+  });
+
+  test("Deve realizar uma busca por status que retorne dois resultados", async () => {
+    const response = await request(app)
+      .get(`/api/book`)
+      .set({ authorization: `Bearer ${accessToken}` })
+      .query({
+        readStatus: "CONCLUDED",
+      });
+
+    assertStatusCode(response, 200);
+    assertStatus(response, OkStatus);
+    assertResponse(response, "books");
+
+    console.log(response.body.response.books);
+    console.log("Tamanho:", response.body.response.books.length);
+    expect(response.body.response.books.length).toBe(2);
+  });
+
+  test("Deve realizar uma busca por status que não retorne nenhum resultado", async () => {
+    const response = await request(app)
+      .get(`/api/book`)
+      .set({ authorization: `Bearer ${accessToken}` })
+      .query({
+        readStatus: "DROPPED",
       });
 
     assertStatusCode(response, 200);

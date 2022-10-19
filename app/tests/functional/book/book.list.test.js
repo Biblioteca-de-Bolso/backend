@@ -22,7 +22,7 @@ describe("Listagem de Livros Cadastrados", () => {
   const userPassword = "charlesbabbage";
 
   // Esse usuário possui seed que realiza o cadastro de 2 livros
-  const userBooks = [9, 10];
+  const userBooks = [9, 10, 11];
 
   test("Não deve listar os livros sem informar um Access Token", async () => {
     const response = await request(app).get(`/api/book`).send();
