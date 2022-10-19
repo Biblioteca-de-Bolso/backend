@@ -162,7 +162,7 @@ module.exports = async () => {
               isbn10: "658843121X",
               isbn13: "9786588431214",
               publisher: "Editora do Máquinas Digitais",
-              description: "Descrição do Matemática Discreta",
+              description: "Descrição do Máquinas Digitais",
             },
           ],
         },
