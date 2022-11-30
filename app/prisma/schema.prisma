@@ -122,3 +122,10 @@ enum ReadStatus {
   CONCLUDED
   DROPPED
 }
+
+model Empty {
+  id      Int    @id @unique @default(autoincrement())
+  message String
+
+  @@map("empty")
+}

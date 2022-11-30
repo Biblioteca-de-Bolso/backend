@@ -138,7 +138,7 @@ module.exports = async () => {
     },
     // User ID: 5
     // A conta do Charles Babbage é utilizada nos testes de listagem de livros
-    // Livros desse usuário: 9 e 10
+    // Livros desse usuário: 9, 10 e 11
     {
       name: "Charles Babbage",
       email: "charlesbabbage@email.com",
@@ -155,6 +155,7 @@ module.exports = async () => {
               isbn13: "9788550811482",
               publisher: "Editora do Matemática Discreta",
               description: "Descrição do Matemática Discreta",
+              readStatus: "READING",
             },
             {
               title: "Máquinas Digitais",
@@ -162,7 +163,17 @@ module.exports = async () => {
               isbn10: "658843121X",
               isbn13: "9786588431214",
               publisher: "Editora do Máquinas Digitais",
-              description: "Descrição do Matemática Discreta",
+              description: "Descrição do Máquinas Digitais",
+              readStatus: "CONCLUDED",
+            },
+            {
+              title: "Banco de Dados",
+              author: "Autor do Banco de Dados",
+              isbn10: "9892004078",
+              isbn13: "9789892004075",
+              publisher: "Editora do Banco de Dados",
+              description: "Descrição do Banco de Dados",
+              readStatus: "CONCLUDED",
             },
           ],
         },
