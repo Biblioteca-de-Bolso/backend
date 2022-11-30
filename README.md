@@ -41,6 +41,6 @@ Documentação da API disponível no Postman: [API Docs](https://documenter.getp
 
 ## Disponibilidade
 
-A API encontra-se disponível hospedada no Heroku através do link: [API Biblitoeca de Bolso](https://bibliotecadebolso.herokuapp.com).
+A API encontra-se disponível hospedada no Render através do link: [API Biblitoeca de Bolso](https://bibliotecadebolso.onrender.com).
 
 Hospedagens gratuitas no Heroku entram em modo de sleeping após 30 minutos sem nenhum trafégo. Esteja ciente de que a primeira requisição pode levar alguns segundos a mais. Após acordar, o servidor responde as chamadas subsequentes normalmente.
