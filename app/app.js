@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv").config({ path: "../.env" });
 const customErrorHandler = require("./src/middlewares/error");
 const { OkStatus, NotFound } = require("./src/modules/codes");
+const prisma = require("./src/prisma");
 
 const app = express();
 
@@ -23,6 +24,17 @@ app.get(["/", "/api"], async (req, res) => {
       message: "Biblioteca de Bolso - API",
       homepage: "https://github.com/Biblioteca-de-Bolso/backend",
       documentation: "https://documenter.getpostman.com/view/19545370/UVkmQGwd",
+    },
+  });
+});
+
+app.get("/empty", async (req, res) => {
+  const empty = await prisma.empty.findMany();
+
+  return res.status(200).json({
+    status: OkStatus,
+    response: {
+      ...empty,
     },
   });
 });
