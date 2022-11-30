@@ -32,7 +32,7 @@ Recursos planejados:
 - Banco de Dados: [PostgreSQL](https://www.postgresql.org/)
 - Interface com o banco de dados: [Prisma](https://www.prisma.io/)
 - Testes: Suíte de testes escrita com o [Jest](https://jestjs.io/pt-BR/)
-- CI/CD: Integração com deploy automático no Heroku e [Github Actions](https://github.com/Biblioteca-de-Bolso/backend/actions)
+- CI/CD: Integração com deploy automático no Render e [Github Actions](https://github.com/Biblioteca-de-Bolso/backend/actions)
 - Ambiente de desenvolvimento: [Docker](https://www.docker.com/)
 
 ## Documentação
